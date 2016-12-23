@@ -1,0 +1,8 @@
+{
+	"parent": "solarfluxreborn:block/solar",
+	"textures": {
+		"side": "solarfluxreborn:blocks/solar0_side",
+		"up": "solarfluxreborn:blocks/solar0_2",
+		"raw": "solarfluxreborn:blocks/solar0_1"
+	}
+}
