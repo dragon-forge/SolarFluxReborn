@@ -8,6 +8,7 @@ import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.creativetab.ModCreativeTab;
 import com.mrdimka.solarfluxreborn.reference.NBTConstants;
 import com.mrdimka.solarfluxreborn.reference.Reference;
+import com.mrdimka.solarfluxreborn.te.DraconicSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.utility.Lang;
 import com.mrdimka.solarfluxreborn.utility.Utils;
@@ -32,15 +33,19 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
-public class SolarPanelBlock extends BlockContainer
+public class DraconicSolarPanelBlock extends BlockContainer
 {
-    private final int mTierIndex;
-    
-    public SolarPanelBlock(String pName, int pTierIndex)
+	public final int cap, transfer, maxGen;
+    protected String name;
+	
+    public DraconicSolarPanelBlock(String pName, int cap, int transfer, int maxGen)
     {
     	super(Material.IRON);
     	setUnlocalizedName(Reference.MOD_ID + ":" + pName);
-        mTierIndex = pTierIndex;
+    	name = pName;
+    	this.cap = cap;
+    	this.transfer = transfer;
+    	this.maxGen = maxGen;
         setCreativeTab(ModCreativeTab.MOD_TAB);
         setHardness(3.0F);
         setHarvestLevel("pickaxe", 0);
@@ -95,7 +100,7 @@ public class SolarPanelBlock extends BlockContainer
     @Override
     public TileEntity createNewTileEntity(World pWorld, int pMetadata)
     {
-        return new SolarPanelTileEntity(mTierIndex);
+        return new DraconicSolarPanelTileEntity(name, cap, transfer, maxGen);
     }
     
     @Override
@@ -219,10 +224,5 @@ public class SolarPanelBlock extends BlockContainer
         
         pWorld.setBlockToAir(pos);
         pWorld.spawnEntityInWorld(new EntityItem(pWorld, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, itemStack));
-    }
-    
-    public int getTierIndex()
-    {
-        return mTierIndex;
     }
 }

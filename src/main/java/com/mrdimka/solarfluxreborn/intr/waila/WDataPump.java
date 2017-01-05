@@ -48,7 +48,7 @@ public class WDataPump implements IWailaDataProvider
 		if(te instanceof TileCustomCable)
 		{
 			TileCustomCable t = (TileCustomCable) te;
-			if(t.tier != 3) currenttip.add(Lang.localise("energy.transfer") + ": " + t.capacityAdded);
+			currenttip.add(Lang.localise("energy.transfer") + ": " + t.capacityAdded);
 		}
 		
 		return currenttip;

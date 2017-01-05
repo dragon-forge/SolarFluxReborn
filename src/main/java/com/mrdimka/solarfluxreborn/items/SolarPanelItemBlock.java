@@ -7,6 +7,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
+import com.mrdimka.solarfluxreborn.blocks.DraconicSolarPanelBlock;
 import com.mrdimka.solarfluxreborn.blocks.SolarPanelBlock;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.reference.NBTConstants;
@@ -21,12 +22,25 @@ public class SolarPanelItemBlock extends ItemBlock {
     @Override
     public void addInformation(ItemStack pItemStack, EntityPlayer pPlayer, List pList, boolean pBoolean) {
         super.addInformation(pItemStack, pPlayer, pList, pBoolean);
-        SolarPanelBlock solar = (SolarPanelBlock) getBlock();
+        
         addChargeTooltip(pList, pItemStack);
         addUpgradeCount(pList, pItemStack);
-        addCapacityTooltip(pList, pItemStack, solar);
-        addGenerationTooltip(pList, pItemStack, solar);
-        addTransferTooltip(pList, pItemStack, solar);
+        
+        if(getBlock() instanceof SolarPanelBlock)
+        {
+        	SolarPanelBlock solar = (SolarPanelBlock) getBlock();
+        	addCapacityTooltip(pList, pItemStack, solar);
+            addGenerationTooltip(pList, pItemStack, solar);
+            addTransferTooltip(pList, pItemStack, solar);
+        }else
+        
+        if(getBlock() instanceof DraconicSolarPanelBlock)
+        {
+        	DraconicSolarPanelBlock solar = (DraconicSolarPanelBlock) getBlock();
+        	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.capacity"), Color.GREY, solar.cap));
+        	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.generation"), Color.GREY, solar.maxGen));
+        	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.transfer"), Color.GREY, solar.transfer));
+        }
     }
 
     private void addChargeTooltip(List pList, ItemStack pItemStack) {

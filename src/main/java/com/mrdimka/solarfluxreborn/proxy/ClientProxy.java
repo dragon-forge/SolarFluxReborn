@@ -7,12 +7,19 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
 
 import com.mrdimka.solarfluxreborn.client.render.tile.RenderCustomCable;
 import com.mrdimka.solarfluxreborn.client.render.tile.RenderSolarPanelTile;
+import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModBlocks;
 import com.mrdimka.solarfluxreborn.init.ModItems;
+import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 
@@ -21,6 +28,8 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void init()
 	{
+		MinecraftForge.EVENT_BUS.register(this);
+		
 		List<Item> items = new ArrayList<Item>();
 		
 		items.add(ModItems.mirror);
@@ -38,6 +47,7 @@ public class ClientProxy extends CommonProxy
 		
 		items.add(Item.getItemFromBlock(ModBlocks.cable1));
 		items.add(Item.getItemFromBlock(ModBlocks.cable2));
+		items.add(Item.getItemFromBlock(ModBlocks.cable3));
 		
 		for(int i = 0; i < ModBlocks.getSolarPanels().size(); ++i)
 		{
@@ -53,5 +63,15 @@ public class ClientProxy extends CommonProxy
 		
 		ClientRegistry.bindTileEntitySpecialRenderer(SolarPanelTileEntity.class, new RenderSolarPanelTile());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileCustomCable.class, new RenderCustomCable());
+	}
+	
+	@SubscribeEvent
+	public void pte(RenderGameOverlayEvent e)
+	{
+		if(ModConfiguration.willNotify)
+		{
+			Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString("[" + Reference.MOD_NAME + "] WARNING: Your configs have been replaced."));
+			ModConfiguration.updateNotification(false);
+		}
 	}
 }

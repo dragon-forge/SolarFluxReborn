@@ -2,18 +2,16 @@ package com.mrdimka.solarfluxreborn.client.render.tile;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mrdimka.hammercore.client.RenderBlocks;
-import com.mrdimka.solarfluxreborn.reference.Reference;
+import com.mrdimka.hammercore.client.utils.RenderBlocks;
+import com.mrdimka.solarfluxreborn.te.DraconicSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 
 public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTileEntity>
@@ -21,6 +19,8 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 	@Override
 	public void renderTileEntityAt(SolarPanelTileEntity te, double x, double y, double z, float var8, int var9)
 	{
+		if(te instanceof DraconicSolarPanelTileEntity) return;
+		
 		int i = te.getWorld().getCombinedLight(te.getPos(), 0);
 		
 		GL11.glPushMatrix();
@@ -34,7 +34,7 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		
 		Tessellator t = Tessellator.getInstance();
 		
-		TextureAtlasSprite sprite2 = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Reference.MOD_ID.toLowerCase() + ":blocks/solar" + te.getTier() + "_1");
+		TextureAtlasSprite sprite2 = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(te.getTopResource().toString());
 				
 		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		

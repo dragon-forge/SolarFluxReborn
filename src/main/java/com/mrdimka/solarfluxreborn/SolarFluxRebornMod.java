@@ -2,17 +2,7 @@ package com.mrdimka.solarfluxreborn;
 
 import java.io.File;
 
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-
+import com.mrdimka.solarfluxreborn.config.DraconicEvolutionConfigs;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.err.NoSolarsRegisteredException;
 import com.mrdimka.solarfluxreborn.gui.GuiHandler;
@@ -22,9 +12,23 @@ import com.mrdimka.solarfluxreborn.init.RecipeIO;
 import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.proxy.CommonProxy;
 import com.mrdimka.solarfluxreborn.reference.Reference;
+import com.mrdimka.solarfluxreborn.te.DraconicSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 import com.mrdimka.solarfluxreborn.utility.SFRLog;
+
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "required-after:hammercore")
 public class SolarFluxRebornMod
@@ -45,19 +49,15 @@ public class SolarFluxRebornMod
 		cfgFolder = new File(cfg);
 		cfgFolder.mkdirs();
 		File main_cfg = new File(cfgFolder, "main.cfg");
-		File recipes_json = new File(cfgFolder, "recipes.json");
-		ModConfiguration.initialize(main_cfg);
+		File draconicevolution = new File(cfgFolder, "DraconicEvolution.cfg");
+		File version_file = new File(cfgFolder, "version.dat");
+		ModConfiguration.initialize(main_cfg, version_file);
+		DraconicEvolutionConfigs.initialize(draconicevolution);
 		
 		GameRegistry.registerTileEntity(SolarPanelTileEntity.class, Reference.MOD_ID + ":solar");
+		GameRegistry.registerTileEntity(DraconicSolarPanelTileEntity.class, Reference.MOD_ID + ":draconicsolar");
 		GameRegistry.registerTileEntity(TileCustomCable.class, Reference.MOD_ID + ":cable_custom");
 		ModBlocks.initialize();
-		
-		if(recipes_json.exists())
-		{
-			boolean deleted = false;
-			try { recipes_json.delete(); deleted = true; } catch(Throwable err) {}
-			SFRLog.bigWarning("File \"" + recipes_json.getAbsolutePath() + "\" was" + (deleted ? "" : "n't") + " deleted." + (!deleted ? " Please try removing this file manually!" : ""));
-		}
 		
 		if(ModBlocks.getSolarPanels().isEmpty())
 		{
@@ -88,6 +88,15 @@ public class SolarFluxRebornMod
 		SFRLog.info("Loading TeslaAPI...");
 		int classesLoaded = TeslaAPI.refreshTeslaClassData();
 		SFRLog.info("TeslaAPI loaded " + classesLoaded + "/" + TeslaAPI.allClasses.size() + " required classes.");
-		RecipeIO.reload();
+	}
+	
+	@EventHandler
+	public void printMessage(FMLServerStartedEvent e)
+	{
+		if(ModConfiguration.willNotify)
+		{
+			SFRLog.bigWarning(TextFormatting.RED + "WARNING: Your configs have been replaced.");
+			ModConfiguration.updateNotification(false);
+		}
 	}
 }

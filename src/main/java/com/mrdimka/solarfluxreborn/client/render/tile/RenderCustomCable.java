@@ -4,25 +4,22 @@ import java.util.Map;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mrdimka.hammercore.client.RenderBlocks;
+import com.mrdimka.hammercore.client.utils.RenderBlocks;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 import com.mrdimka.solarfluxreborn.utility.TileMapper;
 
 import cofh.api.energy.IEnergyConnection;
-import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 
 public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable>
 {
-	
 	@Override
 	public void renderTileEntityAt(TileCustomCable te, double x, double y, double z, float pt, int tp)
 	{

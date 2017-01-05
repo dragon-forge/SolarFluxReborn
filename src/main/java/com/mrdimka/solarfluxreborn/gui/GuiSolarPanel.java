@@ -6,7 +6,7 @@ import java.util.List;
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
-import com.mrdimka.hammercore.client.RenderUtil;
+import com.mrdimka.hammercore.client.utils.RenderUtil;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.utility.Lang;

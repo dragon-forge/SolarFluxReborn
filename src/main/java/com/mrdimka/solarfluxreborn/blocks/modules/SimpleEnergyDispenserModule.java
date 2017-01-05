@@ -16,6 +16,7 @@ import com.mrdimka.solarfluxreborn.blocks.StatefulEnergyStorage;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
 import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
+import com.mrdimka.solarfluxreborn.te.DraconicSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 
 /**
@@ -102,19 +103,28 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
     	}
     }
 
-    protected void sendEnergyToFurnace(TileEntityFurnace pFurnace) {
+    protected void sendEnergyToFurnace(TileEntityFurnace pFurnace)
+    {
         final int FURNACE_COOKING_TICKS = 200;
         final int FURNACE_COOKING_ENERGY = FURNACE_COOKING_TICKS * ModConfiguration.getFurnaceUpgradeHeatingConsumption();
-
-        if (mFurnaceEnergyBuffer < FURNACE_COOKING_ENERGY) {
+        
+        if(mFurnaceEnergyBuffer < FURNACE_COOKING_ENERGY)
             mFurnaceEnergyBuffer += getTileEntity().getEnergyStorage().extractEnergy(FURNACE_COOKING_ENERGY - mFurnaceEnergyBuffer, false);
-        }
-
+        
+//        SolarPanelTileEntity solar = getTileEntity();
+//        if(solar.getTier() > 0 && !(solar instanceof DraconicSolarPanelTileEntity))
+//        {
+//        	pFurnace.setField(2, pFurnace.getField(2) + 8);
+//        }
+        
         // Is there anything to smell?
-        if (pFurnace.getStackInSlot(0) != null && pFurnace.getField(0) < FURNACE_COOKING_TICKS) {
+        if(pFurnace.getStackInSlot(0) != null && pFurnace.getField(0) < FURNACE_COOKING_TICKS)
+        {
             int burnTicksAvailable = mFurnaceEnergyBuffer / ModConfiguration.getFurnaceUpgradeHeatingConsumption();
-            if (burnTicksAvailable >= FURNACE_COOKING_TICKS) {
-                if (pFurnace.getField(0) == 0) {
+            if(burnTicksAvailable >= FURNACE_COOKING_TICKS)
+            {
+                if(pFurnace.getField(0) == 0)
+                {
                     // Add 1 as first tick is not counted in the burning process.
                     pFurnace.setField(0, pFurnace.getField(0) + 1);
                     BlockFurnace.setState(pFurnace.getField(0) > 0, pFurnace.getWorld(), pFurnace.getPos());
