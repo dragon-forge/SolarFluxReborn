@@ -1,15 +1,14 @@
 package com.mrdimka.common.utils;
 
-import java.util.List;
+import com.mrdimka.hammercore.net.HCNetwork;
+import com.mrdimka.solarfluxreborn.net.PacketSyncTileEntity;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -54,8 +53,7 @@ public abstract class CommonTileEntity_SFR extends TileEntity implements ITickab
 	public void sync()
 	{
 		if(worldObj.isRemote) return;
-		List<EntityPlayerMP> players = worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(pos.getX() - 256, Integer.MIN_VALUE, pos.getZ() - 256, pos.getX() + 257, Integer.MAX_VALUE, pos.getZ() + 257));
-		for(EntityPlayerMP player : players) player.connection.sendPacket(getUpdatePacket());
+		HCNetwork.manager.sendToAllAround(new PacketSyncTileEntity(this), getEffectiveUpdateTargetPoint());
 	}
 	
 	public TargetPoint getEffectiveUpdateTargetPoint()

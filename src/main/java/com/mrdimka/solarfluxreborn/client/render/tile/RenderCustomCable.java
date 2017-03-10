@@ -1,15 +1,10 @@
 package com.mrdimka.solarfluxreborn.client.render.tile;
 
+import java.lang.reflect.Field;
 import java.util.Map;
 
-import org.lwjgl.opengl.GL11;
-
-import com.mrdimka.hammercore.client.utils.RenderBlocks;
-import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
-import com.mrdimka.solarfluxreborn.utility.TileMapper;
-
-import cofh.api.energy.IEnergyConnection;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.PlayerControllerMP;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
@@ -17,14 +12,44 @@ import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.RayTraceResult.Type;
+
+import org.lwjgl.opengl.GL11;
+
+import cofh.api.energy.IEnergyConnection;
+
+import com.mrdimka.hammercore.client.utils.RenderBlocks;
+import com.mrdimka.solarfluxreborn.client.DestroyStage;
+import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
+import com.mrdimka.solarfluxreborn.utility.TileMapper;
 
 public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable>
 {
 	@Override
 	public void renderTileEntityAt(TileCustomCable te, double x, double y, double z, float pt, int tp)
 	{
+		ResourceLocation destroy = null;
+		RayTraceResult over = Minecraft.getMinecraft().objectMouseOver;
+		if(over != null && over.typeOfHit == Type.BLOCK && over.getBlockPos().equals(te.getPos()))
+		{
+			try
+			{
+				Field f = PlayerControllerMP.class.getDeclaredFields()[4];
+				f.setAccessible(true);
+				float progress = f.getFloat(Minecraft.getMinecraft().playerController);
+				if(progress > 0F) destroy = DestroyStage.getByProgress(progress);
+			}catch(Throwable err) {}
+		}
+		
 		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		renderWire(te, x, y, z, Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(te.getResourceConnection()));
+		if(destroy != null)
+		{
+			bindTexture(destroy);
+			renderWire(te, x, y, z, Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(te.getResourceConnection()));
+		}
 	}
 	
 	public static void renderWire(TileCustomCable te, double x, double y, double z, TextureAtlasSprite texture)
@@ -99,10 +124,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			GL11.glPopMatrix();
 		}
 		
+		t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
+		
 		if(!renderCore) if(dir == EnumFacing.UP || dir == EnumFacing.DOWN)
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 2D / 16D, 5D / 16D, 1D, 6D / 16D, 10D / 16D);
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 20F / 16F, 0D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -113,14 +138,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceZPos(1D / 16D, 20F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceZPos(1D / 16D, 20F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(!renderCore) if(dir == EnumFacing.EAST || dir == EnumFacing.WEST)
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(10D / 16D, 0, 0, 1, 6D / 16D, 1);
 			
 			renderBlocks.renderFaceZPos(-4D / 16D, 20F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -130,14 +151,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceYPos(-4D / 16D, 20F / 16F, -4D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceYPos(-4D / 16D, 16F / 16F, -4D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(!renderCore) if(dir == EnumFacing.SOUTH || dir == EnumFacing.NORTH)
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 0, 10D / 16D, 1, 6D / 16D, 1);
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 20F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -147,8 +164,6 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceYPos(1D / 16D, 20F / 16F, -4D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceYPos(1D / 16D, 16F / 16F, -4D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		
@@ -156,8 +171,6 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 		
 		if(conns.get(EnumFacing.UP) != null && conns.get(EnumFacing.UP).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 0, 0, 1, 12D / 16D, 4D / 16D);
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 10F / 16F, 6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -168,14 +181,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceZPos(6D / 16D, 10F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceZPos(6D / 16D, 10F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(conns.get(EnumFacing.DOWN) != null && conns.get(EnumFacing.DOWN).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 0, 0, 1D, 12D / 16D, 4D / 16D);
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 20F / 16F, 6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -186,14 +195,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceZPos(6D / 16D, 20F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceZPos(6D / 16D, 20F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(conns.get(EnumFacing.EAST) != null && conns.get(EnumFacing.EAST).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(4D / 16D, 12D / 16D, 0, 10D / 16D, 1D, 4D / 16D);
 			
 			renderBlocks.renderFaceYPos(6D / 16D, 6F / 16F, 6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -204,14 +209,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceZPos(6D / 16D, 10F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceZPos(6D / 16D, 10F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(conns.get(EnumFacing.WEST) != null && conns.get(EnumFacing.WEST).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(4D / 16D, 12D / 16D, 0, 10D / 16D, 1D, 4D / 16D);
 			
 			renderBlocks.renderFaceYPos(-4D / 16D, 6F / 16F, 6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -222,14 +223,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceZPos(-4D / 16D, 10F / 16F, -6D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceZPos(-4D / 16D, 10F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(conns.get(EnumFacing.SOUTH) != null && conns.get(EnumFacing.SOUTH).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 0, 4D / 16D, 4D / 16D, 1, 10D / 16D);
 			
 			renderBlocks.renderFaceYPos(6D / 16D, 6F / 16F, -4D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -240,14 +237,10 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 10F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceXPos(-10D / 16D, 10F / 16F, -10D / 16D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
 		
 		if(conns.get(EnumFacing.NORTH) != null && conns.get(EnumFacing.NORTH).booleanValue())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
-			
 			renderBlocks.setRenderBounds(0, 0, 4D / 16D, 4D / 16D, 1, 10D / 16D);
 			
 			renderBlocks.renderFaceYPos(6D / 16D, 6F / 16F, 6D / 16D, sprite2, 1F, 1F, 1F, i);
@@ -258,9 +251,9 @@ public class RenderCustomCable extends TileEntitySpecialRenderer<TileCustomCable
 			
 			renderBlocks.renderFaceXPos(-6D / 16D, 10F / 16F, 0D, sprite2, 1F, 1F, 1F, i);
 			renderBlocks.renderFaceXPos(-10D / 16D, 10F / 16F, 0D, sprite2, 1F, 1F, 1F, i);
-			
-			t.draw();
 		}
+		
+		t.draw();
 		
 		GL11.glEnable(2884);
 		GL11.glEnable(GL11.GL_LIGHTING);

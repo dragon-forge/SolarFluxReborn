@@ -1,20 +1,28 @@
 package com.mrdimka.solarfluxreborn.gui;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 import com.mrdimka.hammercore.client.utils.RenderUtil;
+import com.mrdimka.hammercore.common.InterItemStack;
+import com.mrdimka.hammercore.common.utils.ItemStackUtil;
+import com.mrdimka.hammercore.net.HCNetwork;
+import com.mrdimka.solarfluxreborn.items.UpgradeItem;
+import com.mrdimka.solarfluxreborn.net.PacketHandleUpgradeClick;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.utility.Lang;
-
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.util.ResourceLocation;
 
 public class GuiSolarPanel extends GuiContainer
 {
@@ -33,41 +41,41 @@ public class GuiSolarPanel extends GuiContainer
     // How far from the border of the GUI we start to draw.
     private static final int BORDER_OFFSET = 8;
 
-    private final SolarPanelTileEntity mSolarPanelTileEntity;
-    private final InventoryPlayer mInventoryPlayer;
+    private final SolarPanelTileEntity solar;
+    private final InventoryPlayer pinv;
 
-    private List<String> mMouseHover = Lists.newArrayList();
+    private List<String> tooltip = Lists.newArrayList();
     
-    public GuiSolarPanel(InventoryPlayer pInventoryPlayer, SolarPanelTileEntity pSolarPanelTileEntity) {
-        super(new ContainerSolarPanel(pInventoryPlayer, pSolarPanelTileEntity));
-        mSolarPanelTileEntity = pSolarPanelTileEntity;
-        mInventoryPlayer = pInventoryPlayer;
+    public GuiSolarPanel(InventoryPlayer pinv, SolarPanelTileEntity solar) {
+        super(new ContainerSolarPanel(pinv, solar));
+        this.solar = solar;
+        this.pinv = pinv;
         xSize = 176;
         ySize = 180;
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(int pMouseX, int pMouseY) {
+    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY) {
         fontRendererObj.drawString(
-                mInventoryPlayer.hasCustomName() ? mInventoryPlayer.getName() : I18n.format(mInventoryPlayer.getName()),
+                pinv.hasCustomName() ? pinv.getName() : I18n.format(pinv.getName()),
                 BORDER_OFFSET,
                 ySize - 96 + 2,
                 0x404040);
 
         fontRendererObj.drawString(
-                String.format("%s: %,d %s", Lang.localise("energy.stored"), mSolarPanelTileEntity.getEnergyStored(), Lang.localise("rf")),
+                String.format("%s: %,d %s", Lang.localise("energy.stored"), solar.getEnergyStored(), Lang.localise("rf")),
                 BORDER_OFFSET,
                 BORDER_OFFSET,
                 0x404040);
 
         fontRendererObj.drawString(
-                String.format("%s: %,d %s", Lang.localise("energy.capacity"), mSolarPanelTileEntity.getMaxEnergyStored(), Lang.localise("rf")),
+                String.format("%s: %,d %s", Lang.localise("energy.capacity"), solar.getMaxEnergyStored(), Lang.localise("rf")),
                 BORDER_OFFSET,
                 BORDER_OFFSET + 10,
                 0x404040);
 
         fontRendererObj.drawString(
-                String.format("%s: %,d %s", Lang.localise("energy.generation"), mSolarPanelTileEntity.getCurrentEnergyGeneration(), Lang.localise("rfPerTick")),
+                String.format("%s: %,d %s", Lang.localise("energy.generation"), solar.getCurrentEnergyGeneration(), Lang.localise("rfPerTick")),
                 BORDER_OFFSET,
                 BORDER_OFFSET + 20,
                 0x404040);
@@ -76,11 +84,35 @@ public class GuiSolarPanel extends GuiContainer
                 String.format(
                         "%s: %,d%%",
                         Lang.localise("energy.efficiency"),
-                        Math.round(100D * mSolarPanelTileEntity.getCurrentEnergyGeneration() / mSolarPanelTileEntity.getMaximumEnergyGeneration())),
+                        Math.round(100D * solar.getCurrentEnergyGeneration() / solar.getMaximumEnergyGeneration())),
                 BORDER_OFFSET,
                 BORDER_OFFSET + 30,
                 0x404040);
-        super.drawGuiContainerForegroundLayer(pMouseX, pMouseY);
+        
+        for(int i = 0; i < SolarPanelTileEntity.INVENTORY_SIZE; ++i)
+        {
+        	ItemStack stack = solar.getStackInSlot(i);
+        	boolean nul = InterItemStack.isStackNull(stack);
+        	if(!nul) mc.getRenderItem().renderItemIntoGUI(stack, 17 + i * 18, 59);
+        	
+        	GlStateManager.disableDepth();
+        	if(!nul)
+        	{
+        		String s = InterItemStack.getStackSize(stack) + "";
+        		fontRendererObj.drawString(s, 34 + i * 18 - fontRendererObj.getStringWidth(s), 68, 0xFFFFFF, true);
+        	}
+        	if(inBounds(guiLeft + 17 + i * 18, guiTop + 59, 16, 16, mouseX, mouseY))
+        	{
+        		int color = 0x88FFFFFF;
+        		drawGradientRect(17 + i * 18, 59, 17 + i * 18 + 16, 59 + 16, color, color);
+        		if(!InterItemStack.isStackNull(stack))
+        		{
+        			tooltip.clear();
+        			tooltip.addAll(stack.getTooltip(pinv.player, mc.gameSettings.advancedItemTooltips));
+        		}
+        	}
+        	GlStateManager.enableDepth();
+        }
     }
 
     @Override
@@ -118,7 +150,7 @@ public class GuiSolarPanel extends GuiContainer
                 GAUGE_INNER_WIDTH,
                 GAUGE_INNER_HEIGHT);
 
-        double height = mSolarPanelTileEntity.getScaledEnergyStoredFraction(GAUGE_INNER_HEIGHT);
+        double height = solar.getScaledEnergyStoredFraction(GAUGE_INNER_HEIGHT);
         double offset = GAUGE_INNER_HEIGHT - height;
         // Foreground color (level).
         RenderUtil.drawTexturedModalRect(
@@ -144,8 +176,8 @@ public class GuiSolarPanel extends GuiContainer
             String str = String.format(
                     "%s: %,d/%,d",
                     Lang.localise("energy.stored"),
-                    mSolarPanelTileEntity.getEnergyStored(),
-                    mSolarPanelTileEntity.getMaxEnergyStored());
+                    solar.getEnergyStored(),
+                    solar.getMaxEnergyStored());
             drawMouseOver(str);
         }
     }
@@ -154,7 +186,7 @@ public class GuiSolarPanel extends GuiContainer
     public void drawScreen(int pMouseX, int pMouseY, float pOpacity) {
         clearMouseHoverCache();
         super.drawScreen(pMouseX, pMouseY, pOpacity);
-        drawHoveringText(mMouseHover, pMouseX, pMouseY, fontRendererObj);
+        drawHoveringText(tooltip, pMouseX, pMouseY, fontRendererObj);
     }
 
     /**
@@ -163,18 +195,28 @@ public class GuiSolarPanel extends GuiContainer
     public void drawMouseOver(String pText) {
         if (pText != null) {
             clearMouseHoverCache();
-            Collections.addAll(mMouseHover, pText.split("\n"));
+            Collections.addAll(tooltip, pText.split("\n"));
         }
     }
 
     private void clearMouseHoverCache() {
-        mMouseHover.clear();
+        tooltip.clear();
     }
     
     public boolean inBounds(int pLeft, int pTop, int pWidth, int pHeight, int pMouseX, int pMouseY) {
         return (pLeft <= pMouseX) && (pMouseX < pLeft + pWidth) && (pTop <= pMouseY) && (pMouseY < pTop + pHeight);
     }
-
+    
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException
+    {
+    	for(int i = 0; i < SolarPanelTileEntity.INVENTORY_SIZE; ++i)
+        	if(inBounds(guiLeft + 17 + i * 18, guiTop + 59, 16, 16, mouseX, mouseY))
+        		HCNetwork.manager.sendToServer(new PacketHandleUpgradeClick(solar, i));
+    	
+    	super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+    
     /**
      * Heavily inspired by Vswe.
      */
@@ -189,8 +231,8 @@ public class GuiSolarPanel extends GuiContainer
                 GAUGE_INNER_WIDTH,
                 GAUGE_INNER_HEIGHT);
     	
-    	mSolarPanelTileEntity.updateCurrentEnergyGeneration(mSolarPanelTileEntity.getPos().up());
-        double height = (((double) GAUGE_INNER_HEIGHT) * ((double) mSolarPanelTileEntity.getSunIntensity()));
+    	solar.updateCurrentEnergyGeneration(solar.getPos().up());
+        double height = (((double) GAUGE_INNER_HEIGHT) * ((double) solar.getSunIntensity()));
         double offset = GAUGE_INNER_HEIGHT - height;
         // Foreground color (level).
         RenderUtil.drawTexturedModalRect(
@@ -216,7 +258,7 @@ public class GuiSolarPanel extends GuiContainer
             String str = String.format(
                     "%s: %d%%",
                     Lang.localise("sun.intensity"),
-                    (int) (100 * mSolarPanelTileEntity.getSunIntensity()));
+                    (int) (100 * solar.getSunIntensity()));
             drawMouseOver(str);
         }
     }

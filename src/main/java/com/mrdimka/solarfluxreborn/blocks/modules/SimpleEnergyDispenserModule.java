@@ -42,7 +42,7 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
 
     protected int getTargetRefreshRate() {
         //TODO Should this be a config option?
-        return 2 * 20;
+        return 20;
     }
 
     protected void searchTargets() {
@@ -111,13 +111,22 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
         if(mFurnaceEnergyBuffer < FURNACE_COOKING_ENERGY)
             mFurnaceEnergyBuffer += getTileEntity().getEnergyStorage().extractEnergy(FURNACE_COOKING_ENERGY - mFurnaceEnergyBuffer, false);
         
-//        SolarPanelTileEntity solar = getTileEntity();
-//        if(solar.getTier() > 0 && !(solar instanceof DraconicSolarPanelTileEntity))
-//        {
-//        	pFurnace.setField(2, pFurnace.getField(2) + 8);
-//        }
+        SolarPanelTileEntity solar = getTileEntity();
+        if((solar.getTier() > 0 || solar instanceof DraconicSolarPanelTileEntity) && pFurnace.isBurning())
+        {
+        	int tier = solar.getTier();
+        	
+        	if(solar instanceof DraconicSolarPanelTileEntity) tier = 100;
+        	
+        	if(pFurnace.getField(2) < 200) pFurnace.setField(2, pFurnace.getField(2) + tier);
+        	if(pFurnace.getField(2) >= 200)
+        	{
+        		pFurnace.smeltItem();
+        		pFurnace.setField(2, 0);
+        	}
+        }
         
-        // Is there anything to smell?
+        // Is there anything to smelt?
         if(pFurnace.getStackInSlot(0) != null && pFurnace.getField(0) < FURNACE_COOKING_TICKS)
         {
             int burnTicksAvailable = mFurnaceEnergyBuffer / ModConfiguration.getFurnaceUpgradeHeatingConsumption();

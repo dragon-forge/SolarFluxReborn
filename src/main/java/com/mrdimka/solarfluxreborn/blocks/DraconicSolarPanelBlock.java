@@ -32,6 +32,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.common.util.Constants.NBT;
 
 public class DraconicSolarPanelBlock extends BlockContainer
 {
@@ -123,6 +124,15 @@ public class DraconicSolarPanelBlock extends BlockContainer
             // Force update to refresh the upgrade cache before restoring the energy.
             localTileCell.markDirty();
             localTileCell.setEnergyStored(stack.getTagCompound().getInteger(NBTConstants.ENERGY));
+            
+            if(localTileCell instanceof DraconicSolarPanelTileEntity && stack.getTagCompound().hasKey("MaxGen", NBT.TAG_INT))
+            {
+            	DraconicSolarPanelTileEntity te = (DraconicSolarPanelTileEntity) localTileCell;
+            	NBTTagCompound nbt = new NBTTagCompound();
+            	te.writeCustomNBT(nbt);
+            	nbt.setInteger("MaxGen", stack.getTagCompound().getInteger("MaxGen"));
+            	te.readCustomNBT(nbt);
+            }
         }
     }
     
@@ -135,7 +145,7 @@ public class DraconicSolarPanelBlock extends BlockContainer
             {
                 if(Utils.hasUsableWrench(player, pos))
                 {
-                    dismantleBlock(w, pos);
+                	w.destroyBlock(pos, false);
                     return true;
                 }
             }else
@@ -179,8 +189,11 @@ public class DraconicSolarPanelBlock extends BlockContainer
      */
     private void dismantleBlock(World pWorld, BlockPos pos)
     {
+    	if(!(pWorld.getTileEntity(pos) instanceof SolarPanelTileEntity)) return; //Issue #38
+    	
         // TODO Consider moving this logic to the Tile Entity class. (could prevent exposing internals of the tile entity) (e.g. readFromItemStack/writeToItemStack)
         ItemStack itemStack = new ItemStack(this);
+        itemStack.setTagCompound(new NBTTagCompound());
         
         // Store the energy in the ItemStack (from the TileEntity)
         if(ModConfiguration.doesKeepEnergyWhenDismantled())
@@ -192,6 +205,12 @@ public class DraconicSolarPanelBlock extends BlockContainer
                 if(itemStack.getTagCompound() == null) itemStack.setTagCompound(new NBTTagCompound());
                 itemStack.getTagCompound().setInteger(NBTConstants.ENERGY, (int) (internalEnergy * 0.01F));
             }
+        }
+        
+        if(pWorld.getTileEntity(pos) instanceof DraconicSolarPanelTileEntity)
+        {
+        	DraconicSolarPanelTileEntity panel = (DraconicSolarPanelTileEntity) pWorld.getTileEntity(pos);
+        	itemStack.getTagCompound().setInteger("MaxGen", panel.getMaximumEnergyGeneration());
         }
         
         // Store the inventory in the ItemStack (from the TileEntity)

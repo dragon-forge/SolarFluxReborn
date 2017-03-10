@@ -130,7 +130,7 @@ public class SolarPanelBlock extends BlockContainer
             {
                 if(Utils.hasUsableWrench(player, pos))
                 {
-                    dismantleBlock(w, pos);
+                	w.destroyBlock(pos, false);
                     return true;
                 }
             }else
@@ -174,6 +174,8 @@ public class SolarPanelBlock extends BlockContainer
      */
     private void dismantleBlock(World pWorld, BlockPos pos)
     {
+    	if(!(pWorld.getTileEntity(pos) instanceof SolarPanelTileEntity)) return; //Issue #38
+    	
         // TODO Consider moving this logic to the Tile Entity class. (could prevent exposing internals of the tile entity) (e.g. readFromItemStack/writeToItemStack)
         ItemStack itemStack = new ItemStack(this);
         

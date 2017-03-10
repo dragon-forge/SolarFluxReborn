@@ -1,5 +1,8 @@
 package com.mrdimka.solarfluxreborn.gui;
 
+import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
+
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
@@ -13,5 +16,17 @@ public class SlotUpgrade extends Slot {
     public boolean isItemValid(ItemStack pItemStack) {
         // Delegate to the inventory.
         return inventory.isItemValidForSlot(getSlotIndex(), pItemStack);
+    }
+    
+    @Override
+    public int getSlotStackLimit()
+    {
+    	if(inventory instanceof SolarPanelTileEntity)
+    	{
+    		SolarPanelTileEntity te = (SolarPanelTileEntity) inventory;
+    		int a = te.additionalUpgradeAllowed(getStack());
+    		return a == 0 ? super.getSlotStackLimit() : a;
+    	}
+    	return super.getSlotStackLimit();
     }
 }

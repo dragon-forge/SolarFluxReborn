@@ -42,7 +42,6 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 		renderBlocks.setRenderBounds(1D / 16D, 0, 1D / 16D, 1D - 1D / 16D, 1D, 1D - 1D / 16D);
 		renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-		t.draw();
 		
 		boolean eastNorth_ = false, eastNorth = false;
 		boolean westSouth_ = false, westSouth = false;
@@ -51,75 +50,61 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(0, 0, 1D / 16D, 2D / 16D, 1D, 1D - 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			westSouth_ = true;
 			westNorth_ = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D - 1D / 16D, 0, 1D / 16D, 1D, 1D, 1D - 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			eastNorth_ = true;
 			southEast_ = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0, 1D - 1D / 16D, 1D - 1D / 16D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			if(eastNorth_) eastNorth = true;
 			if(westNorth_) westNorth = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0, 0D, 1D - 1D / 16D, 1D, 1D - 2D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			if(westSouth_) westSouth = true;
 			if(southEast_) southEast = true;
 		}
 		
 		if(eastNorth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH).offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH).offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(15D / 16D, 0D, 15D / 16D, 1D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(westSouth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.SOUTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.SOUTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(0, 0D, 0, 1D / 16D, 1D, 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(westNorth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.NORTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.NORTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0D, 1D / 16D, 0D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(southEast && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH).offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH).offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 15D, 0D, 0D, 1D, 1D, 1D / 15D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
+		
+		t.draw();
 		
 		GL11.glEnable(2884);
 		GL11.glEnable(GL11.GL_LIGHTING);
