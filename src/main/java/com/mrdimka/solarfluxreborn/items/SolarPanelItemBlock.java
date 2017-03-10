@@ -6,6 +6,7 @@ import net.minecraft.block.Block;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraftforge.common.util.Constants.NBT;
 
 import com.mrdimka.solarfluxreborn.blocks.DraconicSolarPanelBlock;
 import com.mrdimka.solarfluxreborn.blocks.SolarPanelBlock;
@@ -40,6 +41,7 @@ public class SolarPanelItemBlock extends ItemBlock {
         	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.capacity"), Color.GREY, solar.cap));
         	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.generation"), Color.GREY, solar.maxGen));
         	pList.add(String.format("%s%s:%s %,d", Color.AQUA, Lang.localise("energy.transfer"), Color.GREY, solar.transfer));
+        	if(pItemStack.hasTagCompound() && pItemStack.getTagCompound().hasKey("MaxGen", NBT.TAG_INT) && pItemStack.getTagCompound().getInteger("MaxGen") != solar.maxGen) pList.add(Color.AQUA + "MaxGen: " + Color.GREY + pItemStack.getTagCompound().getInteger("MaxGen"));
         }
     }
 

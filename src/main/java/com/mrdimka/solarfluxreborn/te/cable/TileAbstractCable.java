@@ -7,13 +7,14 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 
 import com.mrdimka.common.utils.CommonTileEntity_SFR;
 import com.mrdimka.solarfluxreborn.network.energy.cable.CableNetwork;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 
-public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyReceiver
+public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyReceiver, IEnergyProvider
 {
 	public CableNetwork network;
 	public double internal;
@@ -174,5 +175,13 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 	public String getResourceConnection()
 	{
 		return Reference.MOD_ID + ":blocks/wire_1";
+	}
+
+	@Override
+	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate)
+	{
+		int sent = Math.min((int) getCapacityAddedToNet(), (int) network.energy);
+		if(!simulate) network.energy -= sent;
+		return sent;
 	}
 }

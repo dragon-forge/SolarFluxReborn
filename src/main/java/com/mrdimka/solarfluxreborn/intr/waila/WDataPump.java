@@ -39,9 +39,9 @@ public class WDataPump implements IWailaDataProvider
 		if(te instanceof SolarPanelTileEntity)
 		{
 			SolarPanelTileEntity t = (SolarPanelTileEntity) te;
-			currenttip.add(Lang.localise("energy.stored") + ": " + t.getEnergyStored() + " RF");
-			currenttip.add(Lang.localise("energy.capacity") + ": " + t.getMaxEnergyStored() + " RF");
-			currenttip.add(Lang.localise("energy.generation") + ": " + t.getCurrentEnergyGeneration() + " RF");
+			currenttip.add(Lang.localise("energy.stored") + ": " + String.format("%,d", t.getEnergyStored()) + " RF");
+			currenttip.add(Lang.localise("energy.capacity") + ": " + String.format("%,d", t.getMaxEnergyStored()) + " RF");
+			currenttip.add(Lang.localise("energy.generation") + ": " + String.format("%,d", t.getCurrentEnergyGeneration()) + " RF");
 			currenttip.add(Lang.localise("energy.efficiency") + ": " + Math.round(100D * t.getCurrentEnergyGeneration() / t.getMaximumEnergyGeneration()) + "%");
 		}
 		

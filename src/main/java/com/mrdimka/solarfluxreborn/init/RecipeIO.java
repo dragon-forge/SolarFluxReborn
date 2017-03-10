@@ -47,6 +47,7 @@ public class RecipeIO
 		if(ModItems.mUpgradeFurnace != null) r.add(new ShapedOreRecipe(new ItemStack(ModItems.mUpgradeFurnace), "ccc", "cuc", "cfc", 'u', ModItems.mUpgradeBlank, 'r', "dustRedstone", 'c', Items.COAL, 'f', Blocks.FURNACE));
 		r.add(new ShapedOreRecipe(new ItemStack(ModBlocks.cable1, 6), "ggg", "rrr", "ggg", 'r', "dustRedstone", 'g', "blockGlass"));
 		r.add(new ShapedOreRecipe(new ItemStack(ModBlocks.cable2, 6), "ggg", "rrr", "ggg", 'r', "dustRedstone", 'g', "ingotIron"));
+		r.add(new ShapedOreRecipe(new ItemStack(ModBlocks.cable3, 2), "ddd", "geg", "ddd", 'd', "blockDiamond", 'g', "dustGlowstone", 'e', Items.ENDER_EYE));
 		
 		if(DraconicEvolutionConfigs.canIntegrate)
 		{

@@ -6,6 +6,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.mrdimka.common.utils.CommonTileEntity_SFR;
+import com.mrdimka.hammercore.common.InterItemStack;
 import com.mrdimka.hammercore.common.inventory.InventoryNonTile;
 import com.mrdimka.hammercore.energy.IPowerProvider;
 import com.mrdimka.solarfluxreborn.blocks.StatefulEnergyStorage;
@@ -85,11 +86,13 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	}
 
 	@Override
-	public void update() {
+	public void update()
+	{
 		updateCurrentEnergyGeneration(Utils.isServer(worldObj) ? pos.up() : pos);
-
 		if(!worldObj.isRemote)
 		{
+			if(atTickRate(20)) refreshUpgradeCache();
+			
 			mEnergyDispenserModule.tick();
 			generateEnergy();
 			if(mEnergySharingModule != null)
@@ -119,7 +122,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	}
 
 	public int getMaximumEnergyGeneration() {
-		return getTierConfiguration().getMaximumEnergyGeneration();
+		return getMaxGen();
 	}
 
 	/**
@@ -127,7 +130,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	 */
 	public void updateCurrentEnergyGeneration(BlockPos pos) {
 		computeSunIntensity(pos);
-		double energyGeneration = getMaximumEnergyGeneration() * mSunIntensity;
+		double energyGeneration = getMaxGen() * mSunIntensity;
 		energyGeneration *= (1 + ModConfiguration
 				.getEfficiencyUpgradeIncrease()
 				* Math.pow(getUpgradeCount(ModItems.mUpgradeEfficiency),
@@ -239,7 +242,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	
 	public int getMaxGen()
 	{
-		if(this instanceof DraconicSolarPanelTileEntity) return ((DraconicSolarPanelTileEntity) this).maxGen;
+		if(this instanceof DraconicSolarPanelTileEntity) return ((DraconicSolarPanelTileEntity) this).getMaximumEnergyGeneration();
 		return ModConfiguration.getTierConfiguration(mTierIndex).getMaximumEnergyGeneration();
 	}
 	
@@ -288,9 +291,18 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 		mTierIndex = pNBT.getInteger(NBTConstants.TIER_INDEX);
 		mEnergyStorage.setMaxEnergyStored(getCapacity());
 		mEnergyStorage.setMaxTransfer(getTransfer());
-		if(!pNBT.getBoolean("ClientIgnoredInv")) mInventory.readFromNBT(pNBT);
+		mInventory.readFromNBT(pNBT);
+		refreshUpgradeCache();
 		mEnergyStorage.readFromNBT(pNBT);
 		mCurrentEnergyGeneration = pNBT.getInteger("ÑurrentGen");
+		
+		if(this instanceof DraconicSolarPanelTileEntity)
+		{
+			DraconicSolarPanelTileEntity t = (DraconicSolarPanelTileEntity) this;
+			t.maxGen = pNBT.getInteger("MaxGen");
+			t.transfer = pNBT.getInteger("MaxTransfer");
+			t.cap = pNBT.getInteger("MaxCap");
+		}
 	}
 	
 	protected void addDataToNBT(NBTTagCompound pNBT)
@@ -360,6 +372,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 
 	@Override
 	public ItemStack getStackInSlot(int pSlotIndex) {
+		if(pSlotIndex < 0 || pSlotIndex >= mInventory.getSizeInventory()) return InterItemStack.NULL_STACK;
 		return mInventory.getStackInSlot(pSlotIndex);
 	}
 
@@ -384,13 +397,9 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	}
 
 	@Override
-	public boolean isItemValidForSlot(int pSlotIndex, ItemStack pItemStack) {
-		if (pItemStack.getItem() instanceof UpgradeItem) {
-			if (additionalUpgradeAllowed(pItemStack) >= pItemStack.stackSize) {
-				return mInventory.isItemValidForSlot(pSlotIndex, pItemStack);
-			}
-		}
-		return false;
+	public boolean isItemValidForSlot(int pSlotIndex, ItemStack pItemStack)
+	{
+		return pItemStack.getItem() instanceof UpgradeItem && additionalUpgradeAllowed(pItemStack) >= pItemStack.stackSize;
 	}
 
 	@Override
@@ -460,6 +469,13 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 		mInventory.writeToNBT(nbt);
 		mEnergyStorage.writeToNBT(nbt);
 		nbt.setInteger("ÑurrentGen", mCurrentEnergyGeneration);
+		if(this instanceof DraconicSolarPanelTileEntity)
+		{
+			DraconicSolarPanelTileEntity t = (DraconicSolarPanelTileEntity) this;
+			nbt.setInteger("MaxGen", t.getMaxGen());
+			nbt.setInteger("MaxTransfer", t.transfer);
+			nbt.setInteger("MaxCap", t.cap);
+		}
 	}
 	
 	public ResourceLocation getTopResource()

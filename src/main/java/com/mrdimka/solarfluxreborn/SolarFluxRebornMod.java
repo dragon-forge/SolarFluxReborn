@@ -45,7 +45,7 @@ public class SolarFluxRebornMod
 	public void preInit(FMLPreInitializationEvent pEvent)
 	{
 		String cfg = pEvent.getSuggestedConfigurationFile().getAbsolutePath();
-		cfg = cfg.substring(0, cfg.length() - 3);
+		cfg = cfg.substring(0, cfg.length() - 4);
 		cfgFolder = new File(cfg);
 		cfgFolder.mkdirs();
 		File main_cfg = new File(cfgFolder, "main.cfg");

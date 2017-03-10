@@ -58,7 +58,7 @@ public class ClientProxy extends CommonProxy
 		for(int i = 0; i < items.size(); ++i)
 		{
 			Item item = items.get(i);
-			Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, 0, new ModelResourceLocation(item.getUnlocalizedName().substring(5), "inventory"));
+			if(item != null) try { Minecraft.getMinecraft().getRenderItem().getItemModelMesher().register(item, 0, new ModelResourceLocation(item.getUnlocalizedName().substring(5), "inventory")); } catch(NullPointerException npe) {}
 		}
 		
 		ClientRegistry.bindTileEntitySpecialRenderer(SolarPanelTileEntity.class, new RenderSolarPanelTile());

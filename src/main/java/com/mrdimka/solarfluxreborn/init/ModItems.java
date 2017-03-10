@@ -10,6 +10,7 @@ import com.mrdimka.solarfluxreborn.SolarFluxRebornMod;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.items.CraftingItem;
 import com.mrdimka.solarfluxreborn.items.UpgradeItem;
+import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.utility.Lang;
 
 public class ModItems {
@@ -32,11 +33,11 @@ public class ModItems {
     }
 
     public static void initialize() {
-        GameRegistry.registerItem(mirror, "mirror");
-        GameRegistry.registerItem(solarCell1, "solarCell1");
-        GameRegistry.registerItem(solarCell2, "solarCell2");
-        GameRegistry.registerItem(solarCell3, "solarCell3");
-        GameRegistry.registerItem(solarCell4, "solarCell4");
+        register(mirror, "mirror");
+        register(solarCell1, "solarCell1");
+        register(solarCell2, "solarCell2");
+        register(solarCell3, "solarCell3");
+        register(solarCell4, "solarCell4");
 
         boolean anyUpgrade = false;
         if (ModConfiguration.isEfficiencyUpgradeActive()) {
@@ -44,12 +45,12 @@ public class ModItems {
             infos.add(String.format(Lang.localise("upgrade.efficiency"), ModConfiguration.getEfficiencyUpgradeIncrease() * 100));
             infos.add(localiseReturnsToScale(ModConfiguration.getEfficiencyUpgradeReturnsToScale()));
             mUpgradeEfficiency = new UpgradeItem("upgradeEfficiency", ModConfiguration.getEfficiencyUpgradeMax(), infos);
-            GameRegistry.registerItem(mUpgradeEfficiency, "upgradeEfficiency");
+            register(mUpgradeEfficiency, "upgradeEfficiency");
             anyUpgrade = true;
         }
         if (ModConfiguration.isLowLightUpgradeActive()) {
             mUpgradeLowLight = new UpgradeItem("upgradeLowLight", ModConfiguration.getLowLightUpgradeMax(), Lists.newArrayList(Lang.localise("upgrade.low.light")));
-            GameRegistry.registerItem(mUpgradeLowLight, "upgradeLowLight");
+            register(mUpgradeLowLight, "upgradeLowLight");
             anyUpgrade = true;
         }
         if (ModConfiguration.isTraversalUpgradeActive()) {
@@ -57,7 +58,7 @@ public class ModItems {
                     "upgradeTraversal",
                     ModConfiguration.getTraversalUpgradeMax(),
                     Lists.newArrayList(String.format(Lang.localise("upgrade.traversal"), ModConfiguration.getTraversalUpgradeIncrease())));
-            GameRegistry.registerItem(mUpgradeTraversal, "upgradeTraversal");
+            register(mUpgradeTraversal, "upgradeTraversal");
             anyUpgrade = true;
         }
         if(ModConfiguration.isTransferRateUpgradeActive()) {
@@ -65,7 +66,7 @@ public class ModItems {
             infos.add(String.format(Lang.localise("upgrade.transfer"), ModConfiguration.getTransferRateUpgradeIncrease() * 100));
             infos.add(localiseReturnsToScale(ModConfiguration.getTransferRateUpgradeReturnsToScale()));
             mUpgradeTransferRate = new UpgradeItem("upgradeTransferRate", ModConfiguration.getTransferRateUpgradeMax(), infos);
-            GameRegistry.registerItem(mUpgradeTransferRate, "upgradeTransferRate");
+            register(mUpgradeTransferRate, "upgradeTransferRate");
             anyUpgrade = true;
         }
         
@@ -75,21 +76,21 @@ public class ModItems {
             infos.add(String.format(Lang.localise("upgrade.capacity"), ModConfiguration.getCapacityUpgradeIncrease() * 100));
             infos.add(localiseReturnsToScale(ModConfiguration.getCapacityUpgradeReturnsToScale()));
             mUpgradeCapacity = new UpgradeItem("upgradeCapacity", ModConfiguration.getCapacityUpgradeMax(), infos);
-            GameRegistry.registerItem(mUpgradeCapacity, "upgradeCapacity");
+            register(mUpgradeCapacity, "upgradeCapacity");
             anyUpgrade = true;
         }
         
         if(ModConfiguration.isFurnaceUpgradeActive())
         {
             mUpgradeFurnace = new UpgradeItem("upgradeFurnace", 1, Lists.newArrayList(Lang.localise("upgrade.furnace")));
-            GameRegistry.registerItem(mUpgradeFurnace, "upgradeFurnace");
+            register(mUpgradeFurnace, "upgradeFurnace");
             anyUpgrade = true;
         }
         
         if(anyUpgrade)
         {
             mUpgradeBlank = new CraftingItem("upgradeBlank");
-            GameRegistry.registerItem(mUpgradeBlank, "upgradeBlank");
+            register(mUpgradeBlank, "upgradeBlank");
         }
     }
 
@@ -100,5 +101,11 @@ public class ModItems {
             return Lang.localise("increasingReturnsToScale");
         }
         return Lang.localise("constantReturnsToScale");
+    }
+    
+    public static Item register(Item item, String name)
+    {
+    	item.setRegistryName(Reference.MOD_ID, name);
+    	return GameRegistry.register(item);
     }
 }

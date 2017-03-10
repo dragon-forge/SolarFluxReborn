@@ -12,9 +12,11 @@ import com.mrdimka.solarfluxreborn.config.DraconicEvolutionConfigs;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.items.CableItemBlock;
 import com.mrdimka.solarfluxreborn.items.SolarPanelItemBlock;
+import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.utility.MetricUnits;
 
 import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
@@ -36,7 +38,7 @@ public class ModBlocks
 		for(int tierIndex = 0; tierIndex < ModConfiguration.getTierConfigurations().size(); tierIndex++)
 		{
 			SolarPanelBlock block = new SolarPanelBlock("solar" + tierIndex, tierIndex);
-			GameRegistry.registerBlock(block, SolarPanelItemBlock.class, "solar" + tierIndex);
+			register(block, "solar" + tierIndex, new SolarPanelItemBlock(block));
 			mSolarPanels.add(block);
 		}
 		
@@ -45,25 +47,34 @@ public class ModBlocks
 			if(DraconicEvolutionConfigs.draconicSolar)
 			{
 				DraconicSolarPanelBlock block = new DraconicSolarPanelBlock("solardraconic", 512 * MetricUnits.MEGA, 1024 * MetricUnits.KILO, 131072);
-				GameRegistry.registerBlock(draconicSolar = block, SolarPanelItemBlock.class, "solardraconic");
+				register(draconicSolar = block, "solardraconic", new SolarPanelItemBlock(block));
 				mSolarPanels.add(block);
 			}
 			
 			if(DraconicEvolutionConfigs.chaoticSolar)
 			{
 				DraconicSolarPanelBlock block = new DraconicSolarPanelBlock("solarchaotic", 2048 * MetricUnits.MEGA, 4096 * MetricUnits.KILO, 524288);
-				GameRegistry.registerBlock(chaoticSolar = block, SolarPanelItemBlock.class, "solarchaotic");
+				register(chaoticSolar = block, "solarchaotic", new SolarPanelItemBlock(block));
 				mSolarPanels.add(block);
 			}
 		}
 		
-		GameRegistry.registerBlock(cable1, CableItemBlock.class, "wire_1");
-		GameRegistry.registerBlock(cable2, CableItemBlock.class, "wire_2");
-		GameRegistry.registerBlock(cable3, CableItemBlock.class, "wire_3");
+		register(cable1, "wire_1", new CableItemBlock(cable1));
+		register(cable2, "wire_2", new CableItemBlock(cable2));
+		register(cable3, "wire_3", new CableItemBlock(cable3));
 	}
 	
 	public static List<Block> getSolarPanels()
 	{
 		return mSolarPanels;
+	}
+	
+	public static Block register(Block block, String name, ItemBlock ib)
+	{
+		ib.setRegistryName(Reference.MOD_ID, name);
+		block.setRegistryName(Reference.MOD_ID, name);
+		GameRegistry.register(block);
+		GameRegistry.register(ib);
+		return block;
 	}
 }
