@@ -7,13 +7,18 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
+import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 
 import com.mrdimka.common.utils.CommonTileEntity_SFR;
+import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.network.energy.cable.CableNetwork;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 
-public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyReceiver
+public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyReceiver, IEnergyProvider, IEnergyStorage
 {
 	public CableNetwork network;
 	public double internal;
@@ -26,7 +31,7 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 			Set<CableNetwork> nets = new HashSet<CableNetwork>();
 			for(EnumFacing f : EnumFacing.VALUES)
 			{
-				TileEntity t = worldObj.getTileEntity(pos.offset(f));
+				TileEntity t = world.getTileEntity(pos.offset(f));
 				if(t instanceof TileAbstractCable)
 				{
 					TileAbstractCable w = (TileAbstractCable) t;
@@ -62,7 +67,7 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 			
 			for(EnumFacing f : EnumFacing.VALUES)
 			{
-				TileEntity t = worldObj.getTileEntity(pos.offset(f));
+				TileEntity t = world.getTileEntity(pos.offset(f));
 				if(t instanceof TileAbstractCable)
 				{
 					TileAbstractCable w = (TileAbstractCable) t;
@@ -80,8 +85,8 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 		if(network != null && network.energy > 0) for(EnumFacing f : EnumFacing.VALUES)
 		{
 			p = getPos().offset(f);
-			TileEntity t = worldObj.getTileEntity(p);
-			if(t instanceof TileAbstractCable) continue;
+			TileEntity t = world.getTileEntity(p);
+			if(t instanceof TileAbstractCable || t == null) continue;
 			
 			if(t instanceof IEnergyReceiver)
 			{
@@ -92,6 +97,16 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 					int sent = r.receiveEnergy(f.getOpposite(), Math.min((int) getCapacityAddedToNet(), (int) network.energy), false);
 					network.energy -= sent;
 				}
+			}else if(t.hasCapability(CapabilityEnergy.ENERGY, f.getOpposite()))
+			{
+				IEnergyStorage r = t.getCapability(CapabilityEnergy.ENERGY, f.getOpposite());
+				
+				int sent = r.receiveEnergy(Math.min((int) getCapacityAddedToNet(), (int) network.energy), false);
+				network.energy -= sent;
+			}else if(TeslaAPI.isTeslaConsumer(t))
+			{
+				int sent = (int) TeslaAPI.givePowerToConsumer(t, Math.min((int) getCapacityAddedToNet(), (int) network.energy), false);
+				network.energy -= sent;
 			}
 		}
 	}
@@ -129,6 +144,15 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
         if(!simulate)
         	network.energy += energyReceived;
         return energyReceived;
+	}
+	
+	@Override
+	public int extractEnergy(EnumFacing from, int maxExtract, boolean simulate)
+	{
+		if(network == null) return 0;
+		int energyGiven = (int) Math.min(network.energy, maxExtract);
+        if(!simulate) network.energy -= energyGiven;
+        return energyGiven;
 	}
 
 	@Override
@@ -174,5 +198,55 @@ public class TileAbstractCable extends CommonTileEntity_SFR implements IEnergyRe
 	public String getResourceConnection()
 	{
 		return Reference.MOD_ID + ":blocks/wire_1";
+	}
+	
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+	{
+		if(capability == CapabilityEnergy.ENERGY) return true;
+		return super.hasCapability(capability, facing);
+	}
+	
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+	{
+		if(capability == CapabilityEnergy.ENERGY) return (T) this;
+		return super.getCapability(capability, facing);
+	}
+	
+	@Override
+	public int receiveEnergy(int maxReceive, boolean simulate)
+	{
+		return receiveEnergy(EnumFacing.DOWN, maxReceive, simulate);
+	}
+	
+	@Override
+	public int extractEnergy(int maxExtract, boolean simulate)
+	{
+		return extractEnergy(EnumFacing.DOWN, maxExtract, simulate);
+	}
+	
+	@Override
+	public int getEnergyStored()
+	{
+		return getEnergyStored(EnumFacing.DOWN);
+	}
+	
+	@Override
+	public int getMaxEnergyStored()
+	{
+		return getMaxEnergyStored(EnumFacing.DOWN);
+	}
+	
+	@Override
+	public boolean canExtract()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean canReceive()
+	{
+		return true;
 	}
 }

@@ -1,15 +1,14 @@
 package com.mrdimka.common.utils;
 
-import java.util.List;
+import com.mrdimka.hammercore.net.HCNetwork;
+import com.mrdimka.solarfluxreborn.net.PacketSyncTileEntity;
 
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.network.NetworkRegistry.TargetPoint;
@@ -27,20 +26,15 @@ public abstract class CommonTileEntity_SFR extends TileEntity implements ITickab
 	public abstract void readCustomNBT(NBTTagCompound nbt);
 	public abstract void writeCustomNBT(NBTTagCompound nbt);
 	
-	public boolean atTickRate(int rate) { return ((worldObj.getTotalWorldTime() + pos.toLong() * 50L + (rate * 6000L)) % ((long)rate)) == 0L; }
+	public boolean atTickRate(int rate) { return ((world.getTotalWorldTime() + pos.toLong() * 50L + (rate * 6000L)) % ((long)rate)) == 0L; }
 	
 	@Override
 	public void markDirty()
 	{
 		super.markDirty();
-		if(!isDirty && worldObj != null) sync();
-		worldObj.markAndNotifyBlock(pos, worldObj.getChunkFromBlockCoords(pos), worldObj.getBlockState(pos), worldObj.getBlockState(pos), 3);
+		if(!isDirty && world != null) sync();
+		world.markAndNotifyBlock(pos, world.getChunkFromBlockCoords(pos), world.getBlockState(pos), world.getBlockState(pos), 3);
 	}
-	
-	protected void func_190201_b(World p_190201_1_)
-    {
-        this.setWorldObj(p_190201_1_);
-    }
 	
 	/** Final methods, that do tile entity sync */
 	public final void readFromNBT(NBTTagCompound nbt) { super.readFromNBT(nbt); readCustomNBT(nbt); }
@@ -53,13 +47,12 @@ public abstract class CommonTileEntity_SFR extends TileEntity implements ITickab
 	
 	public void sync()
 	{
-		if(worldObj.isRemote) return;
-		List<EntityPlayerMP> players = worldObj.getEntitiesWithinAABB(EntityPlayerMP.class, new AxisAlignedBB(pos.getX() - 256, Integer.MIN_VALUE, pos.getZ() - 256, pos.getX() + 257, Integer.MAX_VALUE, pos.getZ() + 257));
-		for(EntityPlayerMP player : players) player.connection.sendPacket(getUpdatePacket());
+		if(world.isRemote) return;
+		HCNetwork.manager.sendToAllAround(new PacketSyncTileEntity(this), getEffectiveUpdateTargetPoint());
 	}
 	
 	public TargetPoint getEffectiveUpdateTargetPoint()
 	{
-		return new TargetPoint(worldObj.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 272);
+		return new TargetPoint(world.provider.getDimension(), pos.getX(), pos.getY(), pos.getZ(), 272);
 	}
 }

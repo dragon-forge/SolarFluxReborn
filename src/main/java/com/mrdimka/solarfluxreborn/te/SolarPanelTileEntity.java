@@ -2,12 +2,29 @@ package com.mrdimka.solarfluxreborn.te;
 
 import java.util.Map;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
+import cofh.api.energy.IEnergyProvider;
+
 import com.google.common.base.Objects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Range;
 import com.mrdimka.common.utils.CommonTileEntity_SFR;
+import com.mrdimka.hammercore.common.InterItemStack;
+import com.mrdimka.hammercore.common.capabilities.CapabilityEJ;
 import com.mrdimka.hammercore.common.inventory.InventoryNonTile;
-import com.mrdimka.hammercore.energy.IPowerProvider;
+import com.mrdimka.hammercore.energy.IPowerStorage;
 import com.mrdimka.solarfluxreborn.blocks.StatefulEnergyStorage;
 import com.mrdimka.solarfluxreborn.blocks.modules.EnergySharingModule;
 import com.mrdimka.solarfluxreborn.blocks.modules.ITileEntityModule;
@@ -18,24 +35,14 @@ import com.mrdimka.solarfluxreborn.config.TierConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
 import com.mrdimka.solarfluxreborn.items.UpgradeItem;
 import com.mrdimka.solarfluxreborn.reference.NBTConstants;
+import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.utility.Utils;
 
-import cofh.api.energy.IEnergyProvider;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-
-public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInventory, IEnergyProvider, IPowerProvider
+public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInventory, IEnergyProvider, IPowerStorage, IEnergyStorage
 {
 	public static final int INVENTORY_SIZE = 5;
 	public static final Range<Integer> UPGRADE_SLOTS = Range.closedOpen(0, INVENTORY_SIZE);
-	private final StatefulEnergyStorage mEnergyStorage;
+	protected StatefulEnergyStorage mEnergyStorage;
 	/**
 	 * Index of this tier of SolarPanel.
 	 */
@@ -74,24 +81,22 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	public SolarPanelTileEntity(int pTierIndex)
 	{
 		mTierIndex = pTierIndex;
-		mEnergyStorage = new StatefulEnergyStorage(ModConfiguration
-				.getTierConfiguration(mTierIndex).getCapacity(),
-				ModConfiguration.getTierConfiguration(mTierIndex)
-						.getMaximumEnergyTransfer());
-		if(ModConfiguration.doesAutoBalanceEnergy())
-			mEnergySharingModule = new EnergySharingModule(this);
+		mEnergyStorage = new StatefulEnergyStorage(getCapacity(), getTransfer());
+		if(ModConfiguration.doesAutoBalanceEnergy()) mEnergySharingModule = new EnergySharingModule(this);
 	}
 
-	public TierConfiguration getTierConfiguration() {
+	private TierConfiguration getTierConfiguration() {
 		return ModConfiguration.getTierConfigurations().get(mTierIndex);
 	}
 
 	@Override
-	public void update() {
-		updateCurrentEnergyGeneration(Utils.isServer(worldObj) ? pos.up() : pos);
-
-		if(!worldObj.isRemote)
+	public void update()
+	{
+		updateCurrentEnergyGeneration(Utils.isServer(world) ? pos.up() : pos);
+		if(!world.isRemote)
 		{
+			if(atTickRate(20)) refreshUpgradeCache();
+			
 			mEnergyDispenserModule.tick();
 			generateEnergy();
 			if(mEnergySharingModule != null)
@@ -121,7 +126,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	}
 
 	public int getMaximumEnergyGeneration() {
-		return getTierConfiguration().getMaximumEnergyGeneration();
+		return getMaxGen();
 	}
 
 	/**
@@ -129,7 +134,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	 */
 	public void updateCurrentEnergyGeneration(BlockPos pos) {
 		computeSunIntensity(pos);
-		double energyGeneration = getMaximumEnergyGeneration() * mSunIntensity;
+		double energyGeneration = getMaxGen() * mSunIntensity;
 		energyGeneration *= (1 + ModConfiguration
 				.getEfficiencyUpgradeIncrease()
 				* Math.pow(getUpgradeCount(ModItems.mUpgradeEfficiency),
@@ -152,13 +157,15 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	/**
 	 * Compute the intensity of the sun that can be used by the Solar Panel.
 	 */
-	public void computeSunIntensity(BlockPos at) {
-		if (worldObj.canBlockSeeSky(at)) {
+	public void computeSunIntensity(BlockPos at)
+	{
+		if(world.canBlockSeeSky(at))
+		{
 			// Intensity based on the position of the sun.
 			float multiplicator = 1.5f - (getUpgradeCount(ModItems.mUpgradeLowLight) * 0.122f);
 			float displacement = 1.2f + (getUpgradeCount(ModItems.mUpgradeLowLight) * 0.08f);
 			// Celestial angle == 0 at zenith.
-			float celestialAngleRadians = worldObj
+			float celestialAngleRadians = world
 					.getCelestialAngleRadians(1.0f);
 			if (celestialAngleRadians > Math.PI)
 				celestialAngleRadians = (float) (2 * Math.PI - celestialAngleRadians);
@@ -169,10 +176,10 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 			mSunIntensity = Math.min(1, mSunIntensity);
 
 			if (mSunIntensity > 0) {
-				if (worldObj.isRaining()) {
+				if (world.isRaining()) {
 					mSunIntensity *= ModConfiguration.getRainGenerationFactor();
 				}
-				if (worldObj.isThundering()) {
+				if (world.isThundering()) {
 					mSunIntensity *= ModConfiguration
 							.getThunderGenerationFactor();
 				}
@@ -197,10 +204,10 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 			ItemStack itemStack = getStackInSlot(i);
 			if (itemStack != null && itemStack.getItem() instanceof UpgradeItem) {
 				if (mUpgradeCache.containsKey(itemStack.getItem())) {
-					mUpgradeCache.put(itemStack.getItem(), itemStack.stackSize
+					mUpgradeCache.put(itemStack.getItem(), itemStack.getCount()
 							+ mUpgradeCache.get(itemStack.getItem()));
 				} else {
-					mUpgradeCache.put(itemStack.getItem(), itemStack.stackSize);
+					mUpgradeCache.put(itemStack.getItem(), itemStack.getCount());
 				}
 			}
 		}
@@ -217,9 +224,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 		// Apply effect of transfer rate upgrade.
 		getEnergyStorage()
 				.setMaxTransfer(
-						(int) (ModConfiguration
-								.getTierConfiguration(mTierIndex)
-								.getMaximumEnergyTransfer() * (1 + ModConfiguration
+						(int) (getTransfer() * (1 + ModConfiguration
 								.getTransferRateUpgradeIncrease()
 								* Math.pow(
 										getUpgradeCount(ModItems.mUpgradeTransferRate),
@@ -228,72 +233,97 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 
 		// Apply effect of capacity upgrade
 		getEnergyStorage().setMaxEnergyStored(
-				(int) (ModConfiguration.getTierConfiguration(mTierIndex)
-						.getCapacity() * (1 + ModConfiguration
+				(int) (getCapacity() * (1 + ModConfiguration
 						.getCapacityUpgradeIncrease()
 						* Math.pow(getUpgradeCount(ModItems.mUpgradeCapacity),
 								ModConfiguration
 										.getCapacityUpgradeReturnsToScale()))));
 	}
-
-	public int getTotalUpgradeInstalled() {
+	
+	public int getTransfer()
+	{
+		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).transfer;
+		return ModConfiguration.getTierConfiguration(mTierIndex).getMaximumEnergyTransfer();
+	}
+	
+	public int getMaxGen()
+	{
+		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).getMaximumEnergyGeneration();
+		return ModConfiguration.getTierConfiguration(mTierIndex).getMaximumEnergyGeneration();
+	}
+	
+	public int getCapacity()
+	{
+		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).cap;
+		return ModConfiguration.getTierConfiguration(mTierIndex).getCapacity();
+	}
+	
+	public int getTotalUpgradeInstalled()
+	{
 		int count = 0;
-		for (int value : mUpgradeCache.values()) {
-			count += value;
-		}
+		for(int value : mUpgradeCache.values()) count += value;
 		return count;
 	}
-
+	
 	/**
 	 * Returns the number of upgrade that can still be added.
 	 */
-	public int additionalUpgradeAllowed(ItemStack pItemStack) {
-		if (pItemStack != null) {
+	public int additionalUpgradeAllowed(ItemStack pItemStack)
+	{
+		if(pItemStack != null)
+		{
 			Item item = pItemStack.getItem();
-			if (item instanceof UpgradeItem) {
+			if(item instanceof UpgradeItem)
+			{
 				UpgradeItem upgrade = (UpgradeItem) item;
-				return upgrade.getMaximumPerSolarPanel()
-						- getUpgradeCount(upgrade);
+				return upgrade.getMaximumPerSolarPanel() - getUpgradeCount(upgrade);
 			}
 		}
 		return 0;
 	}
-
-	public int getUpgradeCount(Item pItem) {
-		if (pItem != null) {
+	
+	public int getUpgradeCount(Item pItem)
+	{
+		if(pItem != null)
+		{
 			Integer count = mUpgradeCache.get(pItem);
 			return count == null ? 0 : count;
 		}
 		return 0;
 	}
-
-	protected void loadDataFromNBT(NBTTagCompound pNBT) {
+	
+	protected void loadDataFromNBT(NBTTagCompound pNBT)
+	{
 		mTierIndex = pNBT.getInteger(NBTConstants.TIER_INDEX);
-
-		// Update Energy Storage with Tier Configuration
-		mEnergyStorage.setMaxEnergyStored(ModConfiguration
-				.getTierConfiguration(mTierIndex).getCapacity());
-		mEnergyStorage.setMaxTransfer(ModConfiguration.getTierConfiguration(
-				mTierIndex).getMaximumEnergyTransfer());
-
-		// Restore inventory and force an update of the upgrade cache.
-		if (!pNBT.getBoolean("ClientIgnoredInv"))
-			mInventory.readFromNBT(pNBT);
-
+		mEnergyStorage.setMaxEnergyStored(getCapacity());
+		mEnergyStorage.setMaxTransfer(getTransfer());
+		mInventory.readFromNBT(pNBT);
+		refreshUpgradeCache();
 		mEnergyStorage.readFromNBT(pNBT);
+		mCurrentEnergyGeneration = pNBT.getInteger("ÑurrentGen");
+		
+		if(this instanceof AbstractSolarPanelTileEntity)
+		{
+			AbstractSolarPanelTileEntity t = (AbstractSolarPanelTileEntity) this;
+			t.maxGen = pNBT.getInteger("MaxGen");
+			t.transfer = pNBT.getInteger("MaxTransfer");
+			t.cap = pNBT.getInteger("MaxCap");
+		}
 	}
-
-	protected void addDataToNBT(NBTTagCompound pNBT) {
+	
+	protected void addDataToNBT(NBTTagCompound pNBT)
+	{
 		pNBT.setInteger(NBTConstants.TIER_INDEX, mTierIndex);
 		mInventory.writeToNBT(pNBT);
 		mEnergyStorage.writeToNBT(pNBT);
 	}
-
+	
 	@Override
-	public boolean canConnectEnergy(EnumFacing pFrom) {
+	public boolean canConnectEnergy(EnumFacing pFrom)
+	{
 		return pFrom != EnumFacing.UP;
 	}
-
+	
 	@Override
 	public int extractEnergy(EnumFacing pFrom, int pMaxExtract,
 			boolean pSimulate) {
@@ -348,6 +378,7 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 
 	@Override
 	public ItemStack getStackInSlot(int pSlotIndex) {
+		if(pSlotIndex < 0 || pSlotIndex >= mInventory.getSizeInventory()) return InterItemStack.NULL_STACK;
 		return mInventory.getStackInSlot(pSlotIndex);
 	}
 
@@ -367,18 +398,14 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	}
 
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer pEntityPlayer) {
-		return mInventory.isUseableByPlayer(pEntityPlayer);
+	public boolean isUsableByPlayer(EntityPlayer pEntityPlayer) {
+		return mInventory.isUsableByPlayer(pEntityPlayer, pos);
 	}
-
+	
 	@Override
-	public boolean isItemValidForSlot(int pSlotIndex, ItemStack pItemStack) {
-		if (pItemStack.getItem() instanceof UpgradeItem) {
-			if (additionalUpgradeAllowed(pItemStack) >= pItemStack.stackSize) {
-				return mInventory.isItemValidForSlot(pSlotIndex, pItemStack);
-			}
-		}
-		return false;
+	public boolean isItemValidForSlot(int pSlotIndex, ItemStack pItemStack)
+	{
+		return pItemStack.getItem() instanceof UpgradeItem && additionalUpgradeAllowed(pItemStack) >= pItemStack.getCount();
 	}
 
 	@Override
@@ -447,5 +474,62 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 		nbt.setInteger(NBTConstants.TIER_INDEX, mTierIndex);
 		mInventory.writeToNBT(nbt);
 		mEnergyStorage.writeToNBT(nbt);
+		nbt.setInteger("ÑurrentGen", mCurrentEnergyGeneration);
+		if(this instanceof AbstractSolarPanelTileEntity)
+		{
+			AbstractSolarPanelTileEntity t = (AbstractSolarPanelTileEntity) this;
+			nbt.setInteger("MaxGen", t.getMaxGen());
+			nbt.setInteger("MaxTransfer", t.transfer);
+			nbt.setInteger("MaxCap", t.cap);
+		}
+	}
+	
+	public ResourceLocation getTopResource()
+	{
+		return new ResourceLocation(Reference.MOD_ID + ":blocks/solar" + mTierIndex + "_1");
+	}
+
+	@Override
+	public boolean isEmpty()
+	{
+		return getInventory().isEmpty();
+	}
+	
+	@Override
+	public boolean hasCapability(Capability<?> capability, EnumFacing facing)
+	{
+		if((capability == CapabilityEnergy.ENERGY || capability == CapabilityEJ.ENERGY) && facing != EnumFacing.UP) return true;
+		return super.hasCapability(capability, facing);
+	}
+	
+	@Override
+	public <T> T getCapability(Capability<T> capability, EnumFacing facing)
+	{
+		if((capability == CapabilityEnergy.ENERGY || capability == CapabilityEJ.ENERGY) && facing != EnumFacing.UP) return (T) this;
+		return super.getCapability(capability, facing);
+	}
+	
+	@Override
+	public int receiveEnergy(int maxReceive, boolean simulate)
+	{
+		return 0;
+	}
+	
+	@Override
+	public int extractEnergy(int maxExtract, boolean simulate)
+	{
+		return extractEnergy(EnumFacing.DOWN, maxExtract, simulate);
+	}
+	
+	@Override
+	public boolean canExtract()
+	{
+		return true;
+	}
+	
+	@Override
+	public boolean canReceive()
+	{
+		return false;
 	}
 }

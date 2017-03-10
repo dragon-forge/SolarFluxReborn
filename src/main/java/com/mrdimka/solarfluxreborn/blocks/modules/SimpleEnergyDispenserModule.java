@@ -9,6 +9,9 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import cofh.api.energy.IEnergyReceiver;
 
 import com.google.common.collect.Lists;
@@ -16,6 +19,7 @@ import com.mrdimka.solarfluxreborn.blocks.StatefulEnergyStorage;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
 import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
+import com.mrdimka.solarfluxreborn.te.AbstractSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 
 /**
@@ -41,7 +45,7 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
 
     protected int getTargetRefreshRate() {
         //TODO Should this be a config option?
-        return 2 * 20;
+        return 20;
     }
 
     protected void searchTargets() {
@@ -49,7 +53,7 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
         BlockPos position = getTileEntity().getPos();
         for (EnumFacing direction : EnumFacing.VALUES) {
             BlockPos neighbor = position.offset(direction);
-            if (isValidTarget(neighbor)) {
+            if (isValidTarget(neighbor, direction)) {
                 mTargets.add(neighbor);
                 mFacings.put(neighbor, direction);
             }
@@ -59,7 +63,12 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
     protected List<BlockPos> getTargets() {
         return mTargets;
     }
-
+    
+    protected Map<BlockPos, EnumFacing> getmFacings()
+    {
+		return mFacings;
+	}
+    
     protected void sendEnergyToTargets() {
         if (mTargets.size() > 0 && getTileEntity().getEnergyStored() > 0) {
             for (int i = 0; i < mTargets.size(); ++i) {
@@ -70,22 +79,27 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
         }
     }
 
-    protected boolean isValidTarget(BlockPos pos) {
+    protected boolean isValidTarget(BlockPos pos, EnumFacing to) {
         TileEntity tile = getTileEntity().getWorld().getTileEntity(pos);
+        if(tile == null) return false;
+        if(tile.hasCapability(CapabilityEnergy.ENERGY, to.getOpposite())) return true;
+        if(TeslaAPI.isTeslaConsumer(tile)) return true;
         return tile instanceof IEnergyReceiver || (getTileEntity().getUpgradeCount(ModItems.mUpgradeFurnace) > 0 && tile instanceof TileEntityFurnace);
     }
 
     protected void sendEnergyTo(BlockPos pos, EnumFacing to)
     {
         TileEntity tile = getTileEntity().getWorld().getTileEntity(pos);
-        if (tile instanceof IEnergyReceiver) {
+        if(tile == null) return;
+        
+        if(tile.hasCapability(CapabilityEnergy.ENERGY, to.getOpposite()))
+        	sendEnergyToFE(tile, to);
+        else if(tile instanceof IEnergyReceiver)
             sendEnergyToReceiver((IEnergyReceiver) tile, to.getOpposite());
-        } else if (getTileEntity().getUpgradeCount(ModItems.mUpgradeFurnace) > 0 && tile instanceof TileEntityFurnace) {
+        else if(getTileEntity().getUpgradeCount(ModItems.mUpgradeFurnace) > 0 && tile instanceof TileEntityFurnace)
             sendEnergyToFurnace((TileEntityFurnace) tile);
-        } else if(TeslaAPI.isTeslaConsumer(tile))
-        {
+        else if(TeslaAPI.isTeslaConsumer(tile))
         	sendEnergyToTeslaReceiver(tile, to.getOpposite());
-        }
     }
 
     protected void sendEnergyToReceiver(IEnergyReceiver pEnergyReceiver, EnumFacing pFrom)
@@ -98,23 +112,51 @@ public class SimpleEnergyDispenserModule extends AbstractSolarPanelModule {
     	if(TeslaAPI.isTeslaConsumer(t))
     	{
     		StatefulEnergyStorage storage = getTileEntity().getEnergyStorage();
-        	storage.extractEnergy((int) TeslaAPI.givePowerToConsumer(t, storage.getMaxExtract(), false), false);
+        	storage.extractEnergy((int) TeslaAPI.givePowerToConsumer(t, Math.min(storage.getMaxExtract(), storage.getEnergyStored()), false), false);
     	}
     }
-
-    protected void sendEnergyToFurnace(TileEntityFurnace pFurnace) {
+    
+    protected void sendEnergyToFE(TileEntity t, EnumFacing pFrom)
+    {
+    	if(t != null && t.hasCapability(CapabilityEnergy.ENERGY, pFrom.getOpposite()))
+    	{
+    		StatefulEnergyStorage storage = getTileEntity().getEnergyStorage();
+    		IEnergyStorage ies = t.getCapability(CapabilityEnergy.ENERGY, pFrom.getOpposite());
+        	storage.extractEnergy(ies.receiveEnergy(Math.min(storage.getMaxExtract(), storage.getEnergyStored()), false), false);
+    	}
+    }
+    
+    protected void sendEnergyToFurnace(TileEntityFurnace pFurnace)
+    {
         final int FURNACE_COOKING_TICKS = 200;
         final int FURNACE_COOKING_ENERGY = FURNACE_COOKING_TICKS * ModConfiguration.getFurnaceUpgradeHeatingConsumption();
-
-        if (mFurnaceEnergyBuffer < FURNACE_COOKING_ENERGY) {
+        
+        if(mFurnaceEnergyBuffer < FURNACE_COOKING_ENERGY)
             mFurnaceEnergyBuffer += getTileEntity().getEnergyStorage().extractEnergy(FURNACE_COOKING_ENERGY - mFurnaceEnergyBuffer, false);
+        
+        SolarPanelTileEntity solar = getTileEntity();
+        if((solar.getTier() > 0 || solar instanceof AbstractSolarPanelTileEntity) && pFurnace.isBurning())
+        {
+        	int tier = solar.getTier();
+        	
+        	if(solar instanceof AbstractSolarPanelTileEntity) tier = 100;
+        	
+        	if(pFurnace.getField(2) < 200) pFurnace.setField(2, pFurnace.getField(2) + tier);
+        	if(pFurnace.getField(2) >= 200)
+        	{
+        		pFurnace.smeltItem();
+        		pFurnace.setField(2, 0);
+        	}
         }
-
-        // Is there anything to smell?
-        if (pFurnace.getStackInSlot(0) != null && pFurnace.getField(0) < FURNACE_COOKING_TICKS) {
+        
+        // Is there anything to smelt?
+        if(pFurnace.getStackInSlot(0) != null && pFurnace.getField(0) < FURNACE_COOKING_TICKS)
+        {
             int burnTicksAvailable = mFurnaceEnergyBuffer / ModConfiguration.getFurnaceUpgradeHeatingConsumption();
-            if (burnTicksAvailable >= FURNACE_COOKING_TICKS) {
-                if (pFurnace.getField(0) == 0) {
+            if(burnTicksAvailable >= FURNACE_COOKING_TICKS)
+            {
+                if(pFurnace.getField(0) == 0)
+                {
                     // Add 1 as first tick is not counted in the burning process.
                     pFurnace.setField(0, pFurnace.getField(0) + 1);
                     BlockFurnace.setState(pFurnace.getField(0) > 0, pFurnace.getWorld(), pFurnace.getPos());

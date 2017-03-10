@@ -1,12 +1,14 @@
 package com.mrdimka.solarfluxreborn.blocks.modules;
 
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
@@ -15,6 +17,7 @@ import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 public class TraversalEnergyDispenserModule extends SimpleEnergyDispenserModule {
     private final Set<BlockPos> mVisitedBlocks = Sets.newHashSet();
     private final LinkedList<BlockPos> mBlocksToVisit = Lists.newLinkedList();
+    private final Map<BlockPos, EnumFacing> mBlocksToVisitSides = Maps.newHashMap();
     private int mDirectNeighborDiscovered;
 
     public TraversalEnergyDispenserModule(SolarPanelTileEntity pTileEntity) {
@@ -26,6 +29,8 @@ public class TraversalEnergyDispenserModule extends SimpleEnergyDispenserModule 
             // We have our new targets.
             getTargets().clear();
             getTargets().addAll(mVisitedBlocks);
+            getmFacings().clear();
+            getmFacings().putAll(mBlocksToVisitSides);
             // Reset the search.
             mVisitedBlocks.clear();
             discoverNeighbors(getTileEntity().getPos());
@@ -64,12 +69,13 @@ public class TraversalEnergyDispenserModule extends SimpleEnergyDispenserModule 
     private void discoverNeighbors(BlockPos pPosition) {
         for (EnumFacing direction : EnumFacing.VALUES) {
             BlockPos neighbor = pPosition.offset(direction);
-            if (!mVisitedBlocks.contains(neighbor) && isValidTarget(neighbor)) {
+            if (!mVisitedBlocks.contains(neighbor) && isValidTarget(neighbor, direction)) {
                 mBlocksToVisit.add(neighbor);
+                mBlocksToVisitSides.put(neighbor, direction.getOpposite());
             }
         }
     }
-
+    
     /**
      * Returns the maximum amount of target that can be found in addition to the 4 neighbors of the block.
      */

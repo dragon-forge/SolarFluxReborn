@@ -15,14 +15,18 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import net.minecraftforge.energy.CapabilityEnergy;
 import cofh.api.energy.IEnergyConnection;
 
 import com.mrdimka.solarfluxreborn.creativetab.ModCreativeTab;
+import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 
 public class BlockCable320 extends BlockContainer
 {
+	public static double TRANSFER_RATE = 320D;
+	
 	public static final AxisAlignedBB
 									CENTER = new AxisAlignedBB(6D / 16D, 6D / 16D, 6D / 16D, 10D / 16D, 10D / 16D, 10D / 16D),
 									CENTER_UP = new AxisAlignedBB(6D / 16D, 10D / 16D, 6D / 16D, 10D / 16D, 1D, 10D / 16D),
@@ -36,7 +40,7 @@ public class BlockCable320 extends BlockContainer
 	{
 		super(Material.IRON);
 		setSoundType(SoundType.METAL);
-		setUnlocalizedName(Reference.MOD_ID + ":wire_2");
+		setUnlocalizedName(Reference.MOD_ID + ":wire_1");
 		setLightOpacity(255);
         useNeighborBrightness = true;
         setCreativeTab(ModCreativeTab.MOD_TAB);
@@ -48,17 +52,11 @@ public class BlockCable320 extends BlockContainer
 	@Override
 	public TileEntity createNewTileEntity(World arg0, int arg1)
 	{
-		return new TileCustomCable(320D, 2);
+		return new TileCustomCable(TRANSFER_RATE, 1);
 	}
 	
 	@Override
     public boolean isOpaqueCube(IBlockState p_isOpaqueCube_1_)
-    {
-    	return false;
-    }
-    
-    @Override
-    public boolean isVisuallyOpaque()
     {
     	return false;
     }
@@ -86,8 +84,12 @@ public class BlockCable320 extends BlockContainer
 			
 			TileEntity te = w.getTileEntity(p.offset(f));
 			
+			if(te == null) continue;
+			
 			if(te != null && TileCustomCable.class.isAssignableFrom(te.getClass())) conns.put(f, true);
-			else if(te instanceof IEnergyConnection) conns.put(f, true);
+			else if(te instanceof IEnergyConnection && ((IEnergyConnection) te).canConnectEnergy(f.getOpposite())) conns.put(f, true);
+			else if(te.hasCapability(CapabilityEnergy.ENERGY, f.getOpposite())) conns.put(f, true);
+			else if(TeslaAPI.isTeslaConsumer(te)) conns.put(f, true);
 		}
 		
 		double nx = 5D / 16D, ny = 5D / 16D, nz = 5D / 16D, xx = 11D / 16D, xy = 11D / 16D, xz = 11D / 16D;
@@ -103,16 +105,34 @@ public class BlockCable320 extends BlockContainer
 	}
 	
 	@Override
-	public void addCollisionBoxToList(IBlockState s, World w, BlockPos p, AxisAlignedBB box, List<AxisAlignedBB> l, Entity ent)
+	public void addCollisionBoxToList(IBlockState s, World w, BlockPos p, AxisAlignedBB box, List<AxisAlignedBB> l, Entity ent, boolean something)
 	{
 		addCollisionBoxToList(p, box, l, CENTER);
 		
-		if(w.getBlockState(p.offset(EnumFacing.EAST)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_EAST);
-		if(w.getBlockState(p.offset(EnumFacing.WEST)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_WEST);
-		if(w.getBlockState(p.offset(EnumFacing.SOUTH)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_SOUTH);
-		if(w.getBlockState(p.offset(EnumFacing.NORTH)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_NORTH);
-		if(w.getBlockState(p.offset(EnumFacing.UP)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_UP);
-		if(w.getBlockState(p.offset(EnumFacing.DOWN)).getBlock() == this) addCollisionBoxToList(p, box, l, CENTER_DOWN);
+		Map<EnumFacing, Boolean> conns = new HashMap<EnumFacing, Boolean>();
+		
+		for(EnumFacing f : EnumFacing.VALUES)
+		{
+			conns.put(f, false);
+			
+			TileEntity te = w.getTileEntity(p.offset(f));
+			
+			if(te == null) continue;
+			
+			if(te != null && TileCustomCable.class.isAssignableFrom(te.getClass())) conns.put(f, true);
+			else if(te instanceof IEnergyConnection && ((IEnergyConnection) te).canConnectEnergy(f.getOpposite())) conns.put(f, true);
+			else if(te.hasCapability(CapabilityEnergy.ENERGY, f.getOpposite())) conns.put(f, true);
+			else if(TeslaAPI.isTeslaConsumer(te)) conns.put(f, true);
+		}
+		
+		double nx = 5D / 16D, ny = 5D / 16D, nz = 5D / 16D, xx = 11D / 16D, xy = 11D / 16D, xz = 11D / 16D;
+		
+		if(conns.get(EnumFacing.SOUTH)) addCollisionBoxToList(p, box, l, CENTER_SOUTH);
+		if(conns.get(EnumFacing.NORTH)) addCollisionBoxToList(p, box, l, CENTER_NORTH);
+		if(conns.get(EnumFacing.EAST)) addCollisionBoxToList(p, box, l, CENTER_EAST);
+		if(conns.get(EnumFacing.WEST)) addCollisionBoxToList(p, box, l, CENTER_WEST);
+		if(conns.get(EnumFacing.UP)) addCollisionBoxToList(p, box, l, CENTER_UP);
+		if(conns.get(EnumFacing.DOWN)) addCollisionBoxToList(p, box, l, CENTER_DOWN);
 	}
 	
 	@Override

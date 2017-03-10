@@ -18,7 +18,6 @@ import com.mrdimka.solarfluxreborn.utility.Lang;
 
 public class WDataPump implements IWailaDataProvider
 {
-
 	@Override
 	public ItemStack getWailaStack(IWailaDataAccessor accessor, IWailaConfigHandler config)
 	{
@@ -39,16 +38,16 @@ public class WDataPump implements IWailaDataProvider
 		if(te instanceof SolarPanelTileEntity)
 		{
 			SolarPanelTileEntity t = (SolarPanelTileEntity) te;
-			currenttip.add(Lang.localise("energy.stored") + ": " + t.getEnergyStored() + " RF");
-			currenttip.add(Lang.localise("energy.capacity") + ": " + t.getMaxEnergyStored() + " RF");
-			currenttip.add(Lang.localise("energy.generation") + ": " + t.getCurrentEnergyGeneration() + " RF");
+			currenttip.add(Lang.localise("energy.stored") + ": " + String.format("%,d", t.getEnergyStored()) + " RF");
+			currenttip.add(Lang.localise("energy.capacity") + ": " + String.format("%,d", t.getMaxEnergyStored()) + " RF");
+			currenttip.add(Lang.localise("energy.generation") + ": " + String.format("%,d", t.getCurrentEnergyGeneration()) + " RF/t");
 			currenttip.add(Lang.localise("energy.efficiency") + ": " + Math.round(100D * t.getCurrentEnergyGeneration() / t.getMaximumEnergyGeneration()) + "%");
 		}
 		
 		if(te instanceof TileCustomCable)
 		{
 			TileCustomCable t = (TileCustomCable) te;
-			if(t.tier != 3) currenttip.add(Lang.localise("energy.transfer") + ": " + t.capacityAdded);
+			currenttip.add(Lang.localise("energy.transfer") + ": " + t.capacityAdded);
 		}
 		
 		return currenttip;

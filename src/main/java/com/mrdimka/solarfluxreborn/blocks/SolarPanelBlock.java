@@ -1,5 +1,8 @@
 package com.mrdimka.solarfluxreborn.blocks;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.mrdimka.solarfluxreborn.SolarFluxRebornMod;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.creativetab.ModCreativeTab;
@@ -54,12 +57,6 @@ public class SolarPanelBlock extends BlockContainer
     }
     
     @Override
-    public boolean isVisuallyOpaque()
-    {
-    	return false;
-    }
-    
-    @Override
     public boolean isFullyOpaque(IBlockState p_isFullyOpaque_1_)
     {
     	return false;
@@ -75,18 +72,6 @@ public class SolarPanelBlock extends BlockContainer
     public AxisAlignedBB getBoundingBox(IBlockState s, IBlockAccess w, BlockPos p)
     {
     	return new AxisAlignedBB(0, 0, 0, 1, 6D / 16D, 1);
-    }
-    
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState s, World w, BlockPos p)
-    {
-    	return new AxisAlignedBB(0, 0, 0, 1, 8D / 16D, 1);
-    }
-    
-    @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState s, World w, BlockPos p)
-    {
-    	return new AxisAlignedBB(p.getX(), p.getY(), p.getZ(), p.getX() + 1, p.getY() + (6D / 16D), p.getZ() + 1);
     }
     
     @Override
@@ -119,22 +104,19 @@ public class SolarPanelBlock extends BlockContainer
     }
     
     @Override
-    public boolean onBlockActivated(World w, BlockPos pos, IBlockState s, EntityPlayer player, EnumHand hand, ItemStack stack, EnumFacing side, float p_onBlockActivated_8_, float p_onBlockActivated_9_, float p_onBlockActivated_10_)
+    public boolean onBlockActivated(World w, BlockPos pos, IBlockState s, EntityPlayer player, EnumHand hand, EnumFacing side, float p_onBlockActivated_8_, float p_onBlockActivated_9_, float p_onBlockActivated_10_)
     {
-    	if(!w.isRemote)
-    	{
-            if(player.isSneaking())
+    	if(player.isSneaking())
+        {
+            if(Utils.hasUsableWrench(player, pos))
             {
-                if(Utils.hasUsableWrench(player, pos))
-                {
-                    dismantleBlock(w, pos);
-                    return true;
-                }
-            }else
-            {
-                if(w.getTileEntity(pos) instanceof SolarPanelTileEntity)
-                	player.openGui(SolarFluxRebornMod.instance, 0, w, pos.getX(), pos.getY(), pos.getZ());
+                dismantleBlock(w, pos);
+                return true;
             }
+        }else if(!w.isRemote)
+        {
+            if(w.getTileEntity(pos) instanceof SolarPanelTileEntity)
+            	player.openGui(SolarFluxRebornMod.instance, 0, w, pos.getX(), pos.getY(), pos.getZ());
         }
         return true;
     }
@@ -149,7 +131,20 @@ public class SolarPanelBlock extends BlockContainer
                 tile.getMaxEnergyStored(),
                 Lang.localise("energy.generation"),
                 tile.getCurrentEnergyGeneration());
-        pPlayer.addChatMessage(new TextComponentString(message));
+        pPlayer.sendMessage(new TextComponentString(message));
+    }
+    
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state)
+    {
+    	dismantleBlock(world, pos);
+    	super.breakBlock(world, pos, state);
+    }
+    
+    @Override
+    public List<ItemStack> getDrops(IBlockAccess p_getDrops_1_, BlockPos p_getDrops_2_, IBlockState p_getDrops_3_, int p_getDrops_4_)
+    {
+    	return new ArrayList<ItemStack>();
     }
     
     /**
@@ -158,6 +153,8 @@ public class SolarPanelBlock extends BlockContainer
      */
     private void dismantleBlock(World pWorld, BlockPos pos)
     {
+    	if(!(pWorld.getTileEntity(pos) instanceof SolarPanelTileEntity)) return; //Issue #38 fix
+    	
         // TODO Consider moving this logic to the Tile Entity class. (could prevent exposing internals of the tile entity) (e.g. readFromItemStack/writeToItemStack)
         ItemStack itemStack = new ItemStack(this);
         
@@ -169,7 +166,7 @@ public class SolarPanelBlock extends BlockContainer
             if(internalEnergy > 0)
             {
                 if(itemStack.getTagCompound() == null) itemStack.setTagCompound(new NBTTagCompound());
-                itemStack.getTagCompound().setInteger(NBTConstants.ENERGY, internalEnergy);
+                itemStack.getTagCompound().setInteger(NBTConstants.ENERGY, (int) (internalEnergy * 0.01F));
             }
         }
         
@@ -194,10 +191,15 @@ public class SolarPanelBlock extends BlockContainer
                 // We remove the tile entity to avoid having the inventory content dropped into the world.
                 pWorld.removeTileEntity(pos);
             }
+        }else
+        {
+        	SolarPanelTileEntity localTileCell = (SolarPanelTileEntity) pWorld.getTileEntity(pos);
+            int upgradeInstalled = localTileCell.getTotalUpgradeInstalled();
+            if(upgradeInstalled > 0) localTileCell.getInventory().drop(pWorld, pos);
         }
         
         pWorld.setBlockToAir(pos);
-        pWorld.spawnEntityInWorld(new EntityItem(pWorld, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, itemStack));
+        pWorld.spawnEntity(new EntityItem(pWorld, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, itemStack));
     }
     
     public int getTierIndex()

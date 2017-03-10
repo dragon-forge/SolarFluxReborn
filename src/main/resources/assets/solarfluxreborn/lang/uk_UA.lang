@@ -1,0 +1,66 @@
+﻿itemGroup.solarfluxreborn=Solar Flux Reborn
+
+tile.solarfluxreborn:wire_1.name=Простий кабель
+tile.solarfluxreborn:wire_2.name=Другий кабель
+tile.solarfluxreborn:wire_3.name=Останній кабель
+
+tile.solarfluxreborn:solar0.name=Сонячна панель I
+tile.solarfluxreborn:solar1.name=Сонячна панель II
+tile.solarfluxreborn:solar2.name=Сонячна панель III
+tile.solarfluxreborn:solar3.name=Сонячна панель IV
+tile.solarfluxreborn:solar4.name=Сонячна панель V
+tile.solarfluxreborn:solar5.name=Сонячна панель VI
+tile.solarfluxreborn:solar6.name=Сонячна панель VII
+tile.solarfluxreborn:solar7.name=Сонячна панель VIII
+tile.solarfluxreborn:solar8.name=Сонячна панель IX
+tile.solarfluxreborn:solar9.name=Сонячна панель X
+tile.solarfluxreborn:solar10.name=Сонячна панель XI
+tile.solarfluxreborn:solar11.name=Сонячна панель XII
+tile.solarfluxreborn:solar12.name=Сонячна панель XIII
+tile.solarfluxreborn:solar13.name=Сонячна панель XIV
+tile.solarfluxreborn:solar14.name=Сонячна панель XV
+tile.solarfluxreborn:solar15.name=Сонячна панель XVI
+
+tile.solarfluxreborn:solardraconic.name=Драконіевая сонячна панель
+tile.solarfluxreborn:solarchaotic.name=Сонячна панель хаоса
+
+tile.solarfluxreborn:solardarkmatter.name=Темно-матеріальна сонячна панель
+item.solarfluxreborn:solarcelldarkmatter.name=Фотоелектрична ячейка з темної матерії
+item.solarfluxreborn:unprepareddmsolar.name=Темно-матеріальна сонячна панель (Не готова)
+
+item.solarfluxreborn:mirror.name=Дзеркало
+item.solarfluxreborn:solarCell1.name=Фотоелектрична ячейка I
+item.solarfluxreborn:solarCell2.name=Фотоелектрична ячейка II
+item.solarfluxreborn:solarCell3.name=Фотоелектрична ячейка III
+item.solarfluxreborn:solarCell4.name=Фотоелектрична ячейка IV
+item.solarfluxreborn:upgradeBlank.name=Шаблон апгрейда
+item.solarfluxreborn:upgradeEfficiency.name=Апгрейд: Ефективність
+item.solarfluxreborn:upgradeLowLight.name=Апгрейд: Низьке освітлення
+item.solarfluxreborn:upgradeTraversal.name=Апгрейд: Перетин машин
+item.solarfluxreborn:upgradeTransferRate.name=Апгрейд: Передача
+item.solarfluxreborn:upgradeCapacity.name=Апгрейд: Заряд
+item.solarfluxreborn:upgradeFurnace.name=Апгрейд: Енерго-Піч
+
+info.solarfluxreborn.energy.stored=Заряд
+info.solarfluxreborn.energy.generation=Генерація
+info.solarfluxreborn.energy.transfer=Передача
+info.solarfluxreborn.energy.capacity=Місткість
+info.solarfluxreborn.energy.efficiency=Ефективність
+info.solarfluxreborn.upgrades.installed=Оновлення
+info.solarfluxreborn.sun.intensity=Рівень освітлення
+info.solarfluxreborn.hold.for.info=Зажміть %s для деталей...
+info.solarfluxreborn.shift=Shift
+info.solarfluxreborn.maximum=Макс. кількість апгрейдов
+info.solarfluxreborn.decreasingReturnsToScale=Decreasing returns to scale
+info.solarfluxreborn.constantReturnsToScale=Constant returns to scale
+info.solarfluxreborn.increasingReturnsToScale=Increasing returns to scale
+info.solarfluxreborn.solar.panel.upgrade=Апгрейд для сонячної панелі
+info.solarfluxreborn.upgrade.efficiency=Покращує генерацію сонячної панелі на %.2f%%.
+info.solarfluxreborn.upgrade.low.light=Створює більше енергії в темних місцях, проте зменшує в свілтих.
+info.solarfluxreborn.upgrade.traversal=Розподіляє енергію до %d додаткових механизмів.
+info.solarfluxreborn.upgrade.transfer=Збільшує передачу на %.2f%%.
+info.solarfluxreborn.upgrade.capacity=Збільшує заряд на %.2f%%.
+info.solarfluxreborn.upgrade.furnace=Накоплює енергію, щоб запалити звичайну піч.
+info.solarfluxreborn.rf=RF
+info.solarfluxreborn.rfPerTick=RF/тик
+info.solarfluxreborn.craftitem=Матеріал.

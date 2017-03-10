@@ -1,9 +1,11 @@
-package com.mrdimka.solarfluxreborn.client.render.tile;
+package com.mrdimka.solarfluxreborn.client.tesr;
 
 import org.lwjgl.opengl.GL11;
 
-import com.mrdimka.hammercore.client.RenderBlocks;
-import com.mrdimka.solarfluxreborn.reference.Reference;
+import com.mrdimka.hammercore.client.utils.RenderBlocks;
+import com.mrdimka.solarfluxreborn.blocks.AbstractSolarPanelBlock;
+import com.mrdimka.solarfluxreborn.config.ModConfiguration;
+import com.mrdimka.solarfluxreborn.te.AbstractSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 
 import net.minecraft.block.Block;
@@ -13,7 +15,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
 
 public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTileEntity>
@@ -21,6 +22,10 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 	@Override
 	public void renderTileEntityAt(SolarPanelTileEntity te, double x, double y, double z, float var8, int var9)
 	{
+		Block type = te.getWorld().getBlockState(te.getPos()).getBlock();
+		if(type instanceof AbstractSolarPanelBlock && !((AbstractSolarPanelBlock) type).renderConnectedTextures) return;
+		if(!ModConfiguration.useConnectedTextures()) return;
+		
 		int i = te.getWorld().getCombinedLight(te.getPos(), 0);
 		
 		GL11.glPushMatrix();
@@ -34,7 +39,7 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		
 		Tessellator t = Tessellator.getInstance();
 		
-		TextureAtlasSprite sprite2 = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(Reference.MOD_ID.toLowerCase() + ":blocks/solar" + te.getTier() + "_1");
+		TextureAtlasSprite sprite2 = Minecraft.getMinecraft().getTextureMapBlocks().getAtlasSprite(te.getTopResource().toString());
 				
 		bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		
@@ -42,7 +47,6 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 		renderBlocks.setRenderBounds(1D / 16D, 0, 1D / 16D, 1D - 1D / 16D, 1D, 1D - 1D / 16D);
 		renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-		t.draw();
 		
 		boolean eastNorth_ = false, eastNorth = false;
 		boolean westSouth_ = false, westSouth = false;
@@ -51,75 +55,61 @@ public class RenderSolarPanelTile extends TileEntitySpecialRenderer<SolarPanelTi
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(0, 0, 1D / 16D, 2D / 16D, 1D, 1D - 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			westSouth_ = true;
 			westNorth_ = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D - 1D / 16D, 0, 1D / 16D, 1D, 1D, 1D - 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			eastNorth_ = true;
 			southEast_ = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0, 1D - 1D / 16D, 1D - 1D / 16D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			if(eastNorth_) eastNorth = true;
 			if(westNorth_) westNorth = true;
 		}
 		
 		if(te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0, 0D, 1D - 1D / 16D, 1D, 1D - 2D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 			if(westSouth_) westSouth = true;
 			if(southEast_) southEast = true;
 		}
 		
 		if(eastNorth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH).offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.NORTH).offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(15D / 16D, 0D, 15D / 16D, 1D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(westSouth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.SOUTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.SOUTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(0, 0D, 0, 1D / 16D, 1D, 1D / 16D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(westNorth && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.NORTH)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.WEST).offset(EnumFacing.NORTH))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 16D, 0D, 1D / 16D, 0D, 1D, 1D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
 		
 		if(southEast && te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH).offset(EnumFacing.EAST)) instanceof SolarPanelTileEntity && ((SolarPanelTileEntity) te.getWorld().getTileEntity(te.getPos().offset(EnumFacing.SOUTH).offset(EnumFacing.EAST))).getTier() == te.getTier())
 		{
-			t.getBuffer().begin(7, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);
 			renderBlocks.setRenderBounds(1D / 15D, 0D, 0D, 1D, 1D, 1D / 15D);
 			renderBlocks.renderFaceYPos(0, -.00005D, 0, sprite2, 1F, 1F, 1F, i);
-			t.draw();
 		}
+		
+		t.draw();
 		
 		GL11.glEnable(2884);
 		GL11.glEnable(GL11.GL_LIGHTING);

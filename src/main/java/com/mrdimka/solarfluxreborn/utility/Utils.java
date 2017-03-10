@@ -56,7 +56,7 @@ public final class Utils
         EntityItem entityItem = new EntityItem(pWorld, pX + 0.5, pY + 0.5, pZ + 0.5, pItemStack);
         entityItem.motionX = 0;
         entityItem.motionZ = 0;
-        pWorld.spawnEntityInWorld(entityItem);
+        pWorld.spawnEntity(entityItem);
     }
 
     /**
