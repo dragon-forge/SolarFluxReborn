@@ -2,6 +2,19 @@ package com.mrdimka.solarfluxreborn;
 
 import java.io.File;
 
+import net.minecraft.util.text.TextFormatting;
+import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventHandler;
+import net.minecraftforge.fml.common.SidedProxy;
+import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLInterModComms;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+
+import com.mrdimka.hammercore.ext.TeslaAPI;
 import com.mrdimka.solarfluxreborn.config.BlackHoleStorageConfigs;
 import com.mrdimka.solarfluxreborn.config.DraconicEvolutionConfigs;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
@@ -10,26 +23,12 @@ import com.mrdimka.solarfluxreborn.gui.GuiHandler;
 import com.mrdimka.solarfluxreborn.init.ModBlocks;
 import com.mrdimka.solarfluxreborn.init.ModItems;
 import com.mrdimka.solarfluxreborn.init.RecipeIO;
-import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.proxy.CommonProxy;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.AbstractSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 import com.mrdimka.solarfluxreborn.utility.SFRLog;
-
-import net.minecraft.util.text.TextFormatting;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventHandler;
-import net.minecraftforge.fml.common.SidedProxy;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLInterModComms;
-import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartedEvent;
-import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
-import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 @Mod(modid = Reference.MOD_ID, name = Reference.MOD_NAME, version = Reference.VERSION, guiFactory = Reference.GUI_FACTORY, dependencies = "required-after:hammercore;after:blackholestorage")
 public class SolarFluxRebornMod
@@ -64,17 +63,11 @@ public class SolarFluxRebornMod
 		
 		if(ModBlocks.getSolarPanels().isEmpty())
 		{
-			try { main_cfg.delete(); } catch(Throwable err) {}
-			throw new NoSolarsRegisteredException("No solar panels was registered in config file.\nSolarFluxReborn configs were removed. If not, please remove file \"" + main_cfg.getAbsolutePath() + "\" manually.\nTry restarting game.", false);
+			boolean deleted = main_cfg.delete();
+			throw new NoSolarsRegisteredException("No solar panels was registered in config file." + (deleted ? "\nSolarFluxReborn configs were removed." : "Please remove file \"" + main_cfg.getAbsolutePath() + "\" manually.") + "\nTry restarting game.", false);
 		}
 		
 		ModItems.initialize();
-	}
-	
-	@EventHandler
-	public void postInit(FMLPostInitializationEvent e)
-	{
-		RecipeIO.reload();
 	}
 	
 	@EventHandler
@@ -83,6 +76,8 @@ public class SolarFluxRebornMod
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandler());
 		FMLInterModComms.sendMessage("Waila", "register", "com.mrdimka.solarfluxreborn.intr.waila.WailaIntegrar.registerWAIA");
 		proxy.init();
+		
+		RecipeIO.reload();
 	}
 	
 	@EventHandler

@@ -28,6 +28,12 @@ tile.solarfluxreborn:solardarkmatter.name=Dark Matter Solar Panel
 item.solarfluxreborn:solarcelldarkmatter.name=Dark Matter Photovoltaic Cell
 item.solarfluxreborn:unprepareddmsolar.name=Dark Matter Solar Panel (Unprepared)
 
+item.solarfluxreborn:unpreparedsolar3.name=Solar Panel IV (Unprepared)
+item.solarfluxreborn:unpreparedsolar4.name=Solar Panel V (Unprepared)
+item.solarfluxreborn:unpreparedsolar5.name=Solar Panel VI (Unprepared)
+item.solarfluxreborn:unpreparedsolar6.name=Solar Panel VII (Unprepared)
+item.solarfluxreborn:unpreparedsolar7.name=Solar Panel VIII (Unprepared)
+
 item.solarfluxreborn:mirror.name=Mirror
 item.solarfluxreborn:solarCell1.name=Photovoltaic Cell I
 item.solarfluxreborn:solarCell2.name=Photovoltaic Cell II

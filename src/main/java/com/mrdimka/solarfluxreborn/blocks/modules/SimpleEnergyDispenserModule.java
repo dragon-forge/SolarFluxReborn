@@ -9,16 +9,15 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityFurnace;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
 import cofh.api.energy.IEnergyReceiver;
 
 import com.google.common.collect.Lists;
+import com.mrdimka.hammercore.ext.TeslaAPI;
 import com.mrdimka.solarfluxreborn.blocks.StatefulEnergyStorage;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
-import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.te.AbstractSolarPanelTileEntity;
 import com.mrdimka.solarfluxreborn.te.SolarPanelTileEntity;
 

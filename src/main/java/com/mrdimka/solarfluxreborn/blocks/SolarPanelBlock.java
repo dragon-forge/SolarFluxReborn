@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.mrdimka.solarfluxreborn.SolarFluxRebornMod;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
+import com.mrdimka.solarfluxreborn.config.RemoteConfigs;
 import com.mrdimka.solarfluxreborn.creativetab.ModCreativeTab;
 import com.mrdimka.solarfluxreborn.reference.NBTConstants;
 import com.mrdimka.solarfluxreborn.reference.Reference;
@@ -151,7 +152,7 @@ public class SolarPanelBlock extends BlockContainer
      * Dismantles the block and drops it in the air.
      * Used when wrenched.
      */
-    private void dismantleBlock(World pWorld, BlockPos pos)
+    public void dismantleBlock(World pWorld, BlockPos pos)
     {
     	if(!(pWorld.getTileEntity(pos) instanceof SolarPanelTileEntity)) return; //Issue #38 fix
     	
@@ -205,5 +206,10 @@ public class SolarPanelBlock extends BlockContainer
     public int getTierIndex()
     {
         return mTierIndex;
+    }
+    
+    public int getCapacity()
+    {
+    	return RemoteConfigs.getTierConfiguration(mTierIndex).getCapacity();
     }
 }

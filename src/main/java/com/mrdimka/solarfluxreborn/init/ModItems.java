@@ -6,6 +6,7 @@ import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 
 import com.google.common.collect.Lists;
+import com.mrdimka.solarfluxreborn.blocks.SolarPanelBlock;
 import com.mrdimka.solarfluxreborn.config.BlackHoleStorageConfigs;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
 import com.mrdimka.solarfluxreborn.items.CraftingItem;
@@ -14,6 +15,8 @@ import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.utility.Lang;
 
 public class ModItems {
+	private static final List<CraftingItem> unpreparedSolarPanels = Lists.newArrayList();
+	
     public static final Item mirror = new CraftingItem("mirror");
     public static final Item solarCell1 = new CraftingItem("solarCell1");
     public static final Item solarCell2 = new CraftingItem("solarCell2");
@@ -36,7 +39,20 @@ public class ModItems {
     private ModItems() {
     }
 
-    public static void initialize() {
+    public static void initialize()
+    {
+    	if(ModConfiguration.addUnprepared)
+    	{
+    		unpreparedSolarPanels.clear();
+    		for(int tierIndex = 3; tierIndex < ModConfiguration.getTierConfigurations().size(); tierIndex++)
+    		{
+    			String name = "unpreparedsolar" + tierIndex;
+    			CraftingItem unprepared = new CraftingItem(name);
+    			register(unprepared, name);
+    			unpreparedSolarPanels.add(unprepared);
+    		}
+    	}
+    	
         register(mirror, "mirror");
         register(solarCell1, "solarcell1");
         register(solarCell2, "solarcell2");
@@ -110,7 +126,14 @@ public class ModItems {
             register(mUpgradeBlank, "upgradeblank");
         }
     }
-
+    
+    public static CraftingItem getUnpreparedForPanel(SolarPanelBlock panel)
+    {
+    	int tier = panel.getTierIndex() - 3;
+    	if(unpreparedSolarPanels.size() > tier) return unpreparedSolarPanels.get(tier);
+    	return null;
+    }
+    
     private static String localiseReturnsToScale(float pValue) {
         if (pValue < 1) {
             return Lang.localise("decreasingReturnsToScale");

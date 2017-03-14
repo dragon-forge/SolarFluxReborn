@@ -28,6 +28,12 @@ tile.solarfluxreborn:solardarkmatter.name=Тёмно-материальная с
 item.solarfluxreborn:solarcelldarkmatter.name=Фотоэлектрическая ячейка из тёмной материи
 item.solarfluxreborn:unprepareddmsolar.name=Тёмно-материальная солнечная панель (Не готова)
 
+item.solarfluxreborn:unpreparedsolar3.name=Солнечная панель IV (Не готова)
+item.solarfluxreborn:unpreparedsolar4.name=Солнечная панель V (Не готова)
+item.solarfluxreborn:unpreparedsolar5.name=Солнечная панель VI (Не готова)
+item.solarfluxreborn:unpreparedsolar6.name=Солнечная панель VII (Не готова)
+item.solarfluxreborn:unpreparedsolar7.name=Солнечная панель VIII (Не готова)
+
 item.solarfluxreborn:mirror.name=Зеркало
 item.solarfluxreborn:solarCell1.name=Фотоэлектрическая ячейка I
 item.solarfluxreborn:solarCell2.name=Фотоэлектрическая ячейка II

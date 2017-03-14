@@ -28,6 +28,12 @@ tile.solarfluxreborn:solardarkmatter.name=暗物质太阳能电池板
 item.solarfluxreborn:solarcelldarkmatter.name=暗物质光伏电池
 item.solarfluxreborn:unprepareddmsolar.name=暗物质太阳能电池(未准备)
 
+item.solarfluxreborn:unpreparedsolar3.name=太阳能电池板IV (未准备)
+item.solarfluxreborn:unpreparedsolar4.name=太阳能电池板V (未准备)
+item.solarfluxreborn:unpreparedsolar5.name=太阳能电池板VI (未准备)
+item.solarfluxreborn:unpreparedsolar6.name=太阳能电池板VII (未准备)
+item.solarfluxreborn:unpreparedsolar7.name=太阳能电池板VIII (未准备)
+
 item.solarfluxreborn:mirror.name=镜子
 item.solarfluxreborn:solarCell1.name=光电池I
 item.solarfluxreborn:solarCell2.name=光电池II

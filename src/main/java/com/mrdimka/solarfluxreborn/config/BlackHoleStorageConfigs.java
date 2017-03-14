@@ -11,7 +11,7 @@ public class BlackHoleStorageConfigs
 {
 	private static Configuration cfg;
 	
-	public static boolean darkMatterSolar, solarcellDM, DMSolarRequiresTransformation;
+	public static boolean darkMatterSolar, solarcellDM, DMSolarRequiresTransformation, unpreparedSolarsNeedAT;
 	public static boolean canIntegrate = false;
 	
 	public static void initialize(File cfgFile)
@@ -33,6 +33,8 @@ public class BlackHoleStorageConfigs
 		solarcellDM = cfg.getBoolean("Dark Matter Photovoltaic Cell", "items", true, "Whether or not this Photovoltaic Cell should be added to the game.");
 		
 		DMSolarRequiresTransformation = cfg.getBoolean("Dark Matter Solar Needs Transformation", "crafting", true, "Whether or not this Dark Matter Solar Panel should use atomic tranformation crafting system from Black Hole Storage.");
+		
+		unpreparedSolarsNeedAT = cfg.getBoolean("Unprepared Solars Need Transformation", "crafting", true, "Whether or not Unprepared Solar Panels should use atomic tranformation crafting system from Black Hole Storage.");
 		
 		if(cfg.hasChanged()) cfg.save();
 	}

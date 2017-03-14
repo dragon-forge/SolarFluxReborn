@@ -22,8 +22,8 @@ import org.lwjgl.opengl.GL11;
 import cofh.api.energy.IEnergyConnection;
 
 import com.mrdimka.hammercore.client.utils.RenderBlocks;
+import com.mrdimka.hammercore.ext.TeslaAPI;
 import com.mrdimka.solarfluxreborn.client.DestroyStage;
-import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 import com.mrdimka.solarfluxreborn.utility.TileMapper;
 

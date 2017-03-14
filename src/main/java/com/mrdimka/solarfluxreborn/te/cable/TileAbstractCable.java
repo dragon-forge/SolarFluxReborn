@@ -14,7 +14,7 @@ import cofh.api.energy.IEnergyProvider;
 import cofh.api.energy.IEnergyReceiver;
 
 import com.mrdimka.common.utils.CommonTileEntity_SFR;
-import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
+import com.mrdimka.hammercore.ext.TeslaAPI;
 import com.mrdimka.solarfluxreborn.network.energy.cable.CableNetwork;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 

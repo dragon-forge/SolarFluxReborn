@@ -34,7 +34,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.Constants.NBT;
 
-public class AbstractSolarPanelBlock extends BlockContainer
+public class AbstractSolarPanelBlock extends SolarPanelBlock
 {
 	public boolean renderConnectedTextures = false;
 	public final int cap, transfer, maxGen;
@@ -42,7 +42,7 @@ public class AbstractSolarPanelBlock extends BlockContainer
 	
     public AbstractSolarPanelBlock(String pName, int cap, int transfer, int maxGen)
     {
-    	super(Material.IRON);
+    	super(pName, 0);
     	setUnlocalizedName(Reference.MOD_ID + ":" + pName);
     	name = pName;
     	this.cap = cap;
@@ -176,7 +176,7 @@ public class AbstractSolarPanelBlock extends BlockContainer
      * Dismantles the block and drops it in the air.
      * Used when wrenched.
      */
-    private void dismantleBlock(World pWorld, BlockPos pos)
+    public void dismantleBlock(World pWorld, BlockPos pos)
     {
         // TODO Consider moving this logic to the Tile Entity class. (could prevent exposing internals of the tile entity) (e.g. readFromItemStack/writeToItemStack)
         ItemStack itemStack = new ItemStack(this);
@@ -230,5 +230,11 @@ public class AbstractSolarPanelBlock extends BlockContainer
         
         pWorld.setBlockToAir(pos);
         pWorld.spawnEntity(new EntityItem(pWorld, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, itemStack));
+    }
+    
+    @Override
+    public int getCapacity()
+    {
+    	return cap;
     }
 }

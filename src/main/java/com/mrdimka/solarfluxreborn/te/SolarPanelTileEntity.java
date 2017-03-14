@@ -31,6 +31,7 @@ import com.mrdimka.solarfluxreborn.blocks.modules.ITileEntityModule;
 import com.mrdimka.solarfluxreborn.blocks.modules.SimpleEnergyDispenserModule;
 import com.mrdimka.solarfluxreborn.blocks.modules.TraversalEnergyDispenserModule;
 import com.mrdimka.solarfluxreborn.config.ModConfiguration;
+import com.mrdimka.solarfluxreborn.config.RemoteConfigs;
 import com.mrdimka.solarfluxreborn.config.TierConfiguration;
 import com.mrdimka.solarfluxreborn.init.ModItems;
 import com.mrdimka.solarfluxreborn.items.UpgradeItem;
@@ -243,19 +244,19 @@ public class SolarPanelTileEntity extends CommonTileEntity_SFR implements IInven
 	public int getTransfer()
 	{
 		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).transfer;
-		return ModConfiguration.getTierConfiguration(mTierIndex).getMaximumEnergyTransfer();
+		return RemoteConfigs.getTierConfiguration(mTierIndex).getMaximumEnergyTransfer();
 	}
 	
 	public int getMaxGen()
 	{
 		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).getMaximumEnergyGeneration();
-		return ModConfiguration.getTierConfiguration(mTierIndex).getMaximumEnergyGeneration();
+		return RemoteConfigs.getTierConfiguration(mTierIndex).getMaximumEnergyGeneration();
 	}
 	
 	public int getCapacity()
 	{
 		if(this instanceof AbstractSolarPanelTileEntity) return ((AbstractSolarPanelTileEntity) this).cap;
-		return ModConfiguration.getTierConfiguration(mTierIndex).getCapacity();
+		return RemoteConfigs.getTierConfiguration(mTierIndex).getCapacity();
 	}
 	
 	public int getTotalUpgradeInstalled()

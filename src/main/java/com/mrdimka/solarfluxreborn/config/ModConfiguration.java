@@ -65,6 +65,8 @@ public class ModConfiguration {
 	public static boolean wasConfigReplaced = false;
 	public static boolean willNotify = false;
 	
+	public static boolean addUnprepared = true;
+	
 	public static void initialize(File pConfigFile, File versionFile)
 	{
 		String version = "";
@@ -132,7 +134,8 @@ public class ModConfiguration {
 				0.4f, 0, 1, "Factor used to reduce the energy generation during stormy weather.");
 		mConnectedTextures = cfg.getBoolean("ConnectedTextures", Configuration.CATEGORY_GENERAL, true,
 				"Use connected textures for the solar panels.");
-
+		addUnprepared = cfg.getBoolean("UnpreparedSolars", "crafting", true, "Whether or not unprepared solar panels will be added to the game.");
+		
 		loadTierConfigurations();
 		loadUpgradesConfiguration();
 		

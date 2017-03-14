@@ -1,21 +1,30 @@
 package com.mrdimka.solarfluxreborn.init;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+
 import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 
+import com.mrdimka.solarfluxreborn.blocks.SolarPanelBlock;
 import com.mrdimka.solarfluxreborn.config.BlackHoleStorageConfigs;
 import com.mrdimka.solarfluxreborn.config.DraconicEvolutionConfigs;
+import com.mrdimka.solarfluxreborn.config.ModConfiguration;
+import com.mrdimka.solarfluxreborn.items.CraftingItem;
 import com.mrdimka.solarfluxreborn.utility.ArrayHashSet;
 
 public class RecipeIO
 {
+	private static final ArrayHashSet<FurnaceRecipe> fr = new ArrayHashSet<FurnaceRecipe>();
 	private static final ArrayHashSet<IRecipe> r = new ArrayHashSet<IRecipe>();
+	
 	public static final ArrayHashSet<IRecipe> recipes = new ArrayHashSet<IRecipe>();
 	private static final ArrayHashSet<IRecipe> recipesReg = new ArrayHashSet<IRecipe>();
 	
@@ -34,7 +43,26 @@ public class RecipeIO
 		while(true)
 		{
 			ShapedOreRecipe sor = recipe(i);
-			if(sor != null) r.add(sor);
+			
+			bbb: if(sor != null)
+			{
+				r.add(sor);
+				
+				if(i < 3) break bbb;
+				
+				SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(i);
+				CraftingItem unprepared = ModItems.getUnpreparedForPanel(spb);
+				
+				if(spb != null && unprepared != null)
+				{
+					FurnaceRecipe fr0 = new FurnaceRecipe(new ItemStack(unprepared), new ItemStack(spb));
+					
+					if(BlackHoleStorageConfigs.canIntegrate && BlackHoleStorageConfigs.unpreparedSolarsNeedAT)
+						fr0 = toBHSRecipe(fr0, spb.getCapacity() / (Math.abs(spb.getTierIndex()) + 1));
+					
+					fr.add(fr0);
+				}
+			}
 			else break;
 			++i;
 		}
@@ -77,6 +105,7 @@ public class RecipeIO
 	
 	private static void loadDEFRecipes() { FusionRecipes.register(); }
 	private static void loadBHSRecipes() { SFRAtomicTransformerRecipes.register(); }
+	private static FurnaceRecipe toBHSRecipe(FurnaceRecipe r, long rf) { return SFRAtomicTransformerRecipes.toAtomic(r, rf); }
 	
 	private static ShapedOreRecipe recipe(int solar)
 	{
@@ -85,40 +114,50 @@ public class RecipeIO
 			lastTier = 0;
 			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar)), "mmm", "prp", "ppp", 'm', ModItems.mirror, 'p', "plankWood", 'r', "dustRedstone");
 		}
-		else if(solar == 1 && ModBlocks.getSolarPanels().size() >= 2)
+		else if(solar == 1 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 1;
 			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar)), "sss", "sps", "sss", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', Blocks.PISTON);
 		}
-		else if(solar == 2 && ModBlocks.getSolarPanels().size() >= 3)
+		else if(solar == 2 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 2;
 			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell1, 'c', Items.REPEATER, 'b', "blockIron");
 		}
-		else if(solar == 3 && ModBlocks.getSolarPanels().size() >= 4)
+		else if(solar == 3 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 3;
-			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell2, 'c', Items.CLOCK, 'b', "blockIron");
+			SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(solar);
+			ItemStack result = new ItemStack(ModConfiguration.addUnprepared ? ModItems.getUnpreparedForPanel(spb) : Item.getItemFromBlock(spb), 2);
+			return new ShapedOreRecipe(result, "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell2, 'c', Items.CLOCK, 'b', "blockIron");
 		}
-		else if(solar == 4 && ModBlocks.getSolarPanels().size() >= 5)
+		else if(solar == 4 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 4;
-			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell3, 'c', Blocks.GLOWSTONE, 'b', "blockGold");
+			SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(solar);
+			ItemStack result = new ItemStack(ModConfiguration.addUnprepared ? ModItems.getUnpreparedForPanel(spb) : Item.getItemFromBlock(spb), 2);
+			return new ShapedOreRecipe(result, "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell3, 'c', Blocks.GLOWSTONE, 'b', "blockGold");
 		}
-		else if(solar == 5 && ModBlocks.getSolarPanels().size() >= 6)
+		else if(solar == 5 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 5;
-			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Blocks.REDSTONE_LAMP, 'b', "blockDiamond");
+			SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(solar);
+			ItemStack result = new ItemStack(ModConfiguration.addUnprepared ? ModItems.getUnpreparedForPanel(spb) : Item.getItemFromBlock(spb), 2);
+			return new ShapedOreRecipe(result, "ppp", "scs", "sbs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Blocks.REDSTONE_LAMP, 'b', "blockDiamond");
 		}
-		else if(solar == 6 && ModBlocks.getSolarPanels().size() >= 7)
+		else if(solar == 6 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 6;
-			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "scs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Items.DRAGON_BREATH);
+			SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(solar);
+			ItemStack result = new ItemStack(ModConfiguration.addUnprepared ? ModItems.getUnpreparedForPanel(spb) : Item.getItemFromBlock(spb), 2);
+			return new ShapedOreRecipe(result, "ppp", "scs", "scs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Items.DRAGON_BREATH);
 		}
-		else if(solar == 7 && ModBlocks.getSolarPanels().size() >= 8)
+		else if(solar == 7 && ModBlocks.getSolarPanels().size() > solar)
 		{
 			lastTier = 7;
-			return new ShapedOreRecipe(new ItemStack(ModBlocks.getSolarPanels().get(solar), 2), "ppp", "scs", "scs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Blocks.DRAGON_EGG);
+			SolarPanelBlock spb = (SolarPanelBlock) ModBlocks.getSolarPanels().get(solar);
+			ItemStack result = new ItemStack(ModConfiguration.addUnprepared ? ModItems.getUnpreparedForPanel(spb) : Item.getItemFromBlock(spb), 2);
+			return new ShapedOreRecipe(result, "ppp", "scs", "scs", 's', ModBlocks.getSolarPanels().get(solar - 1), 'p', ModItems.solarCell4, 'c', Blocks.DRAGON_EGG);
 		}
 		
 		return null;
@@ -126,12 +165,73 @@ public class RecipeIO
 	
 	public static void reload()
 	{
+		for(FurnaceRecipe r : fr) r.removeRecipe();
+		fr.clear();
+		
 		r2();
 		
+		for(FurnaceRecipe r : fr) r.addRecipe();
+		
 		CraftingManager.getInstance().getRecipeList().removeAll(recipesReg);
+		recipesReg.clear();
+		
 		CraftingManager.getInstance().getRecipeList().addAll(recipes);
-		recipesReg.addAll(recipes);
 		CraftingManager.getInstance().getRecipeList().addAll(r);
+		recipesReg.addAll(recipes);
 		recipesReg.addAll(r);
+	}
+	
+	public static class FurnaceRecipe
+	{
+		private final ItemStack in, out;
+		private final float xp;
+		
+		public FurnaceRecipe(ItemStack in, ItemStack out) { this(in, out, 0); } // no xp
+		public FurnaceRecipe(ItemStack in, ItemStack out, float xp)
+		{
+			this.in = in;
+			this.out = out;
+			this.xp = xp;
+		}
+		
+		public void addRecipe()
+		{
+			FurnaceRecipes.instance().addSmeltingRecipe(in, out, xp);
+		}
+		
+		public void removeRecipe()
+		{
+			Map<ItemStack, ItemStack> smeltingList = null;
+		    Map<ItemStack, Float> experienceList = null;
+		    
+		    Field[] fs = FurnaceRecipes.class.getDeclaredFields();
+		    
+		    Field f_smeltingList = fs[1];
+		    f_smeltingList.setAccessible(true);
+		    
+		    Field f_experienceList = fs[2];
+		    f_experienceList.setAccessible(true);
+		    
+		    try { smeltingList = (Map<ItemStack, ItemStack>) f_smeltingList.get(FurnaceRecipes.instance()); } catch(Throwable err) { smeltingList = FurnaceRecipes.instance().getSmeltingList(); }
+		    try { experienceList = (Map<ItemStack, Float>) f_experienceList.get(FurnaceRecipes.instance()); } catch(Throwable err) {}
+		    
+		    smeltingList.remove(in);
+		    if(experienceList != null) experienceList.remove(out);
+		}
+		
+		public ItemStack getIn()
+		{
+			return in;
+		}
+		
+		public ItemStack getOut()
+		{
+			return out;
+		}
+		
+		public float getXp()
+		{
+			return xp;
+		}
 	}
 }

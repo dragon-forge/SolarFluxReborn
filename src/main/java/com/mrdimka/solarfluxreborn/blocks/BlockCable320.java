@@ -18,8 +18,8 @@ import net.minecraft.world.World;
 import net.minecraftforge.energy.CapabilityEnergy;
 import cofh.api.energy.IEnergyConnection;
 
+import com.mrdimka.hammercore.ext.TeslaAPI;
 import com.mrdimka.solarfluxreborn.creativetab.ModCreativeTab;
-import com.mrdimka.solarfluxreborn.intr.tesla.TeslaAPI;
 import com.mrdimka.solarfluxreborn.reference.Reference;
 import com.mrdimka.solarfluxreborn.te.cable.TileCustomCable;
 
