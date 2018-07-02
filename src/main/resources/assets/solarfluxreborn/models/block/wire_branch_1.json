@@ -1,0 +1,23 @@
+{
+	"parent": "block/block",
+	"textures": {
+		"tex": "solarfluxreborn:blocks/wire_1",
+		"particle": "solarfluxreborn:blocks/wire_1"
+	},
+	"elements": [
+		{
+			"name": "cube",
+			"from": [6, 10, 6],
+			"to": [10, 16, 10],
+			"shade": true,
+			"faces": {
+				"north": {"uv": [6, 5, 10, 11], "texture": "#tex"},
+				"east": {"uv": [6, 5, 10, 11], "texture": "#tex"},
+				"south": {"uv": [6, 5, 10, 11], "texture": "#tex"},
+				"west": {"uv": [6, 5, 10, 11], "texture": "#tex"},
+				"up": {"uv": [6, 0, 10, 4], "texture": "#tex"},
+				"down": {"uv": [6, 12, 10, 16], "texture": "#tex"}
+			}
+		}
+	]
+}

@@ -1,0 +1,28 @@
+{
+	"display": {
+		"icon": {
+			"item": "solarfluxreborn:solar7",
+			"data": 0
+		},
+		"title": {
+			"translate": "advancement.solarfluxreborn:main/solar7"
+		},
+		"description": {
+			"translate": "advancement.solarfluxreborn:main/solar7.desc"
+		},
+        "frame": "goal"
+	},
+	"parent": "solarfluxreborn:main/solar6",
+	"criteria": {
+		"craft": {
+			"trigger": "minecraft:inventory_changed",
+			"conditions": {
+				"items": [
+					{
+						"item": "solarfluxreborn:solar7"
+					}
+				]
+			}
+		}
+	}
+}

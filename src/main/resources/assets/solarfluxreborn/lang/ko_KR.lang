@@ -1,0 +1,22 @@
+# author TeamMMKP(@clayweb , editor @puyo061)
+itemGroup.solarfluxreborn=솔라 플럭스 Reborn
+tile.solarfluxreborn:solar0.name=태양 전지판 I
+tile.solarfluxreborn:solar1.name=태양 전지판 II
+tile.solarfluxreborn:solar2.name=태양 전지판 III
+tile.solarfluxreborn:solar3.name=태양 전지판 IV
+tile.solarfluxreborn:solar4.name=태양 전지판 V
+tile.solarfluxreborn:solar5.name=태양 전지판 VI
+item.solarfluxreborn:mirror.name=거울
+item.solarfluxreborn:solarCore1.name=코어 I
+item.solarfluxreborn:solarCore2.name=코어 II
+item.solarfluxreborn:solarCore3.name=코어 III
+item.solarfluxreborn:solarCore4.name=코어 IV
+item.solarfluxreborn:solarCore5.name=코어 V
+item.solarfluxreborn:solarCell1.name=태양 전지 I
+item.solarfluxreborn:solarCell2.name=태양 전지 II
+item.solarfluxreborn:solarCell3.name=태양 전지 III
+item.solarfluxreborn:solarCell4.name=태양 전지 IV
+info.solarfluxreborn.energy.stored=에너지 충전량
+info.solarfluxreborn.energy.generation=에너지 발전량
+info.solarfluxreborn.energy.transfer=에너지 출력량
+info.solarfluxreborn.energy.capacity=에너지 저장량

@@ -1,0 +1,17 @@
+itemGroup.solarfluxreborn=Solar Flux Reborn
+tile.solarfluxreborn:solar0.name=Bateria słoneczna I
+tile.solarfluxreborn:solar1.name=Bateria słoneczna II
+tile.solarfluxreborn:solar2.name=Bateria słoneczna III
+tile.solarfluxreborn:solar3.name=Bateria słoneczna IV
+tile.solarfluxreborn:solar4.name=Bateria słoneczna V
+tile.solarfluxreborn:solar5.name=Bateria słoneczna VI
+item.solarfluxreborn:mirror.name=Lustro
+item.solarfluxreborn:solarCore1.name=Rdzeń I
+item.solarfluxreborn:solarCore2.name=Rdzeń II
+item.solarfluxreborn:solarCore3.name=Rdzeń III
+item.solarfluxreborn:solarCore4.name=Rdzeń IV
+item.solarfluxreborn:solarCore5.name=Rdzeń V
+item.solarfluxreborn:solarCell1.name=Ogniwo fotowoltaiczne I
+item.solarfluxreborn:solarCell2.name=Ogniwo fotowoltaiczne II
+item.solarfluxreborn:solarCell3.name=Ogniwo fotowoltaiczne III
+item.solarfluxreborn:solarCell4.name=Ogniwo fotowoltaiczne IV

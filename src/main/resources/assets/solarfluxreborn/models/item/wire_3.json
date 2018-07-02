@@ -1,0 +1,6 @@
+{
+    "parent": "solarfluxreborn:block/wire_inv",
+    "textures": {
+        "tex": "solarfluxreborn:blocks/wire_3"
+    }
+}

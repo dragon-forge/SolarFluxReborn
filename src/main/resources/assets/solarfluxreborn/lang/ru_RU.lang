@@ -1,0 +1,95 @@
+﻿itemGroup.solarfluxreborn=Solar Flux Reborn
+
+tile.solarfluxreborn:wire_1.name=Простой кабель
+tile.solarfluxreborn:wire_2.name=Второй кабель
+tile.solarfluxreborn:wire_3.name=Последний кабель
+
+tile.solarfluxreborn:solar0.name=Солнечная панель I
+tile.solarfluxreborn:solar1.name=Солнечная панель II
+tile.solarfluxreborn:solar2.name=Солнечная панель III
+tile.solarfluxreborn:solar3.name=Солнечная панель IV
+tile.solarfluxreborn:solar4.name=Солнечная панель V
+tile.solarfluxreborn:solar5.name=Солнечная панель VI
+tile.solarfluxreborn:solar6.name=Солнечная панель VII
+tile.solarfluxreborn:solar7.name=Солнечная панель VIII
+tile.solarfluxreborn:solar8.name=Солнечная панель IX
+tile.solarfluxreborn:solar9.name=Солнечная панель X
+tile.solarfluxreborn:solar10.name=Солнечная панель XI
+tile.solarfluxreborn:solar11.name=Солнечная панель XII
+tile.solarfluxreborn:solar12.name=Солнечная панель XIII
+tile.solarfluxreborn:solar13.name=Солнечная панель XIV
+tile.solarfluxreborn:solar14.name=Солнечная панель XV
+tile.solarfluxreborn:solar15.name=Солнечная панель XVI
+
+tile.solarfluxreborn:solardraconic.name=Дракониевая солнечная панель
+tile.solarfluxreborn:solarchaotic.name=Солнечная панель хаоса
+
+tile.solarfluxreborn:solardarkmatter.name=Тёмно-материальная солнечная панель
+item.solarfluxreborn:solarcelldarkmatter.name=Фотоэлектрическая ячейка из тёмной материи
+item.solarfluxreborn:unprepareddmsolar.name=Тёмно-материальная солнечная панель (Не готова)
+
+item.solarfluxreborn:unpreparedsolar3.name=Солнечная панель IV (Не готова)
+item.solarfluxreborn:unpreparedsolar4.name=Солнечная панель V (Не готова)
+item.solarfluxreborn:unpreparedsolar5.name=Солнечная панель VI (Не готова)
+item.solarfluxreborn:unpreparedsolar6.name=Солнечная панель VII (Не готова)
+item.solarfluxreborn:unpreparedsolar7.name=Солнечная панель VIII (Не готова)
+
+item.solarfluxreborn:mirror.name=Зеркало
+item.solarfluxreborn:solarCell1.name=Фотоэлектрическая ячейка I
+item.solarfluxreborn:solarCell2.name=Фотоэлектрическая ячейка II
+item.solarfluxreborn:solarCell3.name=Фотоэлектрическая ячейка III
+item.solarfluxreborn:solarCell4.name=Фотоэлектрическая ячейка IV
+item.solarfluxreborn:upgradeBlank.name=Шаблон апгрейда
+item.solarfluxreborn:upgradeEfficiency.name=Апгрейд: Эффективность
+item.solarfluxreborn:upgradeLowLight.name=Апгрейд: Низкое освещение
+item.solarfluxreborn:upgradeTraversal.name=Апгрейд: Пересечение машин
+item.solarfluxreborn:upgradeTransferRate.name=Апгрейд: Передача
+item.solarfluxreborn:upgradeCapacity.name=Апгрейд: Заряд
+item.solarfluxreborn:upgradeFurnace.name=Апгрейд: Энерго-Печь
+
+info.solarfluxreborn.energy.stored=Заряд
+info.solarfluxreborn.energy.generation=Генерация
+info.solarfluxreborn.energy.transfer=Передача
+info.solarfluxreborn.energy.capacity=Вместимость
+info.solarfluxreborn.energy.efficiency=Эффективность
+info.solarfluxreborn.upgrades.installed=Улучшения
+info.solarfluxreborn.sun.intensity=Уровень освещения
+info.solarfluxreborn.hold.for.info=Зажмите %s для деталей...
+info.solarfluxreborn.shift=Shift
+info.solarfluxreborn.maximum=Макс. количество апгрейдов
+info.solarfluxreborn.decreasingReturnsToScale=Decreasing returns to scale
+info.solarfluxreborn.constantReturnsToScale=Constant returns to scale
+info.solarfluxreborn.increasingReturnsToScale=Increasing returns to scale
+info.solarfluxreborn.solar.panel.upgrade=Апгрейд для солнечной панели
+info.solarfluxreborn.upgrade.efficiency=Увеличивает генерацию солнечной панели на %.2f%%.
+info.solarfluxreborn.upgrade.low.light=Создает больше энергии в темных местах, но уменьшает в светлых.
+info.solarfluxreborn.upgrade.traversal=Распределяет энергию к %d дополнительным механизмам.
+info.solarfluxreborn.upgrade.transfer=Увеличивает передачу на %.2f%%.
+info.solarfluxreborn.upgrade.capacity=Увеличивает заряд на %.2f%%.
+info.solarfluxreborn.upgrade.furnace=Накапливает энергию, чтобы запитать обычную печь.
+info.solarfluxreborn.rf=RF
+info.solarfluxreborn.rfPerTick=RF/тик
+info.solarfluxreborn.craftitem=Материал.
+
+advancement.solarfluxreborn:main/root=Solar Flux Reborn
+advancement.solarfluxreborn:main/root.desc=Солнечные панели которые вырабатывают Редстоун Флакс
+advancement.solarfluxreborn:main/solar1=Солнечная панель 2
+advancement.solarfluxreborn:main/solar1.desc=Создайте солнечную панель Ур. II
+advancement.solarfluxreborn:main/solar2=Солнечная панель 3
+advancement.solarfluxreborn:main/solar2.desc=Создайте солнечную панель Ур. III
+advancement.solarfluxreborn:main/solar3=Солнечная панель 4
+advancement.solarfluxreborn:main/solar3.desc=Создайте солнечную панель Ур. IV
+advancement.solarfluxreborn:main/solar4=Солнечная панель 5
+advancement.solarfluxreborn:main/solar4.desc=Создайте солнечную панель Ур. V
+advancement.solarfluxreborn:main/solar5=Солнечная панель 6
+advancement.solarfluxreborn:main/solar5.desc=Создайте солнечную панель Ур. VI
+advancement.solarfluxreborn:main/solar6=Солнечная панель 7
+advancement.solarfluxreborn:main/solar6.desc=Создайте солнечную панель Ур. VII
+advancement.solarfluxreborn:main/solar7=Солнечная панель 8
+advancement.solarfluxreborn:main/solar7.desc=Создайте солнечную панель Ур. VIII
+advancement.solarfluxreborn:main/wire_1=Простой кабель
+advancement.solarfluxreborn:main/wire_1.desc=Создайте простой кабель
+advancement.solarfluxreborn:main/wire_2=Второй кабель
+advancement.solarfluxreborn:main/wire_2.desc=Создайте второй кабель
+advancement.solarfluxreborn:main/wire_3=Последний кабель
+advancement.solarfluxreborn:main/wire_4.desc=Создайте последний кабель

@@ -1,0 +1,65 @@
+{
+	"multipart": [
+		{
+			"apply": {
+				"model": "solarfluxreborn:wire_base_2"
+			}
+		},
+		{
+			"when": {
+				"up": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2"
+			}
+		},
+		{
+			"when": {
+				"down": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2",
+				"x": 180
+			}
+		},
+		{
+			"when": {
+				"north": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2",
+				"x": 90
+			}
+		},
+		{
+			"when": {
+				"east": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2",
+				"x": 90,
+				"y": 90
+			}
+		},
+		{
+			"when": {
+				"south": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2",
+				"x": 90,
+				"y": 180
+			}
+		},
+		{
+			"when": {
+				"west": true
+			},
+			"apply": {
+				"model": "solarfluxreborn:wire_branch_2",
+				"x": 90,
+				"y": 270
+			}
+		}
+	]
+}
