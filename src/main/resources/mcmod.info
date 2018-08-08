@@ -1,11 +1,11 @@
 [
     {
-        "modid": "solarfluxreborn",
+        "modid": "solarflux",
         "name": "Solar Flux Reborn",
-        "description": "Solar Panels producing Redstone Flux or Forge Energy",
+        "description": "Solar Panels producing Forge Energy",
         "version": "${version}",
         "mcversion": "1.12.2",
-        "authorList": ["APengu"],
+        "authorList": ["Zeitheron"],
         "logoFile": "",
         "credits": ""
     }
