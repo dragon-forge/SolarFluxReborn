@@ -28,7 +28,7 @@ public class InventoryDummy implements IInventory
 	public BiPredicate<Integer, ItemStack> validSlots;
 	public Runnable markedDirty;
 	public Consumer<EntityPlayer> openInv, closeInv;
-	public IFieldHandler fields;
+	public IVariableHandler fields;
 	
 	public InventoryDummy(int inventorySize, NBTTagCompound boundNBT)
 	{
@@ -184,20 +184,18 @@ public class InventoryDummy implements IInventory
 	@Override
 	public int getField(int id)
 	{
-		return fields != null ? fields.getField(id) : 0;
+		return 0;
 	}
 	
 	@Override
 	public void setField(int id, int value)
 	{
-		if(fields != null)
-			fields.setField(id, value);
 	}
 	
 	@Override
 	public int getFieldCount()
 	{
-		return fields != null ? fields.getFieldCount() : 0;
+		return 0;
 	}
 	
 	@Override

@@ -4,11 +4,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.api.SolarInstance;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
 import com.zeitheron.solarflux.gui.ContainerBaseSolar;
 import com.zeitheron.solarflux.utils.FByteHelper;
-import com.zeitheron.solarflux.utils.IFieldHandler;
+import com.zeitheron.solarflux.utils.IVariableHandler;
 import com.zeitheron.solarflux.utils.InventoryDummy;
 
 import net.minecraft.block.state.IBlockState;
@@ -26,7 +27,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.wrapper.InvWrapper;
 
-public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStorage, IFieldHandler
+public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStorage, IVariableHandler
 {
 	protected int energy;
 	
@@ -42,10 +43,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	public final InventoryDummy items = new InventoryDummy(5);
 	public final InvWrapper itemWrapper = new InvWrapper(items);
 	{
-		items.validSlots = (slot, stack) ->
-		{
-			return false;
-		};
+		items.validSlots = (slot, stack) -> false;
 		items.fields = this;
 		items.openInv = crafters::add;
 		items.closeInv = crafters::remove;
@@ -72,14 +70,16 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	@Override
 	public void update()
 	{
-		if(instance == null || !instance.isValid())
+		if(getBlockType() instanceof BlockBaseSolar)
 		{
-			if(getBlockType() instanceof BlockBaseSolar)
+			SolarInfo si = ((BlockBaseSolar) getBlockType()).solarInfo;
+			renderConnectedTextures = si.connectTextures;
+			if(instance == null || !instance.isValid())
 			{
 				instance = new SolarInstance();
-				((BlockBaseSolar) getBlockType()).solarInfo.accept(instance);
+				si.accept(instance);
+				return;
 			}
-			return;
 		}
 		
 		if(world.isRemote)
@@ -251,13 +251,13 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	@Override
 	public int getEnergyStored()
 	{
-		return getField(0);
+		return getVar(0);
 	}
 	
 	@Override
 	public int getMaxEnergyStored()
 	{
-		return getField(1);
+		return getVar(1);
 	}
 	
 	@Override
@@ -273,7 +273,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	}
 	
 	@Override
-	public int getField(int id)
+	public int getVar(int id)
 	{
 		switch(id)
 		{
@@ -295,7 +295,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	}
 	
 	@Override
-	public void setField(int id, int value)
+	public void setVar(int id, int value)
 	{
 		switch(id)
 		{
@@ -321,7 +321,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	}
 	
 	@Override
-	public int getFieldCount()
+	public int getVarCount()
 	{
 		return 6;
 	}

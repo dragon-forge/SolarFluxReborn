@@ -49,10 +49,10 @@ public class GuiBaseSolar extends GuiContainer
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
 		fontRenderer.drawString(pinv.hasCustomName() ? pinv.getName() : I18n.format(pinv.getName()), BORDER_OFFSET, ySize - 96 + 2, 0x404040);
-		fontRenderer.drawString(String.format("%s: %,d FE", I18n.format("info." + InfoSF.MOD_ID + ".energy.stored"), solar.getField(0)), BORDER_OFFSET, BORDER_OFFSET, 0x404040);
-		fontRenderer.drawString(String.format("%s: %,d FE", I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity"), solar.getField(1)), BORDER_OFFSET, BORDER_OFFSET + 10, 0x404040);
-		fontRenderer.drawString(String.format("%s: %,d FE/%s", I18n.format("info." + InfoSF.MOD_ID + ".energy.generation"), solar.getField(4), I18n.format("tick")), BORDER_OFFSET, BORDER_OFFSET + 20, 0x404040);
-		fontRenderer.drawString(String.format("%s: %,d%%", I18n.format("info." + InfoSF.MOD_ID + ".energy.efficiency"), Math.round(100D * solar.getField(4) / solar.getField(2))), BORDER_OFFSET, BORDER_OFFSET + 30, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored1", solar.getVar(0)), BORDER_OFFSET, BORDER_OFFSET, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.getVar(1)), BORDER_OFFSET, BORDER_OFFSET + 10, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", solar.getVar(4)), BORDER_OFFSET, BORDER_OFFSET + 20, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.efficiency", Math.round(100D * solar.getVar(4) / solar.getVar(2))), BORDER_OFFSET, BORDER_OFFSET + 30, 0x404040);
 		
 		int //
 		x = xSize - GAUGE_WIDTH - BORDER_OFFSET, //
@@ -67,7 +67,7 @@ public class GuiBaseSolar extends GuiContainer
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			
 			if(pinv.getItemStack().isEmpty())
-				drawMouseOver(String.format("%s: %,d/%,d", I18n.format("info." + InfoSF.MOD_ID + ".energy.stored"), solar.getEnergyStored(), solar.getMaxEnergyStored()));
+				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored2", solar.getEnergyStored(), solar.getMaxEnergyStored()));
 		}
 		
 		x = xSize - 2 * GAUGE_WIDTH - BORDER_OFFSET - BORDER_OFFSET / 2;
@@ -82,7 +82,7 @@ public class GuiBaseSolar extends GuiContainer
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			
 			if(pinv.getItemStack().isEmpty())
-				drawMouseOver(String.format("%s: %d%%", I18n.format("info." + InfoSF.MOD_ID + ".sun.intensity"), Math.round(100 * solar.sunIntensity)));
+				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".sun.intensity", Math.round(100 * solar.sunIntensity)));
 		}
 	}
 	
@@ -120,7 +120,7 @@ public class GuiBaseSolar extends GuiContainer
 	{
 		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y, GAUGE_INNER_SRC_X + GAUGE_INNER_WIDTH, GAUGE_INNER_SRC_Y, GAUGE_INNER_WIDTH, GAUGE_INNER_HEIGHT);
 		
-		int height = (int) (solar.getField(0) / Math.max(1F, solar.getField(1)) * GAUGE_INNER_HEIGHT);
+		int height = (int) (solar.getVar(0) / Math.max(1F, solar.getVar(1)) * GAUGE_INNER_HEIGHT);
 		int offset = GAUGE_INNER_HEIGHT - height;
 		
 		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);

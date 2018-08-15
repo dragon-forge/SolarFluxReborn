@@ -10,17 +10,25 @@ import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class SolarInstance implements INBTSerializable<NBTTagCompound>
 {
+	public SolarInfo infoDelegate;
 	public ResourceLocation delegate;
 	public int gen, transfer, cap;
 	public boolean valid = false;
 	
 	public SolarInfo getDelegate()
 	{
-		return SolarFluxAPI.SOLAR_PANELS.getValue(this.delegate);
+		if(infoDelegate == null)
+			return infoDelegate = SolarFluxAPI.SOLAR_PANELS.getValue(this.delegate);
+		return infoDelegate;
 	}
 	
 	public float computeSunIntensity(TileBaseSolar solar)
 	{
+		if(getDelegate() != null)
+			return infoDelegate.computeSunIntensity(solar);
+		
+		// If delegate cannot be found for odd reason:
+		
 		if(!solar.getWorld().canBlockSeeSky(solar.getPos()))
 			return 0F;
 		

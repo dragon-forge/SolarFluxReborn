@@ -14,6 +14,7 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
@@ -99,9 +100,9 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
 	{
-		tooltip.add("Generation: " + String.format("%,d", solarInfo.maxGeneration));
-		tooltip.add("Transfer: " + String.format("%,d", solarInfo.maxTransfer));
-		tooltip.add("Capacity: " + String.format("%,d", solarInfo.maxCapacity));
+		tooltip.add(I18n.format("info.solarflux.energy.generation", solarInfo.maxGeneration));
+		tooltip.add(I18n.format("info.solarflux.energy.transfer", solarInfo.maxTransfer));
+		tooltip.add(I18n.format("info.solarflux.energy.capacity", solarInfo.maxCapacity));
 	}
 	
 	@Override

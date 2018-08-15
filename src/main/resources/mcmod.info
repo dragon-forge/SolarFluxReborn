@@ -6,7 +6,8 @@
         "version": "${version}",
         "mcversion": "1.12.2",
         "authorList": ["Zeitheron"],
+        "credits": "",
         "logoFile": "",
-        "credits": ""
+        "dependencies": []
     }
 ]

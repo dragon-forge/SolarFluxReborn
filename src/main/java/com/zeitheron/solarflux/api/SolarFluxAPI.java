@@ -8,7 +8,8 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 public class SolarFluxAPI
 {
-	public static CreativeTabs tab;
-	public static IForgeRegistry<SolarInfo> SOLAR_PANELS;
-	public static Consumer<Item> renderRenderer;
+	public static final CreativeTabs tab = null;
+	public static final IForgeRegistry<SolarInfo> SOLAR_PANELS = null;
+	public static final Consumer<Item> registerItem = null;
+	public static final Consumer<Item> renderRenderer = null;
 }

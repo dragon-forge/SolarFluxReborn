@@ -7,15 +7,22 @@ import java.util.List;
 import com.zeitheron.solarflux.SolarFlux;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 import com.zeitheron.solarflux.client.TESRSolarPanel;
+import com.zeitheron.solarflux.init.SolarsSF;
+import com.zeitheron.solarflux.net.NetworkSF;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
+import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent.Phase;
+import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent;
 
 public class ClientProxy implements ISFProxy
 {
@@ -49,6 +56,35 @@ public class ClientProxy implements ISFProxy
 				gmm.splashText = "Happy hatchday, Zeitheron!";
 			}
 		}
+	}
+	
+	boolean requested;
+	
+	@SubscribeEvent
+	public void clientTick(ClientTickEvent e)
+	{
+		if(e.phase != Phase.END)
+			return;
+		boolean ign = Minecraft.getMinecraft().player != null;
+		
+		if(!ign && requested)
+		{
+			requested = false;
+			SolarFlux.LOG.info("Restoring client settings for solar panels...");
+			SolarsSF.reloadConfigs();
+			SolarFlux.LOG.info("Solar Configs Restored!");
+		}
+	}
+	
+	@SubscribeEvent
+	public void render(RenderGameOverlayEvent.Post e)
+	{
+		if(e.getType() == ElementType.ALL)
+			if(!requested)
+			{
+				requested = true;
+				NetworkSF.INSTANCE.request();
+			}
 	}
 	
 	private void registerRender(Item item)

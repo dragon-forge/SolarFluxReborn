@@ -19,7 +19,7 @@ public class ContainerBaseSolar extends Container
 	public ContainerBaseSolar(TileBaseSolar tile, InventoryPlayer playerInv)
 	{
 		this.tile = tile;
-		this.prev = new int[tile.getFieldCount()];
+		this.prev = new int[tile.getVarCount()];
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
 		
@@ -31,19 +31,19 @@ public class ContainerBaseSolar extends Container
 	{
 		super.detectAndSendChanges();
 		
-		for(int j = 0; j < tile.getFieldCount(); ++j)
-			if(prev[j] != tile.getField(j))
+		for(int j = 0; j < tile.getVarCount(); ++j)
+			if(prev[j] != tile.getVar(j))
 			{
 				for(int i = 0; i < this.listeners.size(); ++i)
-					this.listeners.get(i).sendWindowProperty(this, j, tile.getField(j));
-				prev[j] = tile.getField(j);
+					this.listeners.get(i).sendWindowProperty(this, j, tile.getVar(j));
+				prev[j] = tile.getVar(j);
 			}
 	}
 	
 	@Override
 	public void updateProgressBar(int id, int data)
 	{
-		tile.setField(id, data);
+		tile.setVar(id, data);
 	}
 	
 	protected void addPlayerInventorySlotsToContainer(InventoryPlayer pInventoryPlayer, int pLeft, int pTop)

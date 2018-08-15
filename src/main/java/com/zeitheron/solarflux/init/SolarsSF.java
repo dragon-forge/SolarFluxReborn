@@ -6,11 +6,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
-import com.google.gson.stream.JsonWriter;
 import com.zeitheron.solarflux.InfoSF;
-import com.zeitheron.solarflux.SolarFlux;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
@@ -65,7 +64,7 @@ public class SolarsSF
 		});
 	}
 	
-	public static void init()
+	public static void reloadConfigs()
 	{
 		IForgeRegistry<SolarInfo> infos = SolarFluxAPI.SOLAR_PANELS;
 		
@@ -74,26 +73,25 @@ public class SolarsSF
 			si.getBlock().setCreativeTab(SolarFluxAPI.tab);
 			
 			ResourceLocation rn = si.getRegistryName();
-			File f = new File(cfgDir, rn.getNamespace());
+			File f = new File(cfgDir, si.getCompatMod() != null ? si.getCompatMod() : rn.getNamespace());
 			if(!f.isDirectory())
 				f.mkdirs();
 			f = new File(f, rn.getPath().replaceAll("/", "_") + ".json");
 			
 			if(!f.isFile())
-				try(JsonWriter j = new JsonWriter(new FileWriter(f)))
+				try(FileWriter j = new FileWriter(f))
 				{
-					j.beginObject();
+					j.append('{');
 					
-					j.name("capacity");
-					j.value(si.maxCapacity);
+					String nln = System.lineSeparator() + "\t";
+					char s = '\"';
 					
-					j.name("generation");
-					j.value(si.maxGeneration);
+					j.append(nln + s + "capacity" + s + ": " + si.maxCapacity + ",");
+					j.append(nln + s + "generation" + s + ": " + si.maxGeneration + ",");
+					j.append(nln + s + "transfer" + s + ": " + si.maxTransfer + ",");
+					j.append(nln + s + "connected_textures" + s + ": " + si.connectTextures + System.lineSeparator());
 					
-					j.name("transfer");
-					j.value(si.maxTransfer);
-					
-					j.endObject();
+					j.append('}');
 					j.flush();
 				} catch(IOException e)
 				{
@@ -108,6 +106,9 @@ public class SolarsSF
 				si.maxCapacity = cfg.get("capacity").getAsInt();
 				si.maxGeneration = cfg.get("generation").getAsInt();
 				si.maxTransfer = cfg.get("transfer").getAsInt();
+				
+				JsonElement connected_textures = cfg.get("connected_textures");
+				si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
 			} catch(IOException e)
 			{
 				e.printStackTrace();
