@@ -49,6 +49,7 @@ import net.minecraftforge.fml.common.discovery.ASMDataTable.ASMData;
 import net.minecraftforge.fml.common.event.FMLConstructionEvent;
 import net.minecraftforge.fml.common.event.FMLFingerprintViolationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -56,7 +57,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv")
+@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv", dependencies = "after:thaumcraft")
 public class SolarFlux
 {
 	public static final Logger LOG = LogManager.getLogger(InfoSF.MOD_ID);
@@ -107,7 +108,9 @@ public class SolarFlux
 				}
 				if(Loader.isModLoaded(compat.modid()))
 				{
-					compats.add(ISolarFluxCompat.class.cast(c.newInstance()));
+					ISolarFluxCompat icompat = ISolarFluxCompat.class.cast(c.newInstance());
+					compats.add(icompat);
+					MinecraftForge.EVENT_BUS.register(icompat);
 					LOG.info("Added SolarFlux compat - " + c.getCanonicalName());
 				} else
 					LOG.debug("Skipped SolarFlux compat - " + c.getCanonicalName() + " @" + compat.modid() + " not found!");
@@ -129,6 +132,25 @@ public class SolarFlux
 			{
 				NonNullList<ItemStack> sub = NonNullList.create();
 				super.displayAllRelevantItems(sub);
+				
+				for(int i = 0; i < sub.size(); ++i)
+				{
+					Item it = sub.get(i).getItem();
+					if(it instanceof ItemBlock)
+					{
+						ItemBlock ib = (ItemBlock) it;
+						if(ib.getBlock() instanceof BlockBaseSolar)
+						{
+							BlockBaseSolar bs = (BlockBaseSolar) ib.getBlock();
+							if(bs.solarInfo.maxGeneration <= 0)
+							{
+								sub.remove(i);
+								--i;
+							}
+						}
+					}
+				}
+				
 				sub.sort((a, b) ->
 				{
 					if(a.getItem() instanceof ItemBlock && b.getItem() instanceof ItemBlock)
@@ -208,6 +230,12 @@ public class SolarFlux
 		proxy.init();
 		
 		compats.forEach(ISolarFluxCompat::init);
+	}
+	
+	@EventHandler
+	public void postInit(FMLPostInitializationEvent e)
+	{
+		compats.forEach(ISolarFluxCompat::postInit);
 	}
 	
 	@EventHandler

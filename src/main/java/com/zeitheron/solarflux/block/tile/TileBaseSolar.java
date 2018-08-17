@@ -74,6 +74,13 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		{
 			SolarInfo si = ((BlockBaseSolar) getBlockType()).solarInfo;
 			renderConnectedTextures = si.connectTextures;
+			
+			if(si.maxGeneration <= 0)
+			{
+				world.destroyBlock(pos, true);
+				return;
+			}
+			
 			if(instance == null || !instance.isValid())
 			{
 				instance = new SolarInstance();

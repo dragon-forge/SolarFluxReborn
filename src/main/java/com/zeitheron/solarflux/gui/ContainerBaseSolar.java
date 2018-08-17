@@ -3,11 +3,12 @@ package com.zeitheron.solarflux.gui;
 import java.util.Arrays;
 
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
+import com.zeitheron.solarflux.net.ExpandedContainerListener;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IContainerListener;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 
@@ -16,12 +17,17 @@ public class ContainerBaseSolar extends Container
 	public final TileBaseSolar tile;
 	public final int[] prev;
 	
+	public ExpandedContainerListener networking;
+	
 	public ContainerBaseSolar(TileBaseSolar tile, InventoryPlayer playerInv)
 	{
 		this.tile = tile;
 		this.prev = new int[tile.getVarCount()];
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
+		
+		if(playerInv.player instanceof EntityPlayerMP)
+			networking = new ExpandedContainerListener((EntityPlayerMP) playerInv.player);
 		
 		Arrays.fill(prev, -1);
 	}
@@ -31,13 +37,13 @@ public class ContainerBaseSolar extends Container
 	{
 		super.detectAndSendChanges();
 		
-		for(int j = 0; j < tile.getVarCount(); ++j)
-			if(prev[j] != tile.getVar(j))
-			{
-				for(int i = 0; i < this.listeners.size(); ++i)
-					this.listeners.get(i).sendWindowProperty(this, j, tile.getVar(j));
-				prev[j] = tile.getVar(j);
-			}
+		if(networking != null)
+			for(int j = 0; j < tile.getVarCount(); ++j)
+				if(prev[j] != tile.getVar(j))
+				{
+					networking.sendWindowProperty(this, j, tile.getVar(j));
+					prev[j] = tile.getVar(j);
+				}
 	}
 	
 	@Override

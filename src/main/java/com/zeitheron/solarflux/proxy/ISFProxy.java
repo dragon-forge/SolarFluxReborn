@@ -11,4 +11,8 @@ public interface ISFProxy
 	default void render(Item item)
 	{
 	}
+	
+	default void updateWindow(int window, int key, int val)
+	{
+	}
 }

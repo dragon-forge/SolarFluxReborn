@@ -19,6 +19,10 @@ public interface ISolarFluxCompat
 	{
 	}
 	
+	default void postInit()
+	{
+	}
+	
 	default void registerRecipes(IForgeRegistry<IRecipe> ifr)
 	{
 	}

@@ -9,6 +9,7 @@ import com.zeitheron.solarflux.api.SolarInfo;
 
 import io.netty.buffer.Unpooled;
 import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.Container;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetHandlerPlayServer;
 import net.minecraft.network.PacketBuffer;
@@ -52,6 +53,9 @@ public class NetworkSF
 					si.maxGeneration = nbt.getInteger("MG");
 				}
 			break;
+			case 0x02:
+				SolarFlux.proxy.updateWindow(nbt.getInteger("id"), nbt.getInteger("k"), nbt.getInteger("v"));
+			break;
 			default:
 			break;
 			}
@@ -72,16 +76,16 @@ public class NetworkSF
 			switch(nbt.getInteger("Action"))
 			{
 			case 0x01:
-			INetHandlerPlayServer inet = e.getHandler();
-			if(inet instanceof NetHandlerPlayServer)
-			{
-				NetHandlerPlayServer net = (NetHandlerPlayServer) inet;
-				EntityPlayerMP sender = net.player;
-				
-				// Sync them
-				SolarFluxAPI.SOLAR_PANELS.getValuesCollection().forEach(si -> send(sender, si));
-				SolarFlux.LOG.info("Sent " + SolarFluxAPI.SOLAR_PANELS.getValuesCollection().size() + " Panel Info Packets to " + sender);
-			}
+				INetHandlerPlayServer inet = e.getHandler();
+				if(inet instanceof NetHandlerPlayServer)
+				{
+					NetHandlerPlayServer net = (NetHandlerPlayServer) inet;
+					EntityPlayerMP sender = net.player;
+					
+					// Sync them
+					SolarFluxAPI.SOLAR_PANELS.getValuesCollection().forEach(si -> send(sender, si));
+					SolarFlux.LOG.info("Sent " + SolarFluxAPI.SOLAR_PANELS.getValuesCollection().size() + " Panel Info Packets to " + sender);
+				}
 			break;
 			default:
 			break;
@@ -104,6 +108,18 @@ public class NetworkSF
 		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
 		payload.writeCompoundTag(tag);
 		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), mp);
+	}
+	
+	public void sendWindowProperty(EntityPlayerMP player, Container ctr, int var, int val)
+	{
+		NBTTagCompound tag = new NBTTagCompound();
+		tag.setInteger("Action", 0x02);
+		tag.setInteger("id", ctr.windowId);
+		tag.setInteger("k", var);
+		tag.setInteger("v", val);
+		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
+		payload.writeCompoundTag(tag);
+		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), player);
 	}
 	
 	@SideOnly(Side.CLIENT)
