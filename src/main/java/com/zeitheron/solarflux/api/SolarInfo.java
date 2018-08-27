@@ -1,16 +1,26 @@
 package com.zeitheron.solarflux.api;
 
+import java.util.Locale;
 import java.util.function.Consumer;
 
+import javax.annotation.Nullable;
+
+import com.google.common.reflect.TypeToken;
+import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.fml.common.FMLContainer;
+import net.minecraftforge.fml.common.InjectedModContainer;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.registries.IForgeRegistryEntry;
+import net.minecraftforge.registries.IRegistryDelegate;
 
-public class SolarInfo extends IForgeRegistryEntry.Impl<SolarInfo> implements Consumer<SolarInstance>
+public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<SolarInfo>
 {
 	public String compatMod;
 	
@@ -104,5 +114,60 @@ public class SolarInfo extends IForgeRegistryEntry.Impl<SolarInfo> implements Co
 		float displacement = 1.2F + (lowLightCount * .08F);
 		
 		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
+	}
+	
+	// REGISTRY STUFF //
+	
+	private TypeToken<SolarInfo> token = new TypeToken<SolarInfo>(getClass())
+	{
+	};
+	public final IRegistryDelegate<SolarInfo> delegate = new RegistryDelegate<SolarInfo>(this, (Class<SolarInfo>) token.getRawType());
+	private ResourceLocation registryName = null;
+	
+	public final SolarInfo setRegistryName(String name)
+	{
+		if(getRegistryName() != null)
+			throw new IllegalStateException("Attempted to set registry name with existing registry name! New: " + name + " Old: " + getRegistryName());
+		this.registryName = checkPrefix(name);
+		return (SolarInfo) this;
+	}
+	
+	public static ResourceLocation checkPrefix(String name)
+	{
+		int index = name.lastIndexOf(':');
+		String oldPrefix = index == -1 ? "" : name.substring(0, index).toLowerCase(Locale.ROOT);
+		name = index == -1 ? name : name.substring(index + 1);
+		ModContainer mc = Loader.instance().activeModContainer();
+		String prefix = mc == null || (mc instanceof InjectedModContainer && ((InjectedModContainer) mc).wrappedContainer instanceof FMLContainer) ? InfoSF.MOD_ID : mc.getModId().toLowerCase(Locale.ROOT);
+		if(!oldPrefix.equals(prefix) && oldPrefix.length() > 0)
+			prefix = oldPrefix;
+		return new ResourceLocation(prefix, name);
+	}
+	
+	// Helper functions
+	@Override
+	public final SolarInfo setRegistryName(ResourceLocation name)
+	{
+		return setRegistryName(name.toString());
+	}
+	
+	public final SolarInfo setRegistryName(String modID, String name)
+	{
+		return setRegistryName(modID + ":" + name);
+	}
+	
+	@Nullable
+	@Override
+	public final ResourceLocation getRegistryName()
+	{
+		if(delegate.name() != null)
+			return delegate.name();
+		return registryName != null ? registryName : null;
+	}
+	
+	@Override
+	public final Class<SolarInfo> getRegistryType()
+	{
+		return SolarInfo.class;
 	}
 }
