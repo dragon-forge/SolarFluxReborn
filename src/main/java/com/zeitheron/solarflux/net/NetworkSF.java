@@ -44,6 +44,7 @@ public class NetworkSF
 			switch(nbt.getInteger("Action"))
 			{
 			case 0x01:
+				System.out.println(nbt.getString("SolarInfo"));
 				SolarInfo si = SolarFluxAPI.SOLAR_PANELS.getValue(new ResourceLocation(nbt.getString("SolarInfo")));
 				if(si != null)
 				{
@@ -101,6 +102,7 @@ public class NetworkSF
 	{
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setInteger("Action", 0x01);
+		tag.setString("SolarInfo", si.getRegistryName().toString());
 		tag.setBoolean("CT", si.connectTextures);
 		tag.setInteger("MT", si.maxTransfer);
 		tag.setInteger("MC", si.maxCapacity);

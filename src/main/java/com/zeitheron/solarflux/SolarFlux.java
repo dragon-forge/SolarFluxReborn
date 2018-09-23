@@ -74,12 +74,12 @@ public class SolarFlux
 		MinecraftForge.EVENT_BUS.register(proxy);
 		MinecraftForge.EVENT_BUS.register(this);
 		
-		if(FinalFieldHelper.setSFField(SolarFluxAPI.class, "renderRenderer", (Consumer<Item>) proxy::render))
+		if(FinalFieldHelper.setStaticFinalField(SolarFluxAPI.class, "renderRenderer", (Consumer<Item>) proxy::render))
 			LOG.info("Applied render register to SolarFluxAPI.renderRenderer");
 		else
 			LOG.error("Failed to set SolarFluxAPI.renderRenderer to a valid consumer!");
 		
-		if(FinalFieldHelper.setSFField(SolarFluxAPI.class, "registerItem", (Consumer<Item>) item ->
+		if(FinalFieldHelper.setStaticFinalField(SolarFluxAPI.class, "registerItem", (Consumer<Item>) item ->
 		{
 			item.setTranslationKey(item.getRegistryName().toString());
 			ForgeRegistries.ITEMS.register(item);
@@ -119,7 +119,7 @@ public class SolarFlux
 				err.printStackTrace();
 			}
 		
-		if(FinalFieldHelper.setSFField(SolarFluxAPI.class, "tab", new CreativeTabs(InfoSF.MOD_ID)
+		if(FinalFieldHelper.setStaticFinalField(SolarFluxAPI.class, "tab", new CreativeTabs(InfoSF.MOD_ID)
 		{
 			@Override
 			public ItemStack createIcon()
@@ -207,7 +207,7 @@ public class SolarFlux
 	@SubscribeEvent
 	public void createRegistries(RegistryEvent.NewRegistry e)
 	{
-		if(FinalFieldHelper.setSFField(SolarFluxAPI.class, "SOLAR_PANELS", new RegistryBuilder<SolarInfo>().setName(new ResourceLocation(InfoSF.MOD_ID, "panels")).setType(SolarInfo.class).create()))
+		if(FinalFieldHelper.setStaticFinalField(SolarFluxAPI.class, "SOLAR_PANELS", new RegistryBuilder<SolarInfo>().setName(new ResourceLocation(InfoSF.MOD_ID, "panels")).setType(SolarInfo.class).create()))
 			LOG.info("Applied new registry to SolarFluxAPI.SOLAR_PANELS!");
 		else
 			LOG.error("Failed to set SolarFluxAPI.SOLAR_PANELS to new registry!");
@@ -223,7 +223,7 @@ public class SolarFlux
 	@EventHandler
 	public void init(FMLInitializationEvent e)
 	{
-		FinalFieldHelper.setSFField(NetworkSF.class, "INSTANCE", new NetworkSF());
+		FinalFieldHelper.setStaticFinalField(NetworkSF.class, "INSTANCE", new NetworkSF());
 		
 		SolarsSF.reloadConfigs();
 		NetworkRegistry.INSTANCE.registerGuiHandler(instance, new GuiHandlerSF());
@@ -267,24 +267,20 @@ public class SolarFlux
 		}
 	}
 	
-	private static class FinalFieldHelper
+	public static class FinalFieldHelper
 	{
 		private static Field modifiersField;
 		private static Object reflectionFactory;
 		private static Method newFieldAccessor;
 		private static Method fieldAccessorSet;
 		
-		static boolean setSFField(Class<?> cls, String var, Object val)
+		static boolean setStaticFinalField(Class<?> cls, String var, Object val)
 		{
 			try
 			{
 				Field f = cls.getDeclaredField(var);
-				if(Modifier.isStatic(f.getModifiers()) && Modifier.isFinal(f.getModifiers()))
-				{
-					makeWritable(f);
-					setField(f, null, val);
-					return true;
-				}
+				if(Modifier.isStatic(f.getModifiers()))
+					return setFinalField(f, null, val);
 				return false;
 			} catch(Throwable err)
 			{
@@ -309,10 +305,16 @@ public class SolarFlux
 			return f;
 		}
 		
-		static void setField(Field field, @Nullable Object instance, Object thing) throws ReflectiveOperationException
+		public static boolean setFinalField(Field f, @Nullable Object instance, Object thing) throws ReflectiveOperationException
 		{
-			Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, field, false);
-			fieldAccessorSet.invoke(fieldAccessor, instance, thing);
+			if(Modifier.isFinal(f.getModifiers()))
+			{
+				makeWritable(f);
+				Object fieldAccessor = newFieldAccessor.invoke(reflectionFactory, f, false);
+				fieldAccessorSet.invoke(fieldAccessor, instance, thing);
+				return true;
+			}
+			return false;
 		}
 	}
 }
