@@ -116,6 +116,8 @@ public class SolarFlux
 					LOG.debug("Skipped SolarFlux compat - " + c.getCanonicalName() + " @" + compat.modid() + " not found!");
 			} catch(Throwable err)
 			{
+				if(err instanceof ClassNotFoundException)
+					continue;
 				err.printStackTrace();
 			}
 		
