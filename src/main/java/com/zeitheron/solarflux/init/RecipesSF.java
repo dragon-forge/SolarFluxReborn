@@ -30,13 +30,13 @@ public class RecipesSF
 		Item dragon_egg = ForgeRegistries.ITEMS.getValue(new ResourceLocation("minecraft", "dragon_egg"));
 		
 		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_1.getBlock()), "mmm", "prp", "ppp", 'm', ItemsSF.MIRROR, 'p', "plankWood", 'r', "dustRedstone").setRegistryName(InfoSF.MOD_ID, "solar_panel_1"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_2.getBlock()), "sss", "sps", "sss", 's', new ItemStack(SolarsSF.SOLAR_1.getBlock()), 'p', Blocks.PISTON).setRegistryName(InfoSF.MOD_ID, "solar_panel_2"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_3.getBlock()), "ppp", "scs", "sbs", 's', new ItemStack(SolarsSF.SOLAR_2.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_1, 'c', Items.REPEATER, 'b', "blockIron").setRegistryName(InfoSF.MOD_ID, "solar_panel_3"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_4.getBlock(), 2), "ppp", "scs", "sbs", 's', new ItemStack(SolarsSF.SOLAR_3.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_2, 'c', Items.CLOCK, 'b', "blockIron").setRegistryName(InfoSF.MOD_ID, "solar_panel_4"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_5.getBlock(), 2), "ppp", "scs", "sbs", 's', new ItemStack(SolarsSF.SOLAR_4.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_3, 'c', "dustGlowstone", 'b', "blockGold").setRegistryName(InfoSF.MOD_ID, "solar_panel_5"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_6.getBlock(), 2), "ppp", "scs", "sbs", 's', new ItemStack(SolarsSF.SOLAR_5.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_4, 'c', Blocks.REDSTONE_LAMP, 'b', "blockDiamond").setRegistryName(InfoSF.MOD_ID, "solar_panel_6"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_7.getBlock(), 2), "ppp", "scs", "scs", 's', new ItemStack(SolarsSF.SOLAR_6.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_5, 'c', new ItemStack(Items.DRAGON_BREATH)).setRegistryName(InfoSF.MOD_ID, "solar_panel_7"));
-		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_8.getBlock(), 2), "ppp", "scs", "scs", 's', new ItemStack(SolarsSF.SOLAR_7.getBlock()), 'p', ItemsSF.PHOTOVOLTAIC_CELL_6, 'c', new ItemStack(dragon_egg)).setRegistryName(InfoSF.MOD_ID, "solar_panel_8"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_2.getBlock()), "sss", "sps", "sss", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_1.maxGeneration), 'p', Blocks.PISTON).setRegistryName(InfoSF.MOD_ID, "solar_panel_2"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_3.getBlock(), 2), "ppp", "scs", "sbs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_2.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_1, 'c', Items.REPEATER, 'b', "blockIron").setRegistryName(InfoSF.MOD_ID, "solar_panel_3"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_4.getBlock(), 2), "ppp", "scs", "sbs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_3.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_2, 'c', Items.CLOCK, 'b', "blockIron").setRegistryName(InfoSF.MOD_ID, "solar_panel_4"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_5.getBlock(), 2), "ppp", "scs", "sbs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_4.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_3, 'c', "dustGlowstone", 'b', "blockGold").setRegistryName(InfoSF.MOD_ID, "solar_panel_5"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_6.getBlock(), 2), "ppp", "scs", "sbs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_5.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_4, 'c', Blocks.REDSTONE_LAMP, 'b', "blockDiamond").setRegistryName(InfoSF.MOD_ID, "solar_panel_6"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_7.getBlock(), 2), "ppp", "scs", "scs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_6.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_5, 'c', new ItemStack(Items.DRAGON_BREATH)).setRegistryName(InfoSF.MOD_ID, "solar_panel_7"));
+		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_8.getBlock(), 2), "ppp", "scs", "scs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_7.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_6, 'c', new ItemStack(dragon_egg)).setRegistryName(InfoSF.MOD_ID, "solar_panel_8"));
 	}
 	
 	public static ShapedOreRecipe shaped(Item result, Object... recipe)

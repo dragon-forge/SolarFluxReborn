@@ -5,6 +5,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -17,6 +18,8 @@ import com.zeitheron.solarflux.block.BlockBaseSolar;
 import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -30,9 +33,14 @@ public class SolarsSF
 	public static final SolarInfo SOLAR_5 = new SolarInfo(512, 4_096, 8_000_000).setRegistryName(InfoSF.MOD_ID, "5");
 	public static final SolarInfo SOLAR_6 = new SolarInfo(2_048, 16_384, 32_000_000).setRegistryName(InfoSF.MOD_ID, "6");
 	public static final SolarInfo SOLAR_7 = new SolarInfo(8_192, 64_000, 64_000_000).setRegistryName(InfoSF.MOD_ID, "7");
-	public static final SolarInfo SOLAR_8 = new SolarInfo(32768, 256_000, 128_000_000).setRegistryName(InfoSF.MOD_ID, "8");
+	public static final SolarInfo SOLAR_8 = new SolarInfo(32_768, 256_000, 128_000_000).setRegistryName(InfoSF.MOD_ID, "8");
 	
 	private static File cfgDir;
+	
+	public static Ingredient getGeneratingSolars(int gen)
+	{
+		return Ingredient.fromStacks(SolarFluxAPI.SOLAR_PANELS.getValuesCollection().stream().filter(s -> s.maxGeneration == gen).map(SolarInfo::getBlock).map(ItemStack::new).collect(Collectors.toList()).toArray(new ItemStack[0]));
+	}
 	
 	public static void preInit(File file)
 	{

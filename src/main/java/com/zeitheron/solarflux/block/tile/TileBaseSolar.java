@@ -107,7 +107,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		}
 		
 		int gen = getGeneration();
-		energy += gen;
+		energy += Math.min(getMaxEnergyStored() - energy, gen);
 		currentGeneration = gen;
 		
 		energy = MathHelper.clamp(energy, 0, instance.cap);

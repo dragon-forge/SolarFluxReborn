@@ -2,9 +2,9 @@
 author=Zeitheron
 
 #Runtime info
-forge_version=14.23.4.2718
+forge_version=14.23.5.2768
 minecraft_version=1.12.2
-mcp=snapshot_20180803
+mcp=stable_39
 bhs_version=30a
 jei_version=4.11.0.206
 
@@ -12,6 +12,6 @@ jei_version=4.11.0.206
 mod_id=solarfluxreborn
 mod_id_fancy=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=4.13r
+mod_version=4.15r
 cf_project=246974
 release_type=release

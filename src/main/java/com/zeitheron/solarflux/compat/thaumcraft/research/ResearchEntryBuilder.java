@@ -23,12 +23,6 @@ public class ResearchEntryBuilder
 		return setKey(key).setCategory(category).setName(name).setPosition(x, y).setIcons(icons);
 	}
 	
-	public ResearchEntryBuilder setReward(ItemStack... rewards)
-	{
-		entry.setRewardItem(rewards);
-		return this;
-	}
-	
 	public ResearchEntryBuilder setKey(String key)
 	{
 		entry.setKey(key);

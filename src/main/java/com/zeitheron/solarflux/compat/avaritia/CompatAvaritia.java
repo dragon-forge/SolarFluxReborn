@@ -26,13 +26,13 @@ public class CompatAvaritia implements ISolarFluxCompat
 	@Override
 	public void registerSolarInfos(List<SolarInfo> panels)
 	{
-		panels.add(neutronium = new SolarInfo(256 * 1024, 1024 * MetricUnits.KILO, 512 * MetricUnits.MEGA).setRegistryName(InfoSF.MOD_ID, "neutronium"));
+		panels.add(neutronium = new SolarInfo(8_192 * 1024, 32_768 * MetricUnits.KILO, Integer.MAX_VALUE - 1 /* prevent buffer reset */).setRegistryName(InfoSF.MOD_ID, "neutronium"));
 	}
 	
 	@Override
 	public void init()
 	{
-		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_neutronium"), new ItemStack(neutronium.getBlock(), 2), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'i', ModItems.infinity_catalyst.copy(), 's', new ItemStack(SolarsSF.SOLAR_8.getBlock()));
+		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_neutronium"), new ItemStack(neutronium.getBlock(), 2), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'i', ModItems.infinity_catalyst.copy(), 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_8.maxGeneration));
 	}
 	
 	public static void extremeShaped(ResourceLocation id, ItemStack output, Object... recipe)

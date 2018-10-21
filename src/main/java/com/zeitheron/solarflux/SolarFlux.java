@@ -57,7 +57,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv", dependencies = "after:thaumcraft")
+@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv", dependencies = "after:thaumcraft@[6.1.BETA26,);")
 public class SolarFlux
 {
 	public static final Logger LOG = LogManager.getLogger(InfoSF.MOD_ID);
@@ -117,7 +117,11 @@ public class SolarFlux
 			} catch(Throwable err)
 			{
 				if(err instanceof ClassNotFoundException)
+				{
+					LOG.debug("Skipped SolarFlux compat - " + data.getClassName() + ", requested mod not found!");
 					continue;
+				}
+				
 				err.printStackTrace();
 			}
 		
