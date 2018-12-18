@@ -103,7 +103,7 @@ public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<S
 	
 	public float computeSunIntensity(TileBaseSolar solar)
 	{
-		if(!solar.getWorld().canBlockSeeSky(solar.getPos()))
+		if(!solar.doesSeeSky())
 			return 0F;
 		
 		float celestialAngleRadians = solar.getWorld().getCelestialAngleRadians(1F);

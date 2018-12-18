@@ -1,9 +1,11 @@
 package com.zeitheron.solarflux;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -57,7 +60,7 @@ import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.RegistryBuilder;
 
-@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv", dependencies = "after:thaumcraft@[6.1.BETA26,);")
+@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://pastebin.com/raw/EJgJGHLv", dependencies = "after:thaumcraft@[6.1.BETA26,);after:avaritia@[3.3.0,)")
 public class SolarFlux
 {
 	public static final Logger LOG = LogManager.getLogger(InfoSF.MOD_ID);
@@ -93,9 +96,15 @@ public class SolarFlux
 	
 	public static final Set<ISolarFluxCompat> compats = new HashSet<>();
 	
+	private static Configuration compatConfigs;
+	
 	@EventHandler
 	public void preInit(FMLPreInitializationEvent e)
 	{
+		Map<String, ISolarFluxCompat> cmap = new HashMap<>();
+		List<String> clist = new ArrayList<>();
+		
+		Configuration integrations = new Configuration();
 		for(ASMData data : e.getAsmData().getAll(SFCompat.class.getCanonicalName()))
 			try
 			{
@@ -106,10 +115,12 @@ public class SolarFlux
 					LOG.error("Found class that expects a compat from SolarFlux, but it doesn't implement " + ISolarFluxCompat.class.getName() + "!");
 					continue;
 				}
+				clist.add(compat.modid());
 				if(Loader.isModLoaded(compat.modid()))
 				{
 					ISolarFluxCompat icompat = ISolarFluxCompat.class.cast(c.newInstance());
 					compats.add(icompat);
+					cmap.put(compat.modid(), icompat);
 					MinecraftForge.EVENT_BUS.register(icompat);
 					LOG.info("Added SolarFlux compat - " + c.getCanonicalName());
 				} else
@@ -124,6 +135,34 @@ public class SolarFlux
 				
 				err.printStackTrace();
 			}
+		
+		{
+			String apath = e.getSuggestedConfigurationFile().getAbsolutePath();
+			File modCfgFile = new File(apath.substring(0, apath.lastIndexOf('.')));
+			if(!modCfgFile.isDirectory())
+				modCfgFile.mkdirs();
+			modCfgFile = new File(modCfgFile, "compats.cfg");
+			compatConfigs = new Configuration(modCfgFile);
+			
+			for(String modid : clist)
+			{
+				String modname = Loader.isModLoaded(modid) ? Loader.instance().getIndexedModList().get(modid).getName() : modid;
+				
+				boolean a = 1 == compatConfigs.getInt(modid, "States", modname != null ? 1 : 0, 0, 1, "Should SolarFluxReborn enable compat for '" + modname + "'?\n1 - Enable, 0 - Disable.");
+				if(!a && cmap.containsKey(modid))
+				{
+					compats.remove(cmap.get(modid));
+					MinecraftForge.EVENT_BUS.unregister(cmap.get(modid));
+					LOG.info("Disable SolarFlux compat - " + cmap.get(modid).getClass().getCanonicalName());
+				}
+			}
+			
+			compatConfigs.getCategory("States").setComment("If you are a pack maker, ensure that client and server have the same compats enabled/disabled to connect!");
+			compatConfigs.getCategory("States").setRequiresMcRestart(true);
+			
+			if(compatConfigs.hasChanged())
+				compatConfigs.save();
+		}
 		
 		if(FinalFieldHelper.setStaticFinalField(SolarFluxAPI.class, "tab", new CreativeTabs(InfoSF.MOD_ID)
 		{

@@ -6,7 +6,6 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.INBTSerializable;
-import net.minecraftforge.fml.common.registry.GameRegistry;
 
 public class SolarInstance implements INBTSerializable<NBTTagCompound>
 {
@@ -29,7 +28,7 @@ public class SolarInstance implements INBTSerializable<NBTTagCompound>
 		
 		// If delegate cannot be found for odd reason:
 		
-		if(!solar.getWorld().canBlockSeeSky(solar.getPos()))
+		if(!solar.doesSeeSky())
 			return 0F;
 		
 		float celestialAngleRadians = solar.getWorld().getCelestialAngleRadians(1F);

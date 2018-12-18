@@ -67,9 +67,29 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		return Objects.equals(other.instance.delegate, instance.delegate);
 	}
 	
+	// ***
+	// Implementation to fix #56
+	// ...so ideally this solution would use 9 bits, but this is Java...
+	public boolean cache$seeSky;
+	public byte cache$seeSkyTimer;
+	
+	public boolean doesSeeSky()
+	{
+		if(cache$seeSkyTimer < 1)
+		{
+			cache$seeSkyTimer = 20;
+			cache$seeSky = world != null && pos != null ? world.canBlockSeeSky(pos) : false;
+		}
+		return cache$seeSky;
+	}
+	// ***
+	
 	@Override
 	public void update()
 	{
+		if(cache$seeSkyTimer > 0)
+			--cache$seeSkyTimer;
+		
 		if(getBlockType() instanceof BlockBaseSolar)
 		{
 			SolarInfo si = ((BlockBaseSolar) getBlockType()).solarInfo;

@@ -9,9 +9,9 @@ bhs_version=30a
 jei_version=4.11.0.206
 
 #Mod info
-mod_id=solarfluxreborn
+mod_id=solarflux
 mod_id_fancy=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=4.15r
+mod_version=4.20r
 cf_project=246974
 release_type=release

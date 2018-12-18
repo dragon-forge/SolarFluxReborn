@@ -11,7 +11,6 @@ import com.zeitheron.solarflux.utils.MetricUnits;
 
 import morph.avaritia.init.ModItems;
 import morph.avaritia.recipe.AvaritiaRecipeManager;
-import morph.avaritia.recipe.extreme.ExtremeCraftingManager;
 import morph.avaritia.recipe.extreme.ExtremeShapedRecipe;
 import morph.avaritia.recipe.extreme.IExtremeRecipe;
 import net.minecraft.item.ItemStack;
@@ -26,11 +25,12 @@ public class CompatAvaritia implements ISolarFluxCompat
 	@Override
 	public void registerSolarInfos(List<SolarInfo> panels)
 	{
-		panels.add(neutronium = new SolarInfo(8_192 * 1024, 32_768 * MetricUnits.KILO, Integer.MAX_VALUE - 1 /* prevent buffer reset */).setRegistryName(InfoSF.MOD_ID, "neutronium"));
+		panels.add(neutronium = new SolarInfo(8_192 * 1024, 32_768 * MetricUnits.KILO, //
+		        Integer.MAX_VALUE - 1 /* prevent buffer reset */).setRegistryName(InfoSF.MOD_ID, "neutronium"));
 	}
 	
 	@Override
-	public void init()
+	public void preInit()
 	{
 		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_neutronium"), new ItemStack(neutronium.getBlock(), 2), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'i', ModItems.infinity_catalyst.copy(), 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_8.maxGeneration));
 	}
@@ -41,6 +41,5 @@ public class CompatAvaritia implements ISolarFluxCompat
 		
 		// Do some lewd registration stuff
 		AvaritiaRecipeManager.EXTREME_RECIPES.put(id, r);
-		ExtremeCraftingManager.REGISTRY.putObject(id, r);
 	}
 }
