@@ -21,7 +21,7 @@ import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 
 @SFCompat(modid = "draconicevolution")
-public class CompatDraconicEvo implements ISolarFluxCompat
+public class CompatDraconicEvolution implements ISolarFluxCompat
 {
 	private SolarInfo wyvern, draconic, chaotic;
 	
@@ -36,7 +36,8 @@ public class CompatDraconicEvo implements ISolarFluxCompat
 	@Override
 	public void init()
 	{
-		FusionRecipeAPI.addRecipe(new SimpleFusionRecipe(new ItemStack(chaotic.getBlock(), 4), new ItemStack(DEFeatures.chaoticCore), 256 * MetricUnits.MEGA, 3, SolarsSF.getGeneratingSolars(draconic.maxGeneration), new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore)));
+		for(ItemStack solar : SolarsSF.getGeneratingSolars(draconic.maxGeneration).getMatchingStacks())
+			FusionRecipeAPI.addRecipe(new SimpleFusionRecipe(new ItemStack(chaotic.getBlock(), 4), new ItemStack(DEFeatures.chaoticCore), 256 * MetricUnits.MEGA, 3, solar, new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore), new ItemStack(draconic.getBlock()), new ItemStack(DEFeatures.awakenedCore)));
 	}
 	
 	@Override
