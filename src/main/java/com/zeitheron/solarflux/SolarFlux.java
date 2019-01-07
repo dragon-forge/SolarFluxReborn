@@ -17,7 +17,6 @@ import javax.annotation.Nullable;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.zeitheron.holestorage.InfoBHS;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.api.compat.ISolarFluxCompat;
@@ -301,7 +300,7 @@ public class SolarFlux
 		{
 			Class HammerCore = Class.forName("com.zeitheron.hammercore.HammerCore");
 			Map<String, String> invalidCertificates = (Map<String, String>) HammerCore.getDeclaredField("invalidCertificates").get(null);
-			invalidCertificates.put(InfoBHS.MOD_ID, "https://minecraft.curseforge.com/projects/246974");
+			invalidCertificates.put(InfoSF.MOD_ID, "https://minecraft.curseforge.com/projects/246974");
 		} catch(Throwable err)
 		{
 			if(err instanceof ClassNotFoundException)
