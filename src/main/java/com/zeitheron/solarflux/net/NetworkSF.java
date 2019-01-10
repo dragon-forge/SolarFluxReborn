@@ -44,7 +44,6 @@ public class NetworkSF
 			switch(nbt.getInteger("Action"))
 			{
 			case 0x01:
-				System.out.println(nbt.getString("SolarInfo"));
 				SolarInfo si = SolarFluxAPI.SOLAR_PANELS.getValue(new ResourceLocation(nbt.getString("SolarInfo")));
 				if(si != null)
 				{

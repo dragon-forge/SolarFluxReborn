@@ -7,6 +7,7 @@ import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.api.SolarInstance;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
+import com.zeitheron.solarflux.items.ItemUpgrade;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
@@ -18,12 +19,14 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -115,10 +118,61 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 	}
 	
 	@Override
+	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+	{
+		TileBaseSolar tbs = (TileBaseSolar) worldIn.getTileEntity(pos);
+		if(tbs != null)
+		{
+			tbs.items.drop(worldIn, pos);
+			tbs.itemChargeable.drop(worldIn, pos);
+		}
+		super.breakBlock(worldIn, pos, state);
+	}
+	
+	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
 		if(!worldIn.isRemote && worldIn.getTileEntity(pos) instanceof TileBaseSolar)
+		{
+			ItemStack held = playerIn.getHeldItem(hand);
+			if(!held.isEmpty() && held.getItem() instanceof ItemUpgrade)
+			{
+				TileBaseSolar tbs = (TileBaseSolar) worldIn.getTileEntity(pos);
+				int amt = tbs.getUpgrades(held.getItem());
+				ItemUpgrade iu = (ItemUpgrade) held.getItem();
+				if(amt < iu.getMaxUpgrades())
+				{
+					boolean installed = false;
+					for(int i = 0; i < tbs.items.getSizeInventory(); ++i)
+					{
+						ItemStack stack = tbs.items.getStackInSlot(i);
+						if(stack.isItemEqual(held) && ItemStack.areItemStackTagsEqual(stack, held))
+						{
+							int allow = Math.min(iu.getMaxUpgrades() - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
+							stack.grow(allow);
+							held.shrink(allow);
+							installed = true;
+							break;
+						} else if(stack.isEmpty())
+						{
+							int allow = Math.min(iu.getMaxUpgrades() - tbs.getUpgrades(iu), held.getCount());
+							ItemStack copy = held.copy();
+							held.shrink(allow);
+							copy.setCount(allow);
+							tbs.items.setInventorySlotContents(i, copy);
+							installed = true;
+							break;
+						}
+					}
+					if(installed)
+					{
+						worldIn.playSound(null, pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, .1F, 1F);
+						return true;
+					}
+				}
+			}
 			playerIn.openGui(SolarFlux.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
+		}
 		return true;
 	}
 }

@@ -8,9 +8,11 @@ import net.minecraft.init.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
+import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -37,6 +39,10 @@ public class RecipesSF
 		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_6.getBlock(), 2), "ppp", "scs", "sbs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_5.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_4, 'c', Blocks.REDSTONE_LAMP, 'b', "blockDiamond").setRegistryName(InfoSF.MOD_ID, "solar_panel_6"));
 		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_7.getBlock(), 2), "ppp", "scs", "scs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_6.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_5, 'c', new ItemStack(Items.DRAGON_BREATH)).setRegistryName(InfoSF.MOD_ID, "solar_panel_7"));
 		registry.register(shaped(new ItemStack(SolarsSF.SOLAR_8.getBlock(), 2), "ppp", "scs", "scs", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_7.maxGeneration), 'p', ItemsSF.PHOTOVOLTAIC_CELL_6, 'c', new ItemStack(dragon_egg)).setRegistryName(InfoSF.MOD_ID, "solar_panel_8"));
+		registry.register(shaped(new ItemStack(ItemsSF.EFFICIENCY_UPGRADE), " m ", "mum", " c ", 'm', ItemsSF.MIRROR, 'u', ItemsSF.BLANK_UPGRADE, 'c', ItemsSF.PHOTOVOLTAIC_CELL_1).setRegistryName(InfoSF.MOD_ID, "efficiency_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.TRANSFER_RATE_UPGRADE), "rrr", "gug", "rrr", 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone", 'g', "ingotGold").setRegistryName(InfoSF.MOD_ID, "transfer_rate_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.TRAVERSAL_UPGRADE), "ipi", "rur", "ipi", 'i', "ingotIron", 'p', Ingredient.fromItems(Item.getItemFromBlock(Blocks.PISTON), Item.getItemFromBlock(Blocks.STICKY_PISTON)), 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone").setRegistryName(InfoSF.MOD_ID, "traversal_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.DISPERSIVE_UPGRADE), "geg", "eue", "geg", 'g', "dustGlowstone", 'e', Items.ENDER_EYE, 'u', ItemsSF.BLANK_UPGRADE).setRegistryName(InfoSF.MOD_ID, "dispersive_upgrade"));
 	}
 	
 	public static ShapedOreRecipe shaped(Item result, Object... recipe)

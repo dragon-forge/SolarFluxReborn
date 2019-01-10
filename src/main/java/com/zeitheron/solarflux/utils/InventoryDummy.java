@@ -207,10 +207,7 @@ public class InventoryDummy implements IInventory
 	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		if(nbt != null)
-		{
-			nbt.setInteger("InvSize", inventory.size());
 			ItemStackHelper.saveAllItems(nbt, inventory);
-		}
 		return nbt;
 	}
 	
@@ -218,7 +215,7 @@ public class InventoryDummy implements IInventory
 	{
 		if(nbt != null)
 		{
-			inventory = NonNullList.withSize(nbt.getInteger("InvSize"), ItemStack.EMPTY);
+			inventory = NonNullList.withSize(inventory.size(), ItemStack.EMPTY);
 			ItemStackHelper.loadAllItems(nbt, inventory);
 		}
 		return this;

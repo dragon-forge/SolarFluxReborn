@@ -1,0 +1,104 @@
+itemGroup.solarflux=Solar Flux Reborn
+
+tile.solarflux:solar_panel_1.name=Солнечная панель I
+tile.solarflux:solar_panel_2.name=Солнечная панель II
+tile.solarflux:solar_panel_3.name=Солнечная панель III
+tile.solarflux:solar_panel_4.name=Солнечная панель IV
+tile.solarflux:solar_panel_5.name=Солнечная панель V
+tile.solarflux:solar_panel_6.name=Солнечная панель VI
+tile.solarflux:solar_panel_7.name=Солнечная панель VII
+tile.solarflux:solar_panel_8.name=Солнечная панель VIII
+
+item.solarflux:mirror.name=Зеркало
+item.solarflux:photovoltaic_cell_1.name=Фотоэлектрическая ячейка I
+item.solarflux:photovoltaic_cell_2.name=Фотоэлектрическая ячейка II
+item.solarflux:photovoltaic_cell_3.name=Фотоэлектрическая ячейка III
+item.solarflux:photovoltaic_cell_4.name=Фотоэлектрическая ячейка IV
+item.solarflux:photovoltaic_cell_5.name=Фотоэлектрическая ячейка V
+item.solarflux:photovoltaic_cell_6.name=Фотоэлектрическая ячейка VI
+item.solarflux:blank_upgrade.name=Шаблон улучшения
+item.solarflux:efficiency_upgrade.name=Улучшение: Эффективность
+item.solarflux:low_light_upgrade.name=Улучшение: Слабое освещение
+item.solarflux:traversal_upgrade.name=Улучшение: Распределение по машинам
+item.solarflux:transfer_rate_upgrade.name=Улучшение: Скорость передачи
+item.solarflux:capacity_upgrade.name=Улучшение: Ёмкость
+item.solarflux:furnace_upgrade.name=Улучшение: Печь
+item.solarflux:dispersive_upgrade.name=Улучшение: Рассеивание
+
+### TOOLTIPS ###
+info.solarflux.energy.stored1=Хранится: %,d FE
+info.solarflux.energy.stored2=Хранится: %,d/%,d FE
+info.solarflux.energy.generation=Генерация: %,d FE/tick
+info.solarflux.energy.transfer=Передача: %,d FE/tick
+info.solarflux.energy.capacity=Ёмкость: %,d FE
+info.solarflux.energy.efficiency=Эффективность: %,d%%
+info.solarflux.upgrades.installed=Улучшения
+info.solarflux.sun.intensity=Уровень освещённости: %d%%
+info.solarflux.hold.for.info=Удерживайте %s для просмотра деталей
+info.solarflux.shift=Shift
+info.solarflux.maximum=Максимум
+info.solarflux.decreasingReturnsToScale=Decreasing returns to scale
+info.solarflux.constantReturnsToScale=Constant returns to scale
+info.solarflux.increasingReturnsToScale=Increasing returns to scale
+info.solarflux.solar.panel.upgrade=Улучшение для солнечной панели
+info.solarflux.upgrade.efficiency=Увеличивает количество FE, которое вырабатывает %.2f%%.
+info.solarflux.upgrade.low.light=Генерирует больше FE при слабом освещении, но меньше - при максимальном.
+info.solarflux.upgrade.traversal=Распределяет энергию в %d дополнительную(-ые) присоединённую(-ые) машину(-ы).
+info.solarflux.upgrade.transfer=Увеличивают скорость передачи на %.2f%%.
+info.solarflux.upgrade.capacity=Увеличивают внутреннюю ёмкость на %.2f%%.
+info.solarflux.upgrade.furnace=Накапливает энергию для нагрева ванильных печей.
+info.solarflux.craftitem=Ингредиент в рецептах.
+################
+
+## AVARITIA ##
+tile.solarflux:solar_panel_neutronium.name=Нейтрониевая солнечная панель
+tile.solarflux:solar_panel_infinite.name=Солнечная панель Бесконечности
+##############
+
+## DRACONIC EVOLUTION ##
+tile.solarflux:solar_panel_wyvern.name=Солнечная панель Виверны
+tile.solarflux:solar_panel_draconic.name=Солнечная панель Дракона
+tile.solarflux:solar_panel_chaotic.name=Солнечная панель Хаоса
+########################
+
+## BLACK HOLE STORAGE ##
+tile.solarflux:solar_panel_dark_matter.name=Солнечная панель из тёмной материи
+tile.solarflux:solar_panel_anti_matter.name=Солнечная панель из анти-материи
+item.solarflux:photovoltaic_cell_dark_matter.name=Фотоэлектрическая ячейка из тёмной материи
+########################
+
+## THAUMCRAFT ##
+tc.aspect.sol=Солнце, Солнечный свет
+tc.research_category.SOLARFLUX=Solar Flux
+
+tile.solarflux:solar_panel_alchemical_brass.name=Латунная солнечная панель
+tile.solarflux:solar_panel_thaumium.name=Солнечная панель из таумиума
+tile.solarflux:solar_panel_void_metal.name=Солнечная панель из пустотного металла
+
+# THEORYCRAFT STUFF
+
+card.solarflux:solar_panel.name=Солнечный свет
+card.solarflux:solar_panel.text=Вы чувствуете тепло, исходящее от рядом стоящей солнечной панели. Вы получаете от %,d до %,d в категории Solar Flux и берёте дополнительную карту. Время от времени Вы также можете получить 1 очко вдохновения.
+
+card.solarflux:photovoltaic_cell.name=Фотоэлектрические свойства
+card.solarflux:photovoltaic_cell.text=Вы внимательно и осторожно осматриваете фотоэлектрическую ячейку. Вы получаете от %,d до %,d в категории Solar Flux и берёте дополнительную карту.
+
+# RESEARCH
+
+research_name.solarflux:solarflux=Погружение в Solar Flux
+research_stage.solarflux:solarflux.1=После нескольких сборок панелей я понял, что могу улучшить их, используя магию. И тауматургия может помочь мне с этим!
+research_stage.solarflux:solarflux.2=Похоже, что солнечные панели содержат необычный аспект - Sol. Он может быть ключевым компонентом к наполнению их магией.
+
+research_name.solarflux:brass_solar_panel=Латунная солнечная панель
+research_stage.solarflux:brass_solar_panel.1=Я пришёл к выводу, что солнечную панель второго уровня можно волшебным образом усилить с помощью латуни. Это будет гораздо дешевле, но потом такую панель нельзя будет улучшить до четвёртого уровня.
+research_stage.solarflux:brass_solar_panel.2=Солнечную панель второго уровня легко улучшить с помощью латуни. Думаю, что используя магию, я смогу сделать в будущем альтернативный способ улучшения солнечных панелей.
+
+research_name.solarflux:thaumium_solar_panel=Солнечная панель из таумиума
+research_stage.solarflux:thaumium_solar_panel.1=Мне кажется, что всё чаще задумываясь о солнечных панелях, я познаю больше в магическом направлении их улучшения. Полагаю, что следующим шагом для меня станет использование таумиума.
+research_stage.solarflux:thaumium_solar_panel.2=Я пришёл к выводу, что латунная солнечная панель отвергает попытки улучшения её таумиумом, по крайней мере, на мистическом верстаке. Поэтому мне придётся делать это, используя наполняющую матрицу. Однако процесс этот потребует аспекта Sol, а также будет несколько нестабильным.
+
+research_name.solarflux:void_metal_solar_panel=Солнечная панель из пустотного металла
+research_stage.solarflux:void_metal_solar_panel.1=Я начинаю подумывать о том, что мои солнечные панели из таумиума могут быть улучшены ещё больше! Теперь, когда я знаю о пустотном металле, я могу попытаться нанести его на мою панель из таумиума.
+research_stage.solarflux:void_metal_solar_panel.2=Похоже, пустотный металл хорошо сочетается с третьим уровней фотоэлектрических ячеек, если использовать процесс наполнения. И хоть процесс и будет довольно нестабильным, панель, кажется, должна получиться весьма эффективной.
+
+################

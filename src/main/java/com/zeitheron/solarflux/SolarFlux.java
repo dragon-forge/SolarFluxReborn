@@ -30,6 +30,7 @@ import com.zeitheron.solarflux.init.RecipesSF;
 import com.zeitheron.solarflux.init.SolarsSF;
 import com.zeitheron.solarflux.net.NetworkSF;
 import com.zeitheron.solarflux.proxy.ISFProxy;
+import com.zeitheron.solarflux.utils.charging.ItemChargeHelper;
 
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
@@ -226,6 +227,7 @@ public class SolarFlux
 		{
 			List<SolarInfo> lo = new ArrayList<>();
 			i.registerSolarInfos(lo);
+			i.registerInvListers(ItemChargeHelper.playerInvListers);
 			lo.forEach(si -> si.setCompatMod(i.getClass().getAnnotation(SFCompat.class).modid()));
 			subs.addAll(lo);
 		});

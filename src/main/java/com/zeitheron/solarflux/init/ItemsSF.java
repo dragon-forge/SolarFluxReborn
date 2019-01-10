@@ -4,6 +4,10 @@ import java.util.Arrays;
 
 import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
+import com.zeitheron.solarflux.items.ItemDispersiveUpgrade;
+import com.zeitheron.solarflux.items.ItemEfficiencyUpgrade;
+import com.zeitheron.solarflux.items.ItemTransferRateUpgrade;
+import com.zeitheron.solarflux.items.ItemTraversalUpgrade;
 
 import net.minecraft.item.Item;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -19,6 +23,11 @@ public class ItemsSF
 	public static final Item PHOTOVOLTAIC_CELL_5 = new Item().setRegistryName(InfoSF.MOD_ID, "photovoltaic_cell_5");
 	public static final Item PHOTOVOLTAIC_CELL_6 = new Item().setRegistryName(InfoSF.MOD_ID, "photovoltaic_cell_6");
 	public static final Item BLANK_UPGRADE = new Item().setRegistryName(InfoSF.MOD_ID, "blank_upgrade");
+	
+	public static final Item EFFICIENCY_UPGRADE = new ItemEfficiencyUpgrade();
+	public static final Item TRANSFER_RATE_UPGRADE = new ItemTransferRateUpgrade();
+	public static final Item TRAVERSAL_UPGRADE = new ItemTraversalUpgrade();
+	public static final Item DISPERSIVE_UPGRADE = new ItemDispersiveUpgrade();
 	
 	public static void preInit()
 	{

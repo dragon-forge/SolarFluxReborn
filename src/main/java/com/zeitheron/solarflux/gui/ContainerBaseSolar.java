@@ -26,6 +26,11 @@ public class ContainerBaseSolar extends Container
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
 		
+		for(int i = 0; i < tile.items.getSizeInventory(); ++i)
+			addSlotToContainer(new SlotUpgrade(tile, i, i * 18 + 9, 61));
+		
+		addSlotToContainer(new SlotChargable(tile.itemChargeable, 0, 151, 9));
+		
 		if(playerInv.player instanceof EntityPlayerMP)
 			networking = new ExpandedContainerListener((EntityPlayerMP) playerInv.player);
 		

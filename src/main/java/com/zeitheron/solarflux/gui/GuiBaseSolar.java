@@ -48,6 +48,7 @@ public class GuiBaseSolar extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
+		solar.setBaseValuesOnGet = false;
 		fontRenderer.drawString(pinv.hasCustomName() ? pinv.getName() : I18n.format(pinv.getName()), BORDER_OFFSET, ySize - 96 + 2, 0x404040);
 		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored1", solar.getVar(0)), BORDER_OFFSET, BORDER_OFFSET, 0x404040);
 		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.getVar(1)), BORDER_OFFSET, BORDER_OFFSET + 10, 0x404040);
@@ -66,6 +67,10 @@ public class GuiBaseSolar extends GuiContainer
 			drawGradientRect(x + 1, y + 1, x + GAUGE_WIDTH - 1, y + GAUGE_HEIGHT - 1, 0x88FFFFFF, 0x88FFFFFF);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			
+			GlStateManager.color(1, 1, 1, 1);
+			this.mc.getTextureManager().bindTexture(ELEMENTS);
+			drawTexturedModalRect(x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
+			
 			if(pinv.getItemStack().isEmpty())
 				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored2", solar.getEnergyStored(), solar.getMaxEnergyStored()));
 		}
@@ -74,16 +79,20 @@ public class GuiBaseSolar extends GuiContainer
 		y = BORDER_OFFSET + 32;
 		
 		hover = inBounds(x + guiLeft, y + guiTop, GAUGE_WIDTH, GAUGE_HEIGHT, mouseX, mouseY);
-		
 		if(hover)
 		{
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			drawGradientRect(x + 1, y + 1, x + GAUGE_WIDTH - 1, y + GAUGE_HEIGHT - 1, 0x88FFFFFF, 0x88FFFFFF);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			
+			GlStateManager.color(1, 1, 1, 1);
+			this.mc.getTextureManager().bindTexture(ELEMENTS);
+			drawTexturedModalRect(x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
+			
 			if(pinv.getItemStack().isEmpty())
 				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".sun.intensity", Math.round(100 * solar.sunIntensity)));
 		}
+		solar.setBaseValuesOnGet = true;
 	}
 	
 	@Override
@@ -102,6 +111,13 @@ public class GuiBaseSolar extends GuiContainer
 		
 		drawPower(xStart + xSize - GAUGE_WIDTH - BORDER_OFFSET, yStart + BORDER_OFFSET + 32, mouseX, mouseY);
 		drawSun(xStart + xSize - 2 * GAUGE_WIDTH - BORDER_OFFSET - BORDER_OFFSET / 2, yStart + BORDER_OFFSET + 32, mouseX, mouseY);
+		
+		for(int i = 0; i < solar.items.getSizeInventory(); ++i)
+		{
+			drawTexturedModalRect(xStart + i * 18 + 8, yStart + 60, 18, 0, 18, 18);
+		}
+		
+		drawTexturedModalRect(xStart + 150, yStart + 8, 18, 18, 18, 18);
 	}
 	
 	@Override
