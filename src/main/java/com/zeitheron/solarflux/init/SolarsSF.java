@@ -37,7 +37,7 @@ public class SolarsSF
 	
 	private static File cfgDir;
 	
-	public static Ingredient getGeneratingSolars(int gen)
+	public static Ingredient getGeneratingSolars(long gen)
 	{
 		return Ingredient.fromStacks(SolarFluxAPI.SOLAR_PANELS.getValuesCollection().stream().filter(s -> s.maxGeneration == gen).map(SolarInfo::getBlock).map(ItemStack::new).collect(Collectors.toList()).toArray(new ItemStack[0]));
 	}
@@ -111,8 +111,8 @@ public class SolarsSF
 				JsonStreamParser j = new JsonStreamParser(reader);
 				JsonObject cfg = (JsonObject) j.next();
 				
-				si.maxCapacity = cfg.get("capacity").getAsInt();
-				si.maxGeneration = cfg.get("generation").getAsInt();
+				si.maxCapacity = cfg.get("capacity").getAsLong();
+				si.maxGeneration = cfg.get("generation").getAsLong();
 				si.maxTransfer = cfg.get("transfer").getAsInt();
 				
 				JsonElement connected_textures = cfg.get("connected_textures");

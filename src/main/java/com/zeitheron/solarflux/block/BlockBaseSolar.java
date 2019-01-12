@@ -95,8 +95,7 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 	{
 		if(solarInfo.maxGeneration <= 0 || solarInfo.maxCapacity <= 0 || solarInfo.maxTransfer <= 0)
 			return;
-		if(tab == SolarFluxAPI.tab)
-			items.add(new ItemStack(this));
+		super.getSubBlocks(tab, items);
 	}
 	
 	@Override
@@ -140,7 +139,7 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 				TileBaseSolar tbs = (TileBaseSolar) worldIn.getTileEntity(pos);
 				int amt = tbs.getUpgrades(held.getItem());
 				ItemUpgrade iu = (ItemUpgrade) held.getItem();
-				if(amt < iu.getMaxUpgrades())
+				if(amt < iu.getMaxUpgrades() && iu.canInstall(tbs, held, tbs.items))
 				{
 					boolean installed = false;
 					for(int i = 0; i < tbs.items.getSizeInventory(); ++i)

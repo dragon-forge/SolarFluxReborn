@@ -7,11 +7,21 @@ import net.minecraftforge.common.util.INBTSerializable;
 
 public interface IAttributeProperty extends INBTSerializable<NBTTagCompound>
 {
-	float getValue();
+	double getValue();
 	
-	float getBaseValue();
+	default long getValueL()
+	{
+		return Math.round(getValue());
+	}
 	
-	void setBaseValue(float value);
+	default int getValueI()
+	{
+		return (int) Math.min(getValueL(), (long) Integer.MAX_VALUE);
+	}
+	
+	double getBaseValue();
+	
+	void setBaseValue(double value);
 	
 	IAttributeMod getModifier(UUID uuid);
 	
@@ -21,7 +31,7 @@ public interface IAttributeProperty extends INBTSerializable<NBTTagCompound>
 	
 	void applyModifier(IAttributeMod mod, UUID uuid);
 	
-	float recalculateValue();
+	double recalculateValue();
 	
 	void clearAttributes();
 }

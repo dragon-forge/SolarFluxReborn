@@ -62,11 +62,12 @@ public class CompatThaumcraft implements ISolarFluxCompat
 	
 	public static final Aspect SOL = Aspect.getAspect("sol") != null ? Aspect.getAspect("sol") : new Aspect("sol", 0xFFB600, new Aspect[] { Aspect.LIGHT, Aspect.LIFE }, new ResourceLocation(InfoSF.MOD_ID, "textures/gui/aspect_sol.png"), 1);
 	
-	public static SolarInfo brassSolar, thaumiumSolar, voidSolar;
+	public static SolarInfo alchemicalSolar, brassSolar, thaumiumSolar, voidSolar;
 	
 	@Override
 	public void registerSolarInfos(List<SolarInfo> panels)
 	{
+		panels.add(alchemicalSolar = new SolarInfo(8, 64, 125_000).setRegistryName(InfoSF.MOD_ID, "alchemical"));
 		panels.add(brassSolar = new SolarInfo(32, 256, 425_000).setRegistryName(InfoSF.MOD_ID, "alchemical_brass"));
 		panels.add(thaumiumSolar = new SolarInfo(128, 1_024, 2_000_000).setRegistryName(InfoSF.MOD_ID, "thaumium"));
 		panels.add(voidSolar = new SolarInfo(512, 4_096, 8_000_000).setRegistryName(InfoSF.MOD_ID, "void_metal"));
@@ -90,9 +91,13 @@ public class CompatThaumcraft implements ISolarFluxCompat
 	
 	public void registerTCRecipes()
 	{
+		// CRUCIBLE RECIPES
+		
+		addCrucibleRecipe("alchemical_solar_panel", "SFR_SOLARFLUX", new ItemStack(alchemicalSolar.getBlock()), new ItemStack(SolarsSF.SOLAR_1.getBlock()), new AspectList().add(SOL, 20).add(Aspect.MECHANISM, 10));
+		
 		// ARCANE WORKBENCH RECIPES
 		
-		addShapedArcaneRecipe("brass_solar_panel", "SFR_BRASS_SOLAR_PANEL", 20, new AspectList(), new ItemStack(brassSolar.getBlock()), "ppp", "bsb", "bbb", 'p', new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_1), 'b', "plateBrass", 's', new ItemStack(SolarsSF.SOLAR_2.getBlock()));
+		addShapedArcaneRecipe("brass_solar_panel", "SFR_BRASS_SOLAR_PANEL", 20, new AspectList(), new ItemStack(brassSolar.getBlock()), "ppp", "bsb", "bbb", 'p', new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_1), 'b', "plateBrass", 's', new ItemStack(alchemicalSolar.getBlock()));
 		
 		// INFUSION MATRIX RECIPES
 		
@@ -122,7 +127,7 @@ public class CompatThaumcraft implements ISolarFluxCompat
 	{
 		SolarFlux.LOG.info("Registering TC researches...");
 		
-		new REB().setBaseInfo("SFR_SOLARFLUX", "solarflux", 0, 0, new ResourceLocation(InfoSF.MOD_ID, "textures/items/photovoltaic_cell_6.png")).setMeta(EnumResearchMeta.HIDDEN, EnumResearchMeta.SPIKY).setStages(new RSB().setText("research_stage." + InfoSF.MOD_ID + ":solarflux.1").setKnow(new Knowledge(EnumKnowledgeType.OBSERVATION, RES_CAT, 1)).build(), new RSB().setText("research_stage." + InfoSF.MOD_ID + ":solarflux.2").build()).setParents("FIRSTSTEPS", "!SOLARPANELS").buildAndRegister();
+		new REB().setBaseInfo("SFR_SOLARFLUX", "solarflux", 0, 0, new ResourceLocation(InfoSF.MOD_ID, "textures/items/photovoltaic_cell_6.png")).setMeta(EnumResearchMeta.HIDDEN, EnumResearchMeta.SPIKY).setStages(new RSB().setText("research_stage." + InfoSF.MOD_ID + ":solarflux.1").setKnow(new Knowledge(EnumKnowledgeType.OBSERVATION, RES_CAT, 1)).build(), new RSB().setText("research_stage." + InfoSF.MOD_ID + ":solarflux.2").setRecipes(InfoSF.MOD_ID + ":alchemical_solar_panel").build()).setParents("FIRSTSTEPS", "!SOLARPANELS").buildAndRegister();
 		
 		new REB().setBaseInfo("SFR_BRASS_SOLAR_PANEL", "brass_solar_panel", 0, 2, new ItemStack(brassSolar.getBlock())).setMeta(EnumResearchMeta.HIDDEN).setStages(new RSB().setText("research_stage." + InfoSF.MOD_ID + ":brass_solar_panel.1").setConsumedItems(new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_1)).setRequiredCraft(new ItemStack(SolarsSF.SOLAR_2.getBlock())).setKnow(new Knowledge(EnumKnowledgeType.THEORY, RES_CAT, 1)).build(), new RSB().setText("research_stage." + InfoSF.MOD_ID + ":brass_solar_panel.2").setRecipes(InfoSF.MOD_ID + ":brass_solar_panel").build()).setParents("SFR_SOLARFLUX", "METALLURGY@1").buildAndRegister();
 		new REB().setBaseInfo("SFR_THAUMIUM_SOLAR_PANEL", "thaumium_solar_panel", 0, 4, new ItemStack(thaumiumSolar.getBlock())).setMeta(EnumResearchMeta.HIDDEN).setStages(new RSB().setText("research_stage." + InfoSF.MOD_ID + ":thaumium_solar_panel.1").setConsumedItems(new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_2)).setRequiredCraft(new ItemStack(brassSolar.getBlock())).setKnow(new Knowledge(EnumKnowledgeType.THEORY, RES_CAT, 1)).build(), new RSB().setText("research_stage." + InfoSF.MOD_ID + ":thaumium_solar_panel.2").setRecipes(InfoSF.MOD_ID + ":thaumium_solar_panel").build()).setParents("SFR_BRASS_SOLAR_PANEL", "BASEARTIFICE", "METALLURGY@2").buildAndRegister();

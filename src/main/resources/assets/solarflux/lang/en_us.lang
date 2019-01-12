@@ -24,6 +24,7 @@ item.solarflux:transfer_rate_upgrade.name=Transfer Rate Upgrade
 item.solarflux:capacity_upgrade.name=Capacity Upgrade
 item.solarflux:furnace_upgrade.name=Furnace Upgrade
 item.solarflux:dispersive_upgrade.name=Dispersive Upgrade
+item.solarflux:block_charging_upgrade.name=Block Charging Upgrade
 
 ### TOOLTIPS ###
 info.solarflux.energy.stored1=Stored: %,d FE
@@ -52,7 +53,7 @@ info.solarflux.craftitem=Crafting item.
 
 ## AVARITIA ##
 tile.solarflux:solar_panel_neutronium.name=Neutronium Solar Panel
-tile.solarflux:solar_panel_infinite.name=Solar Panel of Infinity
+tile.solarflux:solar_panel_infinity.name=Solar Panel of Infinity
 ##############
 
 ## DRACONIC EVOLUTION ##
@@ -71,6 +72,7 @@ item.solarflux:photovoltaic_cell_dark_matter.name=Dark Matter Photovoltaic Cell
 tc.aspect.sol=Sun, Sunlight
 tc.research_category.SOLARFLUX=Solar Flux
 
+tile.solarflux:solar_panel_alchemical.name=Alchemical Solar Panel
 tile.solarflux:solar_panel_alchemical_brass.name=Brass Solar Panel
 tile.solarflux:solar_panel_thaumium.name=Thaumium Solar Panel
 tile.solarflux:solar_panel_void_metal.name=Void Metal Solar Panel

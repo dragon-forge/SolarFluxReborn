@@ -31,6 +31,11 @@ public class ExpandedContainerListener implements IContainerListener
 	@Override
 	public void sendWindowProperty(Container containerIn, int varToUpdate, int newValue)
 	{
+		sendWindowProperty2(containerIn, varToUpdate, newValue);
+	}
+	
+	public void sendWindowProperty2(Container containerIn, int varToUpdate, long newValue)
+	{
 		NetworkSF.INSTANCE.sendWindowProperty(player, containerIn, varToUpdate, newValue);
 	}
 	

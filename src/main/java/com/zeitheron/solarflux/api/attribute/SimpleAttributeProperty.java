@@ -19,8 +19,8 @@ public class SimpleAttributeProperty implements IAttributeProperty
 {
 	public static final Logger LOG = LogManager.getLogger("SolarFlux");
 	
-	protected float value;
-	protected float base;
+	protected double value;
+	protected double base;
 	
 	protected boolean dirty = true;
 	
@@ -33,7 +33,7 @@ public class SimpleAttributeProperty implements IAttributeProperty
 	}
 	
 	@Override
-	public float getValue()
+	public double getValue()
 	{
 		if(dirty)
 			return recalculateValue();
@@ -41,19 +41,19 @@ public class SimpleAttributeProperty implements IAttributeProperty
 	}
 	
 	@Override
-	public float getBaseValue()
+	public double getBaseValue()
 	{
 		return base;
 	}
 	
 	@Override
-	public void setBaseValue(float value)
+	public void setBaseValue(double value)
 	{
 		base = value;
 		dirty = true;
 	}
 	
-	public void setValue(float value)
+	public void setValue(double value)
 	{
 		this.value = value;
 		this.dirty = false;
@@ -103,7 +103,7 @@ public class SimpleAttributeProperty implements IAttributeProperty
 	}
 	
 	@Override
-	public float recalculateValue()
+	public double recalculateValue()
 	{
 		value = getBaseValue();
 		for(EnumAttributeLayer l : EnumAttributeLayer.values())
@@ -117,7 +117,7 @@ public class SimpleAttributeProperty implements IAttributeProperty
 	public NBTTagCompound serializeNBT()
 	{
 		NBTTagCompound nbt = new NBTTagCompound();
-		nbt.setFloat("Base", getBaseValue());
+		nbt.setDouble("Base", getBaseValue());
 		NBTTagList attrs = new NBTTagList();
 		for(IAttributeMod mod : modsById.values())
 		{
@@ -130,7 +130,7 @@ public class SimpleAttributeProperty implements IAttributeProperty
 			
 			NBTTagCompound tag = new NBTTagCompound();
 			tag.setUniqueId("UUID", modsById.inverse().get(mod));
-			tag.setFloat("Val", mod.getValue());
+			tag.setDouble("Val", mod.getValue());
 			tag.setString("Id", id);
 			attrs.appendTag(tag);
 		}

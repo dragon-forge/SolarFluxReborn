@@ -2,22 +2,31 @@ package com.zeitheron.solarflux.proxy;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.SolarFlux;
+import com.zeitheron.solarflux.api.SolarFluxAPI;
+import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 import com.zeitheron.solarflux.client.TESRSolarPanel;
+import com.zeitheron.solarflux.gui.ContainerBaseSolar;
 import com.zeitheron.solarflux.init.SolarsSF;
 import com.zeitheron.solarflux.net.NetworkSF;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent.ClientTickEvent;
@@ -44,13 +53,13 @@ public class ClientProxy implements ISFProxy
 	}
 	
 	@Override
-	public void updateWindow(int window, int key, int val)
+	public void updateWindow(int window, int key, long val)
 	{
 		Minecraft.getMinecraft().addScheduledTask(() ->
 		{
 			EntityPlayer pl = Minecraft.getMinecraft().player;
-			if(pl != null && pl.openContainer != null && pl.openContainer.windowId == window)
-				pl.openContainer.updateProgressBar(key, val);
+			if(pl != null && pl.openContainer != null && pl.openContainer.windowId == window && pl.openContainer instanceof ContainerBaseSolar)
+				((ContainerBaseSolar) pl.openContainer).updateProgressBar2(key, val);
 		});
 	}
 	
@@ -66,6 +75,15 @@ public class ClientProxy implements ISFProxy
 				gmm.splashText = "Happy hatchday, Zeitheron!";
 			}
 		}
+	}
+	
+	public static final Map<ResourceLocation, TextureAtlasSprite> TOPFS = new HashMap<>();
+	
+	@SubscribeEvent
+	public void textureStitch(TextureStitchEvent.Pre e)
+	{
+		for(SolarInfo si : SolarFluxAPI.SOLAR_PANELS.getValuesCollection())
+			TOPFS.put(si.getRegistryName(), e.getMap().registerSprite(si.getTexture()));
 	}
 	
 	boolean requested;

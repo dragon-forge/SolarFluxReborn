@@ -38,9 +38,9 @@ import net.minecraftforge.items.wrapper.InvWrapper;
 
 public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStorage, IVariableHandler
 {
-	public int energy;
+	public long energy;
 	
-	public int currentGeneration;
+	public long currentGeneration;
 	public float sunIntensity;
 	
 	public SolarInstance instance;
@@ -51,6 +51,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	
 	public final SimpleAttributeProperty generation = new SimpleAttributeProperty();
 	public final SimpleAttributeProperty transfer = new SimpleAttributeProperty();
+	public final SimpleAttributeProperty capacity = new SimpleAttributeProperty();
 	
 	public final InventoryDummy items = new InventoryDummy(5);
 	public final InventoryDummy itemChargeable = new InventoryDummy(1);
@@ -63,7 +64,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		{
 			if(!(stack.getItem() instanceof ItemUpgrade))
 				return false;
-			return getUpgrades(stack.getItem()) < ((ItemUpgrade) stack.getItem()).getMaxUpgrades();
+			return getUpgrades(stack.getItem()) < ((ItemUpgrade) stack.getItem()).getMaxUpgrades() && ((ItemUpgrade) stack.getItem()).canInstall(this, stack, items);
 		};
 		itemChargeable.validSlots = (slot, stack) ->
 		{
@@ -134,26 +135,31 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		
 		generation.clearAttributes();
 		transfer.clearAttributes();
+		capacity.clearAttributes();
 		
 		for(int i = 0; i < items.getSizeInventory(); ++i)
 		{
 			stack = items.getStackInSlot(i);
 			if(!stack.isEmpty())
 			{
-				if(stack.getItem() instanceof ItemUpgrade)
+				if(stack.getItem() instanceof ItemUpgrade && ((ItemUpgrade) stack.getItem()).canStayInPanel(this, stack, items))
 				{
 					id = stack.getItem().getRegistryName();
 					if(!tickedUpgrades.contains(id))
 					{
 						ItemUpgrade iu = (ItemUpgrade) stack.getItem();
-						iu.update(this, getUpgrades(iu));
+						iu.update(this, stack, getUpgrades(iu));
 						tickedUpgrades.add(id);
 					}
 				} else
 				{
 					// Why non-upgrade items would end up in this inventory?
 					// idk, let's drop them!
-					stack = items.removeStackFromSlot(i);
+					ItemStack s = items.removeStackFromSlot(i);
+					s.copy();
+					
+					items.setInventorySlotContents(i, ItemStack.EMPTY);
+					
 					if(!world.isRemote)
 						world.spawnEntity(new EntityItem(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack));
 				}
@@ -168,8 +174,8 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 			if(!stack.isEmpty() && stack.hasCapability(CapabilityEnergy.ENERGY, null) && (e = stack.getCapability(CapabilityEnergy.ENERGY, null)).canReceive() && e.getEnergyStored() < e.getMaxEnergyStored())
 			{
 				transfer.setBaseValue(instance.transfer);
-				int transfer = Math.round(this.transfer.getValue());
-				energy -= e.receiveEnergy(Math.min(energy, transfer), false);
+				int transfer = this.transfer.getValueI();
+				energy -= e.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
 			}
 		}
 		
@@ -209,6 +215,11 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		
 		tickUpgrades();
 		
+		int gen = getGeneration();
+		capacity.setBaseValue(instance.cap);
+		energy += Math.min(capacity.getValueL() - energy, gen);
+		currentGeneration = gen;
+		
 		for(int i = 0; i < crafters.size(); ++i)
 		{
 			try
@@ -223,11 +234,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 			}
 		}
 		
-		int gen = getGeneration();
-		energy += Math.min(getMaxEnergyStored() - energy, gen);
-		currentGeneration = gen;
-		
-		energy = MathHelper.clamp(energy, 0, instance.cap);
+		energy = Math.min(Math.max(energy, 0), capacity.getValueL());
 		{
 			for(EnumFacing hor : EnumFacing.HORIZONTALS)
 			{
@@ -237,7 +244,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 			}
 			
 			transfer.setBaseValue(instance.transfer);
-			int transfer = Math.round(this.transfer.getValue());
+			int transfer = this.transfer.getValueI();
 			
 			for(EnumFacing hor : EnumFacing.VALUES)
 			{
@@ -253,7 +260,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 				{
 					IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, hor.getOpposite());
 					if(storage.canReceive())
-						energy -= storage.receiveEnergy(Math.min(energy, transfer), false);
+						energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
 				}
 			}
 			
@@ -271,7 +278,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 						IEnergyStorage storage = tile.getCapability(CapabilityEnergy.ENERGY, traverse.face);
 						if(storage.canReceive())
 						{
-							energy -= storage.receiveEnergy(Math.min(energy, transfer), false);
+							energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
 							continue;
 						}
 					}
@@ -288,7 +295,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 			sunIntensity = eff;
 		float energyGeneration = instance.gen * eff;
 		generation.setBaseValue(energyGeneration);
-		return Math.round(generation.getValue());
+		return generation.getValueI();
 	}
 	
 	public NBTTagCompound write(NBTTagCompound nbt)
@@ -296,7 +303,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		nbt.merge(instance.serializeNBT());
 		nbt.setTag("Items", items.writeToNBT(new NBTTagCompound()));
 		nbt.setTag("ChargeableItem", itemChargeable.writeToNBT(new NBTTagCompound()));
-		nbt.setInteger("Energy", energy);
+		nbt.setLong("Energy", energy);
 		return nbt;
 	}
 	
@@ -305,7 +312,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		instance = SolarInstance.deserialize(nbt);
 		items.readFromNBT(nbt.getCompoundTag("Items"));
 		itemChargeable.readFromNBT(nbt.getCompoundTag("ChargeableItem"));
-		energy = nbt.getInteger("Energy");
+		energy = nbt.getLong("Energy");
 	}
 	
 	@Override
@@ -373,9 +380,8 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	public int extractEnergy(int maxExtract, boolean simulate)
 	{
 		transfer.setBaseValue(instance.transfer);
-		int transfer = Math.round(this.transfer.getValue());
-		
-		int energyExtracted = Math.min(energy, Math.min(transfer, maxExtract));
+		int transfer = this.transfer.getValueI();
+		int energyExtracted = Math.min(getEnergyStored(), Math.min(transfer, maxExtract));
 		if(!simulate)
 			energy -= energyExtracted;
 		return energyExtracted;
@@ -390,9 +396,10 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	public int receiveEnergyInternal(int maxReceive, boolean simulate)
 	{
 		transfer.setBaseValue(instance.transfer);
-		int transfer = Math.round(this.transfer.getValue());
-		
-		int energyReceived = Math.min(getMaxEnergyStored() - energy, Math.min(transfer, maxReceive));
+		int transfer = this.transfer.getValueI();
+		capacity.setBaseValue(instance.cap);
+		long cap = capacity.getValueL();
+		int energyReceived = Math.min((int) Math.min(cap - energy, Integer.MAX_VALUE), Math.min(transfer, maxReceive));
 		if(!simulate)
 			energy += energyReceived;
 		return energyReceived;
@@ -401,13 +408,13 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	@Override
 	public int getEnergyStored()
 	{
-		return getVar(0);
+		return (int) Math.min(energy, (long) Integer.MAX_VALUE);
 	}
 	
 	@Override
 	public int getMaxEnergyStored()
 	{
-		return getVar(1);
+		return (int) Math.min(getVar(1), (long) Integer.MAX_VALUE);
 	}
 	
 	@Override
@@ -425,22 +432,24 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	public boolean setBaseValuesOnGet = true;
 	
 	@Override
-	public int getVar(int id)
+	public long getVar(int id)
 	{
 		switch(id)
 		{
 		case 0:
 			return energy;
 		case 1:
-			return instance.cap;
+			if(setBaseValuesOnGet)
+				capacity.setBaseValue(instance.cap);
+			return capacity.getValueL();
 		case 2:
 			if(setBaseValuesOnGet)
 				generation.setBaseValue(instance.gen);
-			return Math.round(generation.getValue());
+			return generation.getValueL();
 		case 3:
 			if(setBaseValuesOnGet)
 				transfer.setBaseValue(instance.transfer);
-			return Math.round(transfer.getValue());
+			return transfer.getValueL();
 		case 4:
 			return currentGeneration;
 		case 5:
@@ -451,15 +460,15 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 	}
 	
 	@Override
-	public void setVar(int id, int value)
+	public void setVar(int id, long value)
 	{
 		switch(id)
 		{
 		case 0:
-			energy = MathHelper.clamp(value, 0, instance.cap);
+			energy = Math.min(Math.max(value, 0), capacity.getValueL());
 		break;
 		case 1:
-			instance.cap = value;
+			capacity.setValue(value);
 		break;
 		case 2:
 			generation.setValue(value);
@@ -471,7 +480,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 			currentGeneration = value;
 		break;
 		case 5:
-			sunIntensity = FByteHelper.toFloat(value);
+			sunIntensity = FByteHelper.toFloat((int) value);
 		break;
 		}
 	}

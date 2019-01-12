@@ -4,6 +4,7 @@ import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 import com.zeitheron.solarflux.utils.InventoryDummy;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 
 public abstract class ItemUpgrade extends Item
 {
@@ -14,11 +15,16 @@ public abstract class ItemUpgrade extends Item
 	
 	public abstract int getMaxUpgrades();
 	
-	public void update(TileBaseSolar tile, int amount)
+	public void update(TileBaseSolar tile, ItemStack stack, int amount)
 	{
 	}
 	
-	public boolean canInstall(TileBaseSolar tile, InventoryDummy upgradeInv)
+	public boolean canStayInPanel(TileBaseSolar tile, ItemStack stack, InventoryDummy upgradeInv)
+	{
+		return true;
+	}
+	
+	public boolean canInstall(TileBaseSolar tile, ItemStack stack, InventoryDummy upgradeInv)
 	{
 		return true;
 	}

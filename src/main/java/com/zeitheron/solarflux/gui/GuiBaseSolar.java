@@ -10,7 +10,10 @@ import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.util.ResourceLocation;
@@ -48,12 +51,17 @@ public class GuiBaseSolar extends GuiContainer
 	@Override
 	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
 	{
-		solar.setBaseValuesOnGet = false;
+		GlStateManager.pushMatrix();
 		fontRenderer.drawString(pinv.hasCustomName() ? pinv.getName() : I18n.format(pinv.getName()), BORDER_OFFSET, ySize - 96 + 2, 0x404040);
-		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored1", solar.getVar(0)), BORDER_OFFSET, BORDER_OFFSET, 0x404040);
-		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.getVar(1)), BORDER_OFFSET, BORDER_OFFSET + 10, 0x404040);
-		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", solar.getVar(4)), BORDER_OFFSET, BORDER_OFFSET + 20, 0x404040);
-		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.efficiency", Math.round(100D * solar.getVar(4) / solar.getVar(2))), BORDER_OFFSET, BORDER_OFFSET + 30, 0x404040);
+		fontRenderer.drawString(solar.getBlockType().getLocalizedName(), BORDER_OFFSET, 4, 0x404040);
+		GlStateManager.translate(BORDER_OFFSET, BORDER_OFFSET + 6, 0);
+		GlStateManager.scale(.9F, .9F, .9F);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored1", solar.energy), 0, 0, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.getVar(1)), 0, 10, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", solar.getVar(4)), 0, 20, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.efficiency", Math.round(100D * solar.getVar(4) / solar.getVar(2))), 0, 30, 0x404040);
+		
+		GlStateManager.popMatrix();
 		
 		int //
 		x = xSize - GAUGE_WIDTH - BORDER_OFFSET, //
@@ -72,7 +80,7 @@ public class GuiBaseSolar extends GuiContainer
 			drawTexturedModalRect(x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 			
 			if(pinv.getItemStack().isEmpty())
-				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored2", solar.getEnergyStored(), solar.getMaxEnergyStored()));
+				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored2", solar.energy, solar.capacity.getValueL()));
 		}
 		
 		x = xSize - 2 * GAUGE_WIDTH - BORDER_OFFSET - BORDER_OFFSET / 2;
@@ -92,7 +100,6 @@ public class GuiBaseSolar extends GuiContainer
 			if(pinv.getItemStack().isEmpty())
 				drawMouseOver(I18n.format("info." + InfoSF.MOD_ID + ".sun.intensity", Math.round(100 * solar.sunIntensity)));
 		}
-		solar.setBaseValuesOnGet = true;
 	}
 	
 	@Override
@@ -123,6 +130,7 @@ public class GuiBaseSolar extends GuiContainer
 	@Override
 	public void drawScreen(int mouseX, int mouseY, float partialTicks)
 	{
+		solar.setBaseValuesOnGet = false;
 		drawDefaultBackground();
 		GlStateManager.enableBlend();
 		GlStateManager.color(1, 1, 1);
@@ -130,17 +138,17 @@ public class GuiBaseSolar extends GuiContainer
 		super.drawScreen(mouseX, mouseY, partialTicks);
 		drawHoveringText(tooltip, mouseX, mouseY, fontRenderer);
 		renderHoveredToolTip(mouseX, mouseY);
+		solar.setBaseValuesOnGet = true;
 	}
 	
 	private void drawPower(int x, int y, int mx, int my)
 	{
 		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y, GAUGE_INNER_SRC_X + GAUGE_INNER_WIDTH, GAUGE_INNER_SRC_Y, GAUGE_INNER_WIDTH, GAUGE_INNER_HEIGHT);
 		
-		int height = (int) (solar.getVar(0) / Math.max(1F, solar.getVar(1)) * GAUGE_INNER_HEIGHT);
-		int offset = GAUGE_INNER_HEIGHT - height;
+		double height = solar.energy * ((double) GAUGE_INNER_HEIGHT) / solar.capacity.getValueL();
+		double offset = GAUGE_INNER_HEIGHT - height;
 		
-		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);
-		drawTexturedModalRect(x, y + GAUGE_INNER_OFFSET_Y + offset - 1, GAUGE_SRC_X, GAUGE_SRC_Y - 1, GAUGE_WIDTH, 1);
+		drawTMR(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);
 		drawTexturedModalRect(x, y, GAUGE_SRC_X, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 	}
 	
@@ -148,12 +156,25 @@ public class GuiBaseSolar extends GuiContainer
 	{
 		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y, 32 + GAUGE_INNER_SRC_X + GAUGE_INNER_WIDTH, GAUGE_INNER_SRC_Y, GAUGE_INNER_WIDTH, GAUGE_INNER_HEIGHT);
 		
-		int height = Math.round(GAUGE_INNER_HEIGHT * solar.sunIntensity);
-		int offset = GAUGE_INNER_HEIGHT - height;
+		float height = GAUGE_INNER_HEIGHT * solar.sunIntensity;
+		float offset = GAUGE_INNER_HEIGHT - height;
 		
-		drawTexturedModalRect(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, 32 + GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);
-		drawTexturedModalRect(x, y + GAUGE_INNER_OFFSET_Y + offset - 1, GAUGE_SRC_X + GAUGE_WIDTH, GAUGE_SRC_Y - 1, GAUGE_WIDTH, 1);
+		drawTMR(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, 32 + GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);
 		drawTexturedModalRect(x, y, GAUGE_SRC_X, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
+	}
+	
+	public void drawTMR(double x, double y, double textureX, double textureY, double width, double height)
+	{
+		float f = 0.00390625F;
+		float f1 = 0.00390625F;
+		Tessellator tessellator = Tessellator.getInstance();
+		BufferBuilder bufferbuilder = tessellator.getBuffer();
+		bufferbuilder.begin(7, DefaultVertexFormats.POSITION_TEX);
+		bufferbuilder.pos((double) (x + 0), (double) (y + height), (double) this.zLevel).tex((double) ((float) (textureX + 0) * 0.00390625F), (double) ((float) (textureY + height) * 0.00390625F)).endVertex();
+		bufferbuilder.pos((double) (x + width), (double) (y + height), (double) this.zLevel).tex((double) ((float) (textureX + width) * 0.00390625F), (double) ((float) (textureY + height) * 0.00390625F)).endVertex();
+		bufferbuilder.pos((double) (x + width), (double) (y + 0), (double) this.zLevel).tex((double) ((float) (textureX + width) * 0.00390625F), (double) ((float) (textureY + 0) * 0.00390625F)).endVertex();
+		bufferbuilder.pos((double) (x + 0), (double) (y + 0), (double) this.zLevel).tex((double) ((float) (textureX + 0) * 0.00390625F), (double) ((float) (textureY + 0) * 0.00390625F)).endVertex();
+		tessellator.draw();
 	}
 	
 	public boolean inBounds(int x, int y, int w, int h, int mx, int my)

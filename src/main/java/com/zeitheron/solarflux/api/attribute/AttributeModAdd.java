@@ -2,21 +2,21 @@ package com.zeitheron.solarflux.api.attribute;
 
 public class AttributeModAdd implements IAttributeMod
 {
-	protected float value;
+	protected double value;
 	
-	public AttributeModAdd(float val)
+	public AttributeModAdd(double val)
 	{
 		this.value = val;
 	}
 	
 	@Override
-	public float operate(float given)
+	public double operate(double given)
 	{
 		return given + value;
 	}
 	
 	@Override
-	public float getValue()
+	public double getValue()
 	{
 		return value;
 	}

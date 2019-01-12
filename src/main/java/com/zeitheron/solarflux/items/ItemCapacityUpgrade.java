@@ -8,25 +8,25 @@ import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 
 import net.minecraft.item.ItemStack;
 
-public class ItemEfficiencyUpgrade extends ItemUpgrade
+public class ItemCapacityUpgrade extends ItemUpgrade
 {
-	public ItemEfficiencyUpgrade()
+	public ItemCapacityUpgrade()
 	{
-		setRegistryName(InfoSF.MOD_ID, "efficiency_upgrade");
+		setRegistryName(InfoSF.MOD_ID, "capacity_upgrade");
 	}
 	
 	@Override
 	public int getMaxUpgrades()
 	{
-		return 20;
+		return 10;
 	}
 	
-	public static final UUID EFFICIENCY_ATTRIBUTE_UUID = UUID.fromString("28575920-a562b-e364d-388af-837a6b8f5a8c");
+	public static final UUID CAPACITY_ATTRIBUTE_UUID = UUID.fromString("a85f5b2f-35e2b-e364f-338af-837a6b8f5a8f");
 	
 	@Override
 	public void update(TileBaseSolar tile, ItemStack stack, int amount)
 	{
-		amount = Math.min(amount, 20);
-		tile.generation.applyModifier(new AttributeModMultiply(1F + (amount * .05F)), EFFICIENCY_ATTRIBUTE_UUID);
+		amount = Math.min(amount, 10);
+		tile.capacity.applyModifier(new AttributeModMultiply(1F + (amount * .1F)), CAPACITY_ATTRIBUTE_UUID);
 	}
 }

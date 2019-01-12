@@ -49,12 +49,12 @@ public class NetworkSF
 				{
 					si.connectTextures = nbt.getBoolean("CT");
 					si.maxTransfer = nbt.getInteger("MT");
-					si.maxCapacity = nbt.getInteger("MC");
-					si.maxGeneration = nbt.getInteger("MG");
+					si.maxCapacity = nbt.getLong("MC");
+					si.maxGeneration = nbt.getLong("MG");
 				}
 			break;
 			case 0x02:
-				SolarFlux.proxy.updateWindow(nbt.getInteger("id"), nbt.getInteger("k"), nbt.getInteger("v"));
+				SolarFlux.proxy.updateWindow(nbt.getInteger("id"), nbt.getInteger("k"), nbt.getLong("v"));
 			break;
 			default:
 			break;
@@ -104,20 +104,20 @@ public class NetworkSF
 		tag.setString("SolarInfo", si.getRegistryName().toString());
 		tag.setBoolean("CT", si.connectTextures);
 		tag.setInteger("MT", si.maxTransfer);
-		tag.setInteger("MC", si.maxCapacity);
-		tag.setInteger("MG", si.maxGeneration);
+		tag.setLong("MC", si.maxCapacity);
+		tag.setLong("MG", si.maxGeneration);
 		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
 		payload.writeCompoundTag(tag);
 		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), mp);
 	}
 	
-	public void sendWindowProperty(EntityPlayerMP player, Container ctr, int var, int val)
+	public void sendWindowProperty(EntityPlayerMP player, Container ctr, int var, long val)
 	{
 		NBTTagCompound tag = new NBTTagCompound();
 		tag.setInteger("Action", 0x02);
 		tag.setInteger("id", ctr.windowId);
 		tag.setInteger("k", var);
-		tag.setInteger("v", val);
+		tag.setLong("v", val);
 		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
 		payload.writeCompoundTag(tag);
 		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), player);

@@ -4,15 +4,15 @@ import net.minecraft.nbt.NBTTagFloat;
 
 public class AttributeModMultiply implements IAttributeMod
 {
-	protected float value;
+	protected double value;
 	
-	public AttributeModMultiply(float val)
+	public AttributeModMultiply(double val)
 	{
 		this.value = val;
 	}
 	
 	@Override
-	public float operate(float given)
+	public double operate(double given)
 	{
 		return given * value;
 	}
@@ -24,7 +24,7 @@ public class AttributeModMultiply implements IAttributeMod
 	}
 	
 	@Override
-	public float getValue()
+	public double getValue()
 	{
 		return value;
 	}

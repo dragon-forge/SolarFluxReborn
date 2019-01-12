@@ -2,9 +2,9 @@ package com.zeitheron.solarflux.api.attribute;
 
 public interface IAttributeMod
 {
-	float operate(float given);
+	double operate(double given);
 	
-	float getValue();
+	double getValue();
 	
 	default EnumAttributeLayer getLayer()
 	{

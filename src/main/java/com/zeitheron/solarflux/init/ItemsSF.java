@@ -4,8 +4,11 @@ import java.util.Arrays;
 
 import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
+import com.zeitheron.solarflux.items.ItemBlockChargingUpgrade;
+import com.zeitheron.solarflux.items.ItemCapacityUpgrade;
 import com.zeitheron.solarflux.items.ItemDispersiveUpgrade;
 import com.zeitheron.solarflux.items.ItemEfficiencyUpgrade;
+import com.zeitheron.solarflux.items.ItemFurnaceUpgrade;
 import com.zeitheron.solarflux.items.ItemTransferRateUpgrade;
 import com.zeitheron.solarflux.items.ItemTraversalUpgrade;
 
@@ -26,8 +29,11 @@ public class ItemsSF
 	
 	public static final Item EFFICIENCY_UPGRADE = new ItemEfficiencyUpgrade();
 	public static final Item TRANSFER_RATE_UPGRADE = new ItemTransferRateUpgrade();
+	public static final Item CAPACITY_UPGRADE = new ItemCapacityUpgrade();
 	public static final Item TRAVERSAL_UPGRADE = new ItemTraversalUpgrade();
 	public static final Item DISPERSIVE_UPGRADE = new ItemDispersiveUpgrade();
+	public static final Item BLOCK_CHARGING_UPGRADE = new ItemBlockChargingUpgrade();
+	public static final Item FURNACE_UPGRADE = new ItemFurnaceUpgrade();
 	
 	public static void preInit()
 	{

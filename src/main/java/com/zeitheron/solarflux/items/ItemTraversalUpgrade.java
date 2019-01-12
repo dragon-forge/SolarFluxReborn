@@ -7,6 +7,7 @@ import com.zeitheron.solarflux.InfoSF;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 import com.zeitheron.solarflux.utils.BlockPosFace;
 
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.math.BlockPos;
@@ -26,10 +27,10 @@ public class ItemTraversalUpgrade extends ItemUpgrade
 		return 1;
 	}
 	
-	List<BlockPos> cache = new ArrayList<>();
+	static List<BlockPos> cache = new ArrayList<>();
 	
 	@Override
-	public void update(TileBaseSolar tile, int amount)
+	public void update(TileBaseSolar tile, ItemStack stack, int amount)
 	{
 		if(tile.getWorld().getTotalWorldTime() % 20L == 0L)
 		{
@@ -40,7 +41,7 @@ public class ItemTraversalUpgrade extends ItemUpgrade
 		}
 	}
 	
-	public void findMachines(TileBaseSolar tile, List<BlockPos> cache, List<BlockPosFace> acceptors)
+	public static void findMachines(TileBaseSolar tile, List<BlockPos> cache, List<BlockPosFace> acceptors)
 	{
 		for(int i = 0; i < cache.size(); ++i)
 		{
@@ -48,7 +49,7 @@ public class ItemTraversalUpgrade extends ItemUpgrade
 			for(EnumFacing face : EnumFacing.VALUES)
 			{
 				BlockPos p = pos.offset(face);
-				if(p.distanceSq(tile.getPos()) > 25D)
+				if(p.distanceSq(cache.get(0)) > 25D)
 					continue;
 				TileEntity t = tile.getWorld().getTileEntity(p);
 				IEnergyStorage e;

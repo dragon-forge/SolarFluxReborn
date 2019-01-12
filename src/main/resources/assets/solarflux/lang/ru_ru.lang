@@ -24,6 +24,7 @@ item.solarflux:transfer_rate_upgrade.name=Улучшение: Скорость �
 item.solarflux:capacity_upgrade.name=Улучшение: Ёмкость
 item.solarflux:furnace_upgrade.name=Улучшение: Печь
 item.solarflux:dispersive_upgrade.name=Улучшение: Рассеивание
+item.solarflux:block_charging_upgrade.name=Улучшение: Зарядка блока
 
 ### TOOLTIPS ###
 info.solarflux.energy.stored1=Хранится: %,d FE
@@ -52,7 +53,7 @@ info.solarflux.craftitem=Ингредиент в рецептах.
 
 ## AVARITIA ##
 tile.solarflux:solar_panel_neutronium.name=Нейтрониевая солнечная панель
-tile.solarflux:solar_panel_infinite.name=Солнечная панель Бесконечности
+tile.solarflux:solar_panel_infinity.name=Солнечная панель Бесконечности
 ##############
 
 ## DRACONIC EVOLUTION ##
@@ -71,6 +72,7 @@ item.solarflux:photovoltaic_cell_dark_matter.name=Фотоэлектрическ
 tc.aspect.sol=Солнце, Солнечный свет
 tc.research_category.SOLARFLUX=Solar Flux
 
+tile.solarflux:solar_panel_alchemical.name=Алхимическая солнечная панель
 tile.solarflux:solar_panel_alchemical_brass.name=Латунная солнечная панель
 tile.solarflux:solar_panel_thaumium.name=Солнечная панель из таумиума
 tile.solarflux:solar_panel_void_metal.name=Солнечная панель из пустотного металла

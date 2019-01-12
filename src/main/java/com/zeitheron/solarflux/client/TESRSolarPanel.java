@@ -3,11 +3,13 @@ package com.zeitheron.solarflux.client;
 import org.lwjgl.opengl.GL11;
 
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
+import com.zeitheron.solarflux.proxy.ClientProxy;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureMap;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.EnumFacing;
@@ -35,9 +37,13 @@ public class TESRSolarPanel extends TileEntitySpecialRenderer<TileBaseSolar>
 		
 		Tessellator tess = Tessellator.getInstance();
 		
-		TextureAtlasSprite s = TextureAtlasSpriteFull.sprite;
-		
-		bindTexture(te.instance.getDelegate().getTexture());
+		TextureAtlasSprite s = ClientProxy.TOPFS.get(te.instance.delegate);
+		if(s == null)
+		{
+			s = TextureAtlasSpriteFull.sprite;
+			bindTexture(te.instance.getDelegate().getTexture());
+		} else
+			bindTexture(TextureMap.LOCATION_BLOCKS_TEXTURE);
 		
 		// Draw center
 		tess.getBuffer().begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_LMAP_COLOR);

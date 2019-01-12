@@ -43,6 +43,9 @@ public class RecipesSF
 		registry.register(shaped(new ItemStack(ItemsSF.TRANSFER_RATE_UPGRADE), "rrr", "gug", "rrr", 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone", 'g', "ingotGold").setRegistryName(InfoSF.MOD_ID, "transfer_rate_upgrade"));
 		registry.register(shaped(new ItemStack(ItemsSF.TRAVERSAL_UPGRADE), "ipi", "rur", "ipi", 'i', "ingotIron", 'p', Ingredient.fromItems(Item.getItemFromBlock(Blocks.PISTON), Item.getItemFromBlock(Blocks.STICKY_PISTON)), 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone").setRegistryName(InfoSF.MOD_ID, "traversal_upgrade"));
 		registry.register(shaped(new ItemStack(ItemsSF.DISPERSIVE_UPGRADE), "geg", "eue", "geg", 'g', "dustGlowstone", 'e', Items.ENDER_EYE, 'u', ItemsSF.BLANK_UPGRADE).setRegistryName(InfoSF.MOD_ID, "dispersive_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.BLOCK_CHARGING_UPGRADE), "geg", "eue", "geg", 'g', "enderpearl", 'e', "blockRedstone", 'u', ItemsSF.DISPERSIVE_UPGRADE).setRegistryName(InfoSF.MOD_ID, "block_charging_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.FURNACE_UPGRADE), "ccc", "cuc", "cfc", 'u', ItemsSF.BLANK_UPGRADE, 'c', Items.COAL, 'f', Blocks.FURNACE).setRegistryName(InfoSF.MOD_ID, "furnace_upgrade"));
+		registry.register(shaped(new ItemStack(ItemsSF.CAPACITY_UPGRADE), " r ", "rur", "rcr", 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone", 'c', "blockDiamond").setRegistryName(InfoSF.MOD_ID, "capacity_upgrade"));
 	}
 	
 	public static ShapedOreRecipe shaped(Item result, Object... recipe)

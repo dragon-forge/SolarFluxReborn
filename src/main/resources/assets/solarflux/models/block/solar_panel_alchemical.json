@@ -1,0 +1,7 @@
+{
+	"parent": "solarflux:block/solar_panel_base",
+	"textures": {
+		"side": "solarflux:blocks/solar_base_alchemical",
+		"particle": "solarflux:blocks/solar_top_alchemical"
+	}
+}

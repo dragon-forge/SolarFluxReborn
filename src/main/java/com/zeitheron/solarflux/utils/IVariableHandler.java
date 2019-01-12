@@ -2,9 +2,9 @@ package com.zeitheron.solarflux.utils;
 
 public interface IVariableHandler
 {
-	int getVar(int id);
+	long getVar(int id);
 	
-	void setVar(int id, int value);
+	void setVar(int id, long value);
 	
 	int getVarCount();
 }

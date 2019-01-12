@@ -206,7 +206,7 @@ public class SolarFlux
 						{
 							BlockBaseSolar abs = (BlockBaseSolar) aib.getBlock();
 							BlockBaseSolar bbs = (BlockBaseSolar) bib.getBlock();
-							return abs.solarInfo.maxGeneration - bbs.solarInfo.maxGeneration;
+							return (int) Math.max(Math.min(abs.solarInfo.maxGeneration - bbs.solarInfo.maxGeneration, Integer.MAX_VALUE), Integer.MIN_VALUE);
 						}
 					}
 					

@@ -12,7 +12,7 @@ public interface ISFProxy
 	{
 	}
 	
-	default void updateWindow(int window, int key, int val)
+	default void updateWindow(int window, int key, long val)
 	{
 	}
 }

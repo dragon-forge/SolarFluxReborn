@@ -15,14 +15,14 @@ import net.minecraft.item.ItemStack;
 public class ContainerBaseSolar extends Container
 {
 	public final TileBaseSolar tile;
-	public final int[] prev;
+	public final long[] prev;
 	
 	public ExpandedContainerListener networking;
 	
 	public ContainerBaseSolar(TileBaseSolar tile, InventoryPlayer playerInv)
 	{
 		this.tile = tile;
-		this.prev = new int[tile.getVarCount()];
+		this.prev = new long[tile.getVarCount()];
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
 		
@@ -34,7 +34,7 @@ public class ContainerBaseSolar extends Container
 		if(playerInv.player instanceof EntityPlayerMP)
 			networking = new ExpandedContainerListener((EntityPlayerMP) playerInv.player);
 		
-		Arrays.fill(prev, -1);
+		Arrays.fill(prev, -1L);
 	}
 	
 	@Override
@@ -46,13 +46,18 @@ public class ContainerBaseSolar extends Container
 			for(int j = 0; j < tile.getVarCount(); ++j)
 				if(prev[j] != tile.getVar(j))
 				{
-					networking.sendWindowProperty(this, j, tile.getVar(j));
+					networking.sendWindowProperty2(this, j, tile.getVar(j));
 					prev[j] = tile.getVar(j);
 				}
 	}
 	
 	@Override
 	public void updateProgressBar(int id, int data)
+	{
+		tile.setVar(id, data);
+	}
+	
+	public void updateProgressBar2(int id, long data)
 	{
 		tile.setVar(id, data);
 	}

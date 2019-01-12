@@ -24,13 +24,13 @@ public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<S
 {
 	public String compatMod;
 	
-	public int maxGeneration;
+	public long maxGeneration;
 	public int maxTransfer;
-	public int maxCapacity;
+	public long maxCapacity;
 	
 	public boolean connectTextures = true;
 	
-	public SolarInfo(int mgen, int mtranf, int mcap)
+	public SolarInfo(long mgen, int mtranf, long mcap)
 	{
 		this.maxGeneration = mgen;
 		this.maxTransfer = mtranf;
@@ -63,7 +63,7 @@ public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<S
 	{
 		if(tex != null)
 			return tex;
-		tex = new ResourceLocation(getRegistryName().getNamespace(), "textures/blocks/solar_topf_" + getRegistryName().getPath() + ".png");
+		tex = new ResourceLocation(getRegistryName().getNamespace(), "blocks/solar_topf_" + getRegistryName().getPath());
 		return tex;
 	}
 	
@@ -89,16 +89,16 @@ public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<S
 	
 	public void read(PacketBuffer buf)
 	{
-		maxGeneration = buf.readInt();
+		maxGeneration = buf.readLong();
 		maxTransfer = buf.readInt();
-		maxCapacity = buf.readInt();
+		maxCapacity = buf.readLong();
 	}
 	
 	public void write(PacketBuffer buf)
 	{
-		buf.writeInt(maxGeneration);
+		buf.writeLong(maxGeneration);
 		buf.writeInt(maxTransfer);
-		buf.writeInt(maxCapacity);
+		buf.writeLong(maxCapacity);
 	}
 	
 	public float computeSunIntensity(TileBaseSolar solar)
