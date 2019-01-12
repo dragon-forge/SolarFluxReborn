@@ -29,6 +29,7 @@ import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DimensionType;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
@@ -118,7 +119,7 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		if(cache$seeSkyTimer < 1)
 		{
 			cache$seeSkyTimer = 20;
-			cache$seeSky = world != null && world.provider.getDimensionType() == DimensionType.OVERWORLD && pos != null ? world.canBlockSeeSky(pos) : false;
+			cache$seeSky = world != null && world.getLightFor(EnumSkyBlock.SKY, pos) > 0 && pos != null ? world.canBlockSeeSky(pos) : false;
 		}
 		return cache$seeSky;
 	}
