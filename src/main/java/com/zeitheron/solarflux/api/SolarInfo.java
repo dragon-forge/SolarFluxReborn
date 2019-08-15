@@ -1,6 +1,8 @@
 package com.zeitheron.solarflux.api;
 
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import javax.annotation.Nullable;
@@ -27,6 +29,10 @@ public class SolarInfo implements Consumer<SolarInstance>, IForgeRegistryEntry<S
 	public long maxGeneration;
 	public int maxTransfer;
 	public long maxCapacity;
+	public int thiccness = 6;
+	
+	public boolean isCustom = false;
+	public Map<String, String> localizations = null;
 	
 	public boolean connectTextures = true;
 	

@@ -28,10 +28,13 @@ public class TESRSolarPanel extends TileEntitySpecialRenderer<TileBaseSolar>
 		
 		int i = getBrightnessForRB(te, rb);
 		
+		double dist = Math.sqrt(x * x + y * y + z * z);
+		double offset = dist / 20D * 0.009D;
+		
 		GL11.glPushMatrix();
 		GL11.glDisable(2884);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glTranslated(x, y + 2.01D - (1 - .375F), z + 1D);
+		GL11.glTranslated(x, y + 2.0001D + offset - (1 - te.instance.getDelegate().thiccness / 16F), z + 1D);
 		GL11.glRotatef(180F, 1F, 0F, 0F);
 		GL11.glColor3f(1f, 1f, 1f);
 		

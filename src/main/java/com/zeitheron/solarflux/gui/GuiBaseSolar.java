@@ -57,7 +57,7 @@ public class GuiBaseSolar extends GuiContainer
 		GlStateManager.translate(BORDER_OFFSET, BORDER_OFFSET + 6, 0);
 		GlStateManager.scale(.9F, .9F, .9F);
 		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.stored1", solar.energy), 0, 0, 0x404040);
-		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.getVar(1)), 0, 10, 0x404040);
+		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", solar.capacity.getValueL()), 0, 10, 0x404040);
 		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", solar.getVar(4)), 0, 20, 0x404040);
 		fontRenderer.drawString(I18n.format("info." + InfoSF.MOD_ID + ".energy.efficiency", Math.round(100D * solar.getVar(4) / solar.getVar(2))), 0, 30, 0x404040);
 		

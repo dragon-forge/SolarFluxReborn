@@ -4,7 +4,19 @@ import net.minecraft.item.Item;
 
 public interface ISFProxy
 {
+	default void construct()
+	{
+	}
+	
+	default void preInit()
+	{
+	}
+	
 	default void init()
+	{
+	}
+	
+	default void postInit()
 	{
 	}
 	

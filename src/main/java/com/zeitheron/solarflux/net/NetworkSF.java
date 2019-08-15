@@ -106,9 +106,7 @@ public class NetworkSF
 		tag.setInteger("MT", si.maxTransfer);
 		tag.setLong("MC", si.maxCapacity);
 		tag.setLong("MG", si.maxGeneration);
-		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
-		payload.writeCompoundTag(tag);
-		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), mp);
+		channel.sendTo(new FMLProxyPacket(new PacketBuffer(Unpooled.buffer()).writeCompoundTag(tag), InfoSF.MOD_ID), mp);
 	}
 	
 	public void sendWindowProperty(EntityPlayerMP player, Container ctr, int var, long val)
@@ -118,9 +116,7 @@ public class NetworkSF
 		tag.setInteger("id", ctr.windowId);
 		tag.setInteger("k", var);
 		tag.setLong("v", val);
-		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
-		payload.writeCompoundTag(tag);
-		channel.sendTo(new FMLProxyPacket(payload, InfoSF.MOD_ID), player);
+		channel.sendTo(new FMLProxyPacket(new PacketBuffer(Unpooled.buffer()).writeCompoundTag(tag), InfoSF.MOD_ID), player);
 	}
 	
 	@SideOnly(Side.CLIENT)
@@ -132,8 +128,6 @@ public class NetworkSF
 		
 		SolarFlux.LOG.info("Requesting solar configurations from server...");
 		
-		PacketBuffer payload = new PacketBuffer(Unpooled.buffer());
-		payload.writeCompoundTag(tag);
-		channel.sendToServer(new FMLProxyPacket(payload, InfoSF.MOD_ID));
+		channel.sendToServer(new FMLProxyPacket(new PacketBuffer(Unpooled.buffer()).writeCompoundTag(tag), InfoSF.MOD_ID));
 	}
 }

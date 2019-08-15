@@ -1,10 +1,18 @@
 package com.zeitheron.solarflux.init;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonElement;
@@ -36,6 +44,41 @@ public class SolarsSF
 	public static final SolarInfo SOLAR_8 = new SolarInfo(32_768, 256_000, 128_000_000).setRegistryName(InfoSF.MOD_ID, "8");
 	
 	private static File cfgDir;
+	
+	public static File getCfgDir()
+	{
+		return cfgDir;
+	}
+	
+	public static File getCustomCfgDir()
+	{
+		File ccfg = new File(getCfgDir(), "_custom");
+		if(!ccfg.isDirectory())
+			ccfg.mkdirs();
+		File rdm = new File(ccfg, "README.txt");
+		
+		String internalMarker = "~ README v1.0 ~";
+		
+		boolean write = !rdm.isFile();
+		if(!write)
+			try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rdm))))
+			{
+				if(!br.readLine().equals(internalMarker))
+					write = true;
+			} catch(Throwable err)
+			{
+			}
+		
+		try(FileOutputStream fos = new FileOutputStream(rdm))
+		{
+			fos.write((internalMarker + System.lineSeparator()).getBytes());
+			fos.write("This directory enables pack developers to add custom solar panels, with custom textures. Read this guide to understand, how to do so...\n\n\nThe first this you want to do is create a folder with internal solar panel name (registry ID). In-game, you would be able to give it to yourself using /give @p solarflux:custom_solar_panel_{NAME}\nAfter you've created the folder, make a new file called \"panel.json\"\nThere, fill out the following template:\n\n{\n\t\"capacity\": 0,\n\t\"generation\": 0,\n\t\"trasnfer\": 0,\n\t\"thickness\": 6,\n\t\"connected_textures\": true\n\t\"localizations\": {\n\t\t\"en_us\": \"NAME Solar Panel\"\n\t}\n}\n\nWhen you're done, save it to \"panel.json\"\n\nNext up: textures!\nIn your panel folder, you're going to need 3 texture files: \"top.png\", \"top_full.png\" and \"base.png\".\nLet's have a quick look through each file...\n- base.png - The base texture. It's applied to sides and bottom of the solar panel.\n- top.png - this is what you would expect, the top face of the solar panel. HOWEVER! This texture MUST have borders of the \"base.png\", because this texture is rendered in the inventory.\n- top_full.png - this is the same as \"top.png\", but without any borders.\nThese textures can be animated, if provided with the NAME.mcmeta files, and fill them as in default minecraft resource packs.\n\n\nIf you're lazy enough to read all of this, I made a tutorial video, explaining all of this in details:\nhttps://youtu.be/AhEaUzP4ozk\n\n\nSincerely, Zeitheron.\nhttps://www.curseforge.com/projects/246974".getBytes());
+		} catch(IOException ioe)
+		{
+		}
+		
+		return ccfg;
+	}
 	
 	public static Ingredient getGeneratingSolars(long gen)
 	{
@@ -70,6 +113,53 @@ public class SolarsSF
 				err.printStackTrace();
 			}
 		});
+		
+		File[] customPanels = getCustomCfgDir().listFiles(f -> f.isDirectory());
+		
+		for(File cpdir : customPanels)
+		{
+			File inf = new File(cpdir, "panel.json");
+			
+			if(inf.isFile())
+			{
+				SolarInfo si = new SolarInfo(0, 0, 0);
+				si.setRegistryName(new ResourceLocation("solarflux", cpdir.getName()));
+				si.isCustom = true;
+				
+				try(FileReader reader = new FileReader(inf))
+				{
+					JsonStreamParser j = new JsonStreamParser(reader);
+					JsonObject cfg = j.next().getAsJsonObject();
+					
+					si.maxCapacity = cfg.get("capacity").getAsLong();
+					si.maxGeneration = cfg.get("generation").getAsLong();
+					si.maxTransfer = cfg.get("transfer").getAsInt();
+					
+					JsonElement thickness = cfg.get("thickness");
+					si.thiccness = thickness == null ? 6 : thickness.getAsInt();
+					
+					JsonElement connected_textures = cfg.get("connected_textures");
+					si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
+					
+					try
+					{
+						solars.register(si);
+						BlockBaseSolar block = si.getBlock();
+						blocks.register(block);
+						Item model = new ItemBlock(block);
+						model.setRegistryName(block.getRegistryName());
+						items.register(model);
+						SolarFluxAPI.renderRenderer.accept(model);
+					} catch(Throwable err)
+					{
+						err.printStackTrace();
+					}
+				} catch(IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+		}
 	}
 	
 	public static void reloadConfigs()
@@ -79,12 +169,20 @@ public class SolarsSF
 		for(SolarInfo si : infos.getValuesCollection())
 		{
 			si.getBlock().setCreativeTab(SolarFluxAPI.tab);
-			
 			ResourceLocation rn = si.getRegistryName();
-			File f = new File(cfgDir, si.getCompatMod() != null ? si.getCompatMod() : rn.getNamespace());
-			if(!f.isDirectory())
-				f.mkdirs();
-			f = new File(f, rn.getPath().replaceAll("/", "_") + ".json");
+			
+			File f;
+			
+			if(si.isCustom)
+			{
+				f = new File(getCustomCfgDir(), si.getRegistryName().getPath() + File.separator + "panel.json");
+			} else
+			{
+				f = new File(cfgDir, si.getCompatMod() != null ? si.getCompatMod() : rn.getNamespace());
+				if(!f.isDirectory())
+					f.mkdirs();
+				f = new File(f, rn.getPath().replaceAll("/", "_") + ".json");
+			}
 			
 			if(!f.isFile())
 				try(FileWriter j = new FileWriter(f))
@@ -97,6 +195,7 @@ public class SolarsSF
 					j.append(nln + s + "capacity" + s + ": " + si.maxCapacity + ",");
 					j.append(nln + s + "generation" + s + ": " + si.maxGeneration + ",");
 					j.append(nln + s + "transfer" + s + ": " + si.maxTransfer + ",");
+					j.append(nln + s + "thickness" + s + ": " + si.thiccness + ",");
 					j.append(nln + s + "connected_textures" + s + ": " + si.connectTextures + System.lineSeparator());
 					
 					j.append('}');
@@ -106,17 +205,33 @@ public class SolarsSF
 					e.printStackTrace();
 				}
 			
-			try(FileReader reader = new FileReader(f))
+			try(InputStreamReader reader = new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))
 			{
 				JsonStreamParser j = new JsonStreamParser(reader);
-				JsonObject cfg = (JsonObject) j.next();
+				JsonObject cfg = j.next().getAsJsonObject();
 				
 				si.maxCapacity = cfg.get("capacity").getAsLong();
 				si.maxGeneration = cfg.get("generation").getAsLong();
 				si.maxTransfer = cfg.get("transfer").getAsInt();
 				
+				JsonElement thickness = cfg.get("thickness");
+				si.thiccness = thickness == null ? 6 : thickness.getAsInt();
+				
 				JsonElement connected_textures = cfg.get("connected_textures");
 				si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
+				
+				if(si.isCustom)
+				{
+					JsonElement localsElem = cfg.get("localizations");
+					if(localsElem != null)
+					{
+						JsonObject locals = localsElem.getAsJsonObject();
+						Map<String, String> lmap = new HashMap<>();
+						for(Map.Entry<String, JsonElement> langs : locals.entrySet())
+							lmap.put(langs.getKey().toLowerCase(), langs.getValue().getAsString());
+						si.localizations = Collections.unmodifiableMap(lmap);
+					}
+				}
 			} catch(IOException e)
 			{
 				e.printStackTrace();

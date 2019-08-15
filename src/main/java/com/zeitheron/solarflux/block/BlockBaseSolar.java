@@ -44,7 +44,7 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 		setSoundType(SoundType.METAL);
 		this.solarInfo = solarInfo;
 		ResourceLocation r = solarInfo.getRegistryName();
-		setRegistryName(r.getNamespace(), "solar_panel_" + r.getPath());
+		setRegistryName(r.getNamespace(), (solarInfo.isCustom ? "custom_" : "") + "solar_panel_" + r.getPath());
 		setTranslationKey(getRegistryName().toString());
 		setHardness(4F);
 		setHarvestLevel("pickaxe", 2);
@@ -55,6 +55,8 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
+		if(Math.abs(solarInfo.thiccness / 16F - aabb.maxY) > 1.0E-4)
+			aabb = new AxisAlignedBB(0, 0, 0, 1, solarInfo.thiccness / 16F, 1);
 		return aabb;
 	}
 	

@@ -37,10 +37,23 @@ public class ContainerBaseSolar extends Container
 		Arrays.fill(prev, -1L);
 	}
 	
+	boolean fsync;
+	
 	@Override
 	public void detectAndSendChanges()
 	{
 		super.detectAndSendChanges();
+		
+		if(!fsync)
+		{
+			fsync = true;
+			if(networking != null)
+				for(int j = 0; j < tile.getVarCount(); ++j)
+				{
+					networking.sendWindowProperty2(this, j, tile.getVar(j));
+					prev[j] = tile.getVar(j);
+				}
+		}
 		
 		if(networking != null)
 			for(int j = 0; j < tile.getVarCount(); ++j)
@@ -59,6 +72,7 @@ public class ContainerBaseSolar extends Container
 	
 	public void updateProgressBar2(int id, long data)
 	{
+		prev[id] = data;
 		tile.setVar(id, data);
 	}
 	

@@ -27,8 +27,6 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.DimensionType;
 import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.energy.CapabilityEnergy;
@@ -371,8 +369,8 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		int delta = getEnergyStored() - solar.getEnergyStored();
 		if(delta < 0)
 			return solar.autoBalanceEnergy(this);
-		else if(delta > 0 && solar.getEnergyStored() < solar.getMaxEnergyStored())
-			return extractEnergy(solar.receiveEnergyInternal(delta / 2, false), false);
+		else if(delta > 0)
+			return extractEnergy(solar.receiveEnergyInternal(extractEnergy(solar.receiveEnergyInternal(delta / 2, true), true), false), false);
 		return 0;
 	}
 	
@@ -437,11 +435,11 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		switch(id)
 		{
 		case 0:
-			return energy;
-		case 1:
 			if(setBaseValuesOnGet)
 				capacity.setBaseValue(instance.cap);
 			return capacity.getValueL();
+		case 1:
+			return energy;
 		case 2:
 			if(setBaseValuesOnGet)
 				generation.setBaseValue(instance.gen);
@@ -465,10 +463,10 @@ public class TileBaseSolar extends TileEntity implements ITickable, IEnergyStora
 		switch(id)
 		{
 		case 0:
-			energy = Math.min(Math.max(value, 0), capacity.getValueL());
+			capacity.setValue(value);
 		break;
 		case 1:
-			capacity.setValue(value);
+			energy = Math.min(Math.max(value, 0), capacity.getValueL());
 		break;
 		case 2:
 			generation.setValue(value);
