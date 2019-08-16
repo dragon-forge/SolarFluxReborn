@@ -1,11 +1,14 @@
 package com.zeitheron.solarflux.client;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -14,13 +17,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
 import com.zeitheron.solarflux.init.SolarsSF;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.AbstractResourcePack;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -41,38 +51,12 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 	
 	private static IResourceStreamSupplier ofText(String text)
 	{
-		return new IResourceStreamSupplier()
-		{
-			@Override
-			public boolean exists()
-			{
-				return true;
-			}
-			
-			@Override
-			public InputStream create() throws IOException
-			{
-				return new ByteArrayInputStream(text.getBytes());
-			}
-		};
+		return IResourceStreamSupplier.create(() -> true, () -> new ByteArrayInputStream(text.getBytes()));
 	}
 	
 	private static IResourceStreamSupplier ofFile(File file)
 	{
-		return new IResourceStreamSupplier()
-		{
-			@Override
-			public boolean exists()
-			{
-				return file.isFile();
-			}
-			
-			@Override
-			public InputStream create() throws IOException
-			{
-				return new FileInputStream(file);
-			}
-		};
+		return IResourceStreamSupplier.create(file::isFile, () -> new FileInputStream(file));
 	}
 	
 	public void rebake()
@@ -83,10 +67,15 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 		domains.clear();
 		
 		domains.addAll(Loader.instance().getIndexedModList().keySet());
-		domains.addAll(SolarFluxAPI.resourceDomains);
+		domains.remove("minecraft");
 		
 		if(SolarFluxAPI.SOLAR_PANELS != null)
 			infos.addAll(SolarFluxAPI.SOLAR_PANELS.getValuesCollection());
+		
+		if(!infos.isEmpty())
+			domains.clear();
+		
+		domains.addAll(SolarFluxAPI.resourceDomains);
 		
 		for(SolarInfo si : infos)
 		{
@@ -124,7 +113,7 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 			
 			if(si.isCustom)
 			{
-				File customDir = new File(SolarsSF.getCfgDir(), "_custom");
+				File customDir = SolarsSF.getCustomCfgDir();
 				
 				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_base_" + reg2.getPath() + ".png");
 				ResourceLocation textures_blocks_topf = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_topf_" + reg2.getPath() + ".png");
@@ -178,6 +167,8 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 	@Override
 	public boolean resourceExists(ResourceLocation location)
 	{
+		if(location.toString().contains("pack.mcmeta"))
+			System.out.println(location);
 		IResourceStreamSupplier s;
 		return (s = resourceMap.get(location)) != null && s.exists();
 	}
@@ -191,7 +182,27 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 	@Override
 	public <T extends IMetadataSection> T getPackMetadata(MetadataSerializer metadataSerializer, String metadataSectionName) throws IOException
 	{
-		return null;
+		return readMetadata(metadataSerializer, new ByteArrayInputStream("{\"pack\": {\"pack_format\": 1,\"description\": \"External & Generated resources for SolarFluxReborn\"}}".getBytes()), metadataSectionName);
+	}
+	
+	static <T extends IMetadataSection> T readMetadata(MetadataSerializer metadataSerializer, InputStream p_110596_1_, String sectionName)
+	{
+		JsonObject jsonobject = null;
+		BufferedReader bufferedreader = null;
+		
+		try
+		{
+			bufferedreader = new BufferedReader(new InputStreamReader(p_110596_1_, StandardCharsets.UTF_8));
+			jsonobject = (new JsonParser()).parse(bufferedreader).getAsJsonObject();
+		} catch(RuntimeException runtimeexception)
+		{
+			throw new JsonParseException(runtimeexception);
+		} finally
+		{
+			IOUtils.closeQuietly((Reader) bufferedreader);
+		}
+		
+		return (T) metadataSerializer.parseMetadataSection(sectionName, jsonobject);
 	}
 	
 	@Override
@@ -260,8 +271,32 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 	
 	public static interface IResourceStreamSupplier
 	{
+		static IResourceStreamSupplier create(BooleanSupplier exists, IIOSupplier<InputStream> streamable)
+		{
+			return new IResourceStreamSupplier()
+			{
+				@Override
+				public boolean exists()
+				{
+					return exists.getAsBoolean();
+				}
+				
+				@Override
+				public InputStream create() throws IOException
+				{
+					return streamable.get();
+				}
+			};
+		}
+		
 		boolean exists();
 		
 		InputStream create() throws IOException;
+	}
+	
+	@FunctionalInterface
+	public static interface IIOSupplier<T>
+	{
+		T get() throws IOException;
 	}
 }
