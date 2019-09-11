@@ -30,7 +30,6 @@ import com.zeitheron.solarflux.block.BlockBaseSolar;
 import com.zeitheron.solarflux.init.SolarsSF;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.AbstractResourcePack;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.resources.IResourceManagerReloadListener;
@@ -167,8 +166,6 @@ public class SolarFluxResourcePack implements IResourcePack, IResourceManagerRel
 	@Override
 	public boolean resourceExists(ResourceLocation location)
 	{
-		if(location.toString().contains("pack.mcmeta"))
-			System.out.println(location);
 		IResourceStreamSupplier s;
 		return (s = resourceMap.get(location)) != null && s.exists();
 	}

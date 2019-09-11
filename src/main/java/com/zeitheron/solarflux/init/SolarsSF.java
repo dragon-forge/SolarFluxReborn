@@ -24,10 +24,12 @@ import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
 
 import net.minecraft.block.Block;
+import net.minecraft.crash.CrashReport;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
+import net.minecraft.util.ReportedException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -57,7 +59,7 @@ public class SolarsSF
 			ccfg.mkdirs();
 		File rdm = new File(ccfg, "README.txt");
 		
-		String internalMarker = "~ README v1.0 ~";
+		String internalMarker = "~ README v1.1 ~";
 		
 		boolean write = !rdm.isFile();
 		if(!write)
@@ -72,7 +74,7 @@ public class SolarsSF
 		try(FileOutputStream fos = new FileOutputStream(rdm))
 		{
 			fos.write((internalMarker + System.lineSeparator()).getBytes());
-			fos.write("This directory enables pack developers to add custom solar panels, with custom textures. Read this guide to understand, how to do so...\n\n\nThe first this you want to do is create a folder with internal solar panel name (registry ID). In-game, you would be able to give it to yourself using /give @p solarflux:custom_solar_panel_{NAME}\nAfter you've created the folder, make a new file called \"panel.json\"\nThere, fill out the following template:\n\n{\n\t\"capacity\": 0,\n\t\"generation\": 0,\n\t\"trasnfer\": 0,\n\t\"thickness\": 6,\n\t\"connected_textures\": true\n\t\"localizations\": {\n\t\t\"en_us\": \"NAME Solar Panel\"\n\t}\n}\n\nWhen you're done, save it to \"panel.json\"\n\nNext up: textures!\nIn your panel folder, you're going to need 3 texture files: \"top.png\", \"top_full.png\" and \"base.png\".\nLet's have a quick look through each file...\n- base.png - The base texture. It's applied to sides and bottom of the solar panel.\n- top.png - this is what you would expect, the top face of the solar panel. HOWEVER! This texture MUST have borders of the \"base.png\", because this texture is rendered in the inventory.\n- top_full.png - this is the same as \"top.png\", but without any borders.\nThese textures can be animated, if provided with the NAME.mcmeta files, and fill them as in default minecraft resource packs.\n\n\nIf you're lazy enough to read all of this, I made a tutorial video, explaining all of this in details:\nhttps://youtu.be/AhEaUzP4ozk\n\n\nSincerely, Zeitheron.\nhttps://www.curseforge.com/projects/246974".getBytes());
+			fos.write("This directory enables pack developers to add custom solar panels, with custom textures. Read this guide to understand, how to do so...\n\n\nThe first this you want to do is create a folder with internal solar panel name (registry ID). In-game, you would be able to give it to yourself using /give @p solarflux:custom_solar_panel_{NAME}\nAfter you've created the folder, make a new file called \"panel.json\"\nThere, fill out the following template:\n\n{\n\t\"capacity\": 0,\n\t\"generation\": 0,\n\t\"transfer\": 0,\n\t\"thickness\": 6,\n\t\"connected_textures\": true,\n\t\"localizations\": {\n\t\t\"en_us\": \"NAME Solar Panel\"\n\t}\n}\n\nWhen you're done, save it to \"panel.json\"\nOh also, please fill out the numerical fields to be greater than zero, or you'll run into troubles.\nSmall tips for the JSON:\n- You can remove \"thickness\" if you want to use standard 6-pixel thickness.\n- You can remove \"connected_textures\" if you want the panels to connect anyway.\n- Any language is supported, but the fallback is always \"en_us\", so keep that in place!\n\n\nNext up: textures!\nIn your panel folder, you're going to need 3 texture files: \"top.png\", \"top_full.png\" and \"base.png\".\nLet's have a quick look through each file...\n- base.png - The base texture. It's applied to sides and bottom of the solar panel.\n- top.png - this is what you would expect, the top face of the solar panel. HOWEVER! This texture MUST have borders of the \"base.png\", because this texture is rendered in the inventory.\n- top_full.png - this is the same as \"top.png\", but without any borders.\nThese textures can be animated, if provided with the NAME.mcmeta files, and fill them as in default minecraft resource packs.\n\n\nIf you're lazy enough to read all of this, I made a tutorial video, explaining all of this in details:\nhttps://youtu.be/AhEaUzP4ozk\n\n\nSincerely, Zeitheron.\nhttps://www.curseforge.com/projects/246974".getBytes());
 		} catch(IOException ioe)
 		{
 		}
@@ -131,12 +133,25 @@ public class SolarsSF
 					JsonStreamParser j = new JsonStreamParser(reader);
 					JsonObject cfg = j.next().getAsJsonObject();
 					
-					si.maxCapacity = cfg.get("capacity").getAsLong();
-					si.maxGeneration = cfg.get("generation").getAsLong();
-					si.maxTransfer = cfg.get("transfer").getAsInt();
+					String err;
 					
-					JsonElement thickness = cfg.get("thickness");
-					si.thiccness = thickness == null ? 6 : thickness.getAsInt();
+					JsonElement je = cfg.get("capacity");
+					if(je == null || je.getAsLong() <= 0L)
+						throw new ReportedException(new CrashReport(err = ((je == null ? "\"capacity\" FIELD IS NOT FOUND" : "\"capacity\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
+					si.maxCapacity = je.getAsLong();
+					
+					je = cfg.get("generation");
+					if(je == null || je.getAsLong() <= 0L)
+						throw new ReportedException(new CrashReport(err = ((je == null ? "\"generation\" FIELD IS NOT FOUND" : "\"generation\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
+					si.maxGeneration = je.getAsLong();
+					
+					je = cfg.get("transfer");
+					if(je == null || je.getAsLong() <= 0L)
+						throw new ReportedException(new CrashReport(err = ((je == null ? "\"transfer\" FIELD IS NOT FOUND" : "\"transfer\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
+					si.maxTransfer = je.getAsInt();
+					
+					je = cfg.get("thickness");
+					si.thiccness = je == null ? 6 : je.getAsInt();
 					
 					JsonElement connected_textures = cfg.get("connected_textures");
 					si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
@@ -150,13 +165,13 @@ public class SolarsSF
 						model.setRegistryName(block.getRegistryName());
 						items.register(model);
 						SolarFluxAPI.renderRenderer.accept(model);
-					} catch(Throwable err)
+					} catch(Throwable thr)
 					{
-						err.printStackTrace();
+						thr.printStackTrace();
 					}
-				} catch(IOException e)
+				} catch(IOException ioe)
 				{
-					e.printStackTrace();
+					ioe.printStackTrace();
 				}
 			}
 		}
