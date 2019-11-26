@@ -1,0 +1,15 @@
+# Mod Info
+mod_id=solarflux
+archive_name=SolarFluxReborn
+mod_version=14.1.0
+
+# MC Info
+mc_version=1.14.4
+forge_version=28.1.96
+
+# MCP Info
+mcp_ch=snapshot
+mcp_vr=20190719-1.14.3
+
+# Misc Info
+java=1.8
