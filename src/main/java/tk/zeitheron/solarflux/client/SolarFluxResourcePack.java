@@ -28,6 +28,11 @@ public class SolarFluxResourcePack implements IResourcePack
 {
 	public final Map<ResourceLocation, IResourceStreamSupplier> resourceMap = new HashMap<>();
 	
+	public static void addResourcePack(SimpleReloadableResourceManager manager)
+	{
+		manager.addResourcePack(getPackInstance());
+	}
+	
 	private static IResourceStreamSupplier ofText(String text)
 	{
 		return IResourceStreamSupplier.create(() -> true, () -> new ByteArrayInputStream(text.getBytes()));
@@ -38,6 +43,23 @@ public class SolarFluxResourcePack implements IResourcePack
 		return IResourceStreamSupplier.create(file::isFile, () -> new FileInputStream(file));
 	}
 	
+	private static IResourceStreamSupplier ofInternal(String path)
+	{
+		boolean exists = false;
+		
+		try(InputStream in = SolarFluxResourcePack.class.getResourceAsStream(path))
+		{
+			exists = in != null;
+		} catch(IOException e)
+		{
+			exists = false;
+		}
+		
+		final boolean fe = exists;
+		
+		return IResourceStreamSupplier.create(() -> fe, () -> SolarFluxResourcePack.class.getResourceAsStream(path));
+	}
+	
 	static SolarFluxResourcePack packInstance;
 	
 	public static SolarFluxResourcePack getPackInstance()
@@ -46,11 +68,6 @@ public class SolarFluxResourcePack implements IResourcePack
 			packInstance = new SolarFluxResourcePack();
 		packInstance.init();
 		return packInstance;
-	}
-	
-	public static void addResourcePack(SimpleReloadableResourceManager manager)
-	{
-		manager.addResourcePack(getPackInstance());
 	}
 	
 	public void init()

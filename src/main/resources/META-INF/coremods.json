@@ -1,3 +1,3 @@
 {
-  "RenderManager": "META-INF/SimpleReloadableResourceManager.js"
+  "RenderManager": "META-INF/ResourcePackHooker.js"
 }

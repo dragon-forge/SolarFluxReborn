@@ -40,7 +40,6 @@ public class SFRClientProxy extends SFRCommonProxy
 	
 	private Locale prevLocale;
 	
-	@SuppressWarnings("unchecked")
 	@SubscribeEvent
 	public void clientTick(ClientTickEvent e)
 	{

@@ -1,3 +1,6 @@
+var resourcePackClass = "tk/zeitheron/solarflux/client/SolarFluxResourcePack";
+var resourcePackRegistrar = "addResourcePack";
+
 function initializeCoreMod()
 {
 	return {
@@ -17,12 +20,12 @@ function initializeCoreMod()
 					if(method.name.equals("reloadResources") && method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)"))
 					{
 						var code = method.instructions;
-						code.insertBefore(code.get(5), new MethodInsnNode(Opcodes.INVOKESTATIC, "tk/zeitheron/solarflux/client/SolarFluxResourcePack", "addResourcePack", "(L" + classNode.name + ";)V", false));
+						code.insertBefore(code.get(5), new MethodInsnNode(Opcodes.INVOKESTATIC, resourcePackClass, resourcePackRegistrar, "(L" + classNode.name + ";)V", false));
 						code.insertBefore(code.get(5), new VarInsnNode(Opcodes.ALOAD, 0));
 					} else if(method.name.equals("initialReload") && method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)"))
 					{
 						var code = method.instructions;
-						code.insertBefore(code.getFirst(), new MethodInsnNode(Opcodes.INVOKESTATIC, "tk/zeitheron/solarflux/client/SolarFluxResourcePack", "addResourcePack", "(L" + classNode.name + ";)V", false));
+						code.insertBefore(code.getFirst(), new MethodInsnNode(Opcodes.INVOKESTATIC, resourcePackClass, resourcePackRegistrar, "(L" + classNode.name + ";)V", false));
 						code.insertBefore(code.getFirst(), new VarInsnNode(Opcodes.ALOAD, 0));
 					}
 				}

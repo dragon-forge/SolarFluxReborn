@@ -90,6 +90,7 @@ def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
     builtBy 'reobfJar'
 }
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
@@ -102,3 +103,10 @@ publishing {
         }
     }
 }
+
+task signJar(type: SignJar, dependsOn: reobfJar) {
+    inputFile = jar.archivePath
+    outputFile = jar.archivePath
+}
+
+build.dependsOn signJar
