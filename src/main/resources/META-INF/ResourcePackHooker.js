@@ -17,12 +17,12 @@ function initializeCoreMod()
 				for(m in methods)
 				{
 					var method = methods[m];
-					if(method.name.equals("reloadResources") && method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)"))
+					if(method.name.equals("reloadResources") || method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;Ljava/util/List;)"))
 					{
 						var code = method.instructions;
 						code.insertBefore(code.get(5), new MethodInsnNode(Opcodes.INVOKESTATIC, resourcePackClass, resourcePackRegistrar, "(L" + classNode.name + ";)V", false));
 						code.insertBefore(code.get(5), new VarInsnNode(Opcodes.ALOAD, 0));
-					} else if(method.name.equals("initialReload") && method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)"))
+					} else if(method.name.equals("initialReload") || method.desc.startsWith("(Ljava/util/concurrent/Executor;Ljava/util/concurrent/Executor;Ljava/util/concurrent/CompletableFuture;)"))
 					{
 						var code = method.instructions;
 						code.insertBefore(code.getFirst(), new MethodInsnNode(Opcodes.INVOKESTATIC, resourcePackClass, resourcePackRegistrar, "(L" + classNode.name + ";)V", false));

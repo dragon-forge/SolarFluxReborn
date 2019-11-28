@@ -52,12 +52,16 @@ public class SolarPanelBakedModel implements IDynamicBakedModel
 				
 				TextureAtlasSprite top = t_top(), base = t_base();
 				
-				float h = block.panel.getClientPanelData().height * 16F;
+				float h = block.panel.getPanelData().height * 16F;
 				
 				quads.add(COOKER.makeBakedQuad( //
 				        new Vector3f(0, 0, 0), new Vector3f(16, h, 16), //
 				        new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[] { 0, side.getAxis() == Axis.Y ? 0 : (16F - h), 16, 16 }, 4)), //
 				        side == Direction.UP ? top : base, side, ZERO_SPRITE, null, true));
+				
+				// world/pos not set? no connected textures == no crash!
+				if(world == null || pos == null)
+					return quads;
 				
 				boolean west = false, east = false, north = false, south = false;
 				

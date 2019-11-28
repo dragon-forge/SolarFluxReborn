@@ -4,6 +4,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.client.renderer.model.ModelResourceLocation;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.resources.Locale;
@@ -16,7 +17,9 @@ import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent.ClientTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import tk.zeitheron.solarflux.SolarFlux;
 import tk.zeitheron.solarflux.client.SolarPanelBakedModel;
+import tk.zeitheron.solarflux.client.screen.SolarPanelScreen;
 import tk.zeitheron.solarflux.panels.SolarPanel;
 import tk.zeitheron.solarflux.panels.SolarPanels;
 
@@ -30,6 +33,7 @@ public class SFRClientProxy extends SFRCommonProxy
 	@OnlyIn(Dist.CLIENT)
 	public void clientSetup()
 	{
+		ScreenManager.registerFactory(SolarFlux.SOLAR_PANEL_CONTAINER, SolarPanelScreen::new);
 	}
 	
 	@Override

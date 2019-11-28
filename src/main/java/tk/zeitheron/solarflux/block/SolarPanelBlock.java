@@ -10,6 +10,7 @@ import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
@@ -22,6 +23,7 @@ import net.minecraft.world.IBlockReader;
 import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
+import net.minecraftforge.fml.network.NetworkHooks;
 import tk.zeitheron.solarflux.panels.SolarPanel;
 
 public class SolarPanelBlock extends ContainerBlock
@@ -73,7 +75,7 @@ public class SolarPanelBlock extends ContainerBlock
 		
 		boolean west = false, east = false, north = false, south = false;
 		
-		float h = panel.getClientPanelData().height, h2 = h + 0.25F / 16F;
+		float h = panel.getPanelData().height, h2 = h + 0.25F / 16F;
 		
 		if(west = world.getBlockState(pos.west()).getBlock() != this)
 			shapes.add(VoxelShapes.create(0, h, 1 / 16F, 1 / 16F, h2, 15 / 16F));
@@ -105,6 +107,10 @@ public class SolarPanelBlock extends ContainerBlock
 	@Override
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
 	{
+		TileEntity te = worldIn.getTileEntity(pos);
+		SolarPanelTile tile = te instanceof SolarPanelTile ? (SolarPanelTile) te : null;
+		if(player instanceof ServerPlayerEntity && tile != null)
+			NetworkHooks.openGui((ServerPlayerEntity) player, tile, buf -> buf.writeBlockPos(pos));
 		return true;
 	}
 	

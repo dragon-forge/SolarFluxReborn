@@ -43,23 +43,6 @@ public class SolarFluxResourcePack implements IResourcePack
 		return IResourceStreamSupplier.create(file::isFile, () -> new FileInputStream(file));
 	}
 	
-	private static IResourceStreamSupplier ofInternal(String path)
-	{
-		boolean exists = false;
-		
-		try(InputStream in = SolarFluxResourcePack.class.getResourceAsStream(path))
-		{
-			exists = in != null;
-		} catch(IOException e)
-		{
-			exists = false;
-		}
-		
-		final boolean fe = exists;
-		
-		return IResourceStreamSupplier.create(() -> fe, () -> SolarFluxResourcePack.class.getResourceAsStream(path));
-	}
-	
 	static SolarFluxResourcePack packInstance;
 	
 	public static SolarFluxResourcePack getPackInstance()
@@ -83,7 +66,7 @@ public class SolarFluxResourcePack implements IResourcePack
 			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/" + reg.getPath() + ".json");
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
-			float thicc = si.getClientPanelData().height * 16F;
+			float thicc = si.getPanelData().height * 16F;
 			float thic2 = thicc + 0.25F;
 			float reverseThicc = 16 - thicc;
 			

@@ -1,13 +1,12 @@
 package tk.zeitheron.solarflux.panels;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
 import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.MathHelper;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
+import tk.zeitheron.solarflux.block.SolarPanelTile;
 
 public class SolarPanel
 {
@@ -28,8 +27,7 @@ public class SolarPanel
 		this.isCustom = isCustom;
 	}
 	
-	@OnlyIn(Dist.CLIENT)
-	public SolarPanelData getClientPanelData()
+	public SolarPanelData getPanelData()
 	{
 		return networkData != null ? networkData : delegateData;
 	}
@@ -84,10 +82,25 @@ public class SolarPanel
 		return langs;
 	}
 	
+	public float computeSunIntensity(SolarPanelTile solar)
+	{
+		if(!solar.doesSeeSky())
+			return 0F;
+		
+		float celestialAngleRadians = solar.getWorld().getCelestialAngleRadians(1F);
+		if(celestialAngleRadians > Math.PI)
+			celestialAngleRadians = (float) (2 * Math.PI - celestialAngleRadians);
+		int lowLightCount = 0;
+		float multiplicator = 1.5F - (lowLightCount * .122F);
+		float displacement = 1.2F + (lowLightCount * .08F);
+		
+		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
+	}
+	
 	public static class Builder
 	{
 		String name;
-		BigInteger generation, capacity, transfer;
+		Long generation, capacity, transfer;
 		float height = 6 / 16F;
 		boolean custom = false;
 		
@@ -105,9 +118,9 @@ public class SolarPanel
 		
 		public Builder generation(Number n)
 		{
-			if(n instanceof BigInteger)
+			if(n instanceof Long)
 			{
-				this.generation = (BigInteger) n;
+				this.generation = (Long) n;
 				return this;
 			}
 			return generation(Long.toString(n.longValue()));
@@ -115,15 +128,15 @@ public class SolarPanel
 		
 		public Builder generation(String s)
 		{
-			this.generation = new BigInteger(s);
+			this.generation = new Long(s);
 			return this;
 		}
 		
 		public Builder capacity(Number n)
 		{
-			if(n instanceof BigInteger)
+			if(n instanceof Long)
 			{
-				this.capacity = (BigInteger) n;
+				this.capacity = (Long) n;
 				return this;
 			}
 			return capacity(Long.toString(n.longValue()));
@@ -131,15 +144,15 @@ public class SolarPanel
 		
 		public Builder capacity(String s)
 		{
-			this.capacity = new BigInteger(s);
+			this.capacity = new Long(s);
 			return this;
 		}
 		
 		public Builder transfer(Number n)
 		{
-			if(n instanceof BigInteger)
+			if(n instanceof Long)
 			{
-				this.transfer = (BigInteger) n;
+				this.transfer = (Long) n;
 				return this;
 			}
 			return transfer(Long.toString(n.longValue()));
@@ -147,7 +160,7 @@ public class SolarPanel
 		
 		public Builder transfer(String s)
 		{
-			this.transfer = new BigInteger(s);
+			this.transfer = new Long(s);
 			return this;
 		}
 		
@@ -207,18 +220,18 @@ public class SolarPanel
 	
 	public static class SolarPanelData
 	{
-		public final BigInteger generation, capacity, transfer;
+		public final long generation, capacity, transfer;
 		public final float height;
 		
 		public SolarPanelData(PacketBuffer buf)
 		{
-			this.generation = new BigInteger(buf.readByteArray());
-			this.capacity = new BigInteger(buf.readByteArray());
-			this.transfer = new BigInteger(buf.readByteArray());
+			this.generation = buf.readLong();
+			this.capacity = buf.readLong();
+			this.transfer = buf.readLong();
 			this.height = buf.readFloat();
 		}
 		
-		public SolarPanelData(BigInteger generation, BigInteger capacity, BigInteger transfer, float height)
+		public SolarPanelData(long generation, long capacity, long transfer, float height)
 		{
 			this.generation = generation;
 			this.capacity = capacity;
@@ -228,10 +241,28 @@ public class SolarPanel
 		
 		public void write(PacketBuffer buf)
 		{
-			buf.writeByteArray(generation.toByteArray());
-			buf.writeByteArray(capacity.toByteArray());
-			buf.writeByteArray(transfer.toByteArray());
+			buf.writeLong(generation);
+			buf.writeLong(capacity);
+			buf.writeLong(transfer);
 			buf.writeFloat(height);
 		}
+	}
+
+	public SolarPanelInstance createInstance(SolarPanelTile tile)
+	{
+		SolarPanelInstance inst = new SolarPanelInstance();
+		inst.delegate = name;
+		inst.infoDelegate = this;
+		inst.reset();
+		return inst;
+	}
+
+	public void accept(SolarPanelInstance t)
+	{
+		SolarPanelData data = getPanelData();
+		t.gen = data.generation;
+		t.cap = data.capacity;
+		t.transfer = data.transfer;
+		t.delegate = name;
 	}
 }

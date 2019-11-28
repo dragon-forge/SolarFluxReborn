@@ -29,7 +29,7 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 minecraft {
     mappings channel: config.mcp_ch, version: config.mcp_vr
-    accessTransformer = file('src/main/resources/META-INF/at.cfg')
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
     runs {
         client {
             workingDirectory project.file('run')
@@ -104,9 +104,17 @@ publishing {
     }
 }
 
+/*
 task signJar(type: SignJar, dependsOn: reobfJar) {
+    onlyIf {
+        project.hasProperty('keyStore')
+    }
+    keyStore = project.findProperty('keyStore')
+    alias = project.findProperty('keyStoreAlias')
+    storePass = project.findProperty('keyStorePass')
+    keyPass = project.findProperty('keyStorePass')
     inputFile = jar.archivePath
     outputFile = jar.archivePath
 }
-
 build.dependsOn signJar
+*/
