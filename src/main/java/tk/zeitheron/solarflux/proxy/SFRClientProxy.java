@@ -51,13 +51,13 @@ public class SFRClientProxy extends SFRCommonProxy
 			prevLocale = I18n.i18nLocale;
 		if(prevLocale != null)
 		{
+			String lang = Minecraft.getInstance().gameSettings.language;
 			Map<String, String>[] langMaps = new Map[] { prevLocale.properties, LanguageMap.getInstance().languageList };
 			for(Map<String, String> langs : langMaps)
 			{
-				if(!Objects.equals(langs.get("solarflux.langsapplied"), "Yes!"))
+				if(!Objects.equals(langs.get("solarflux.langsapplied"), lang))
 				{
-					langs.put("solarflux.langsapplied", "Yes!");
-					String lang = Minecraft.getInstance().getLanguageManager().getCurrentLanguage().getName();
+					langs.put("solarflux.langsapplied", lang);
 					SolarPanels.listPanels().filter(SolarPanel::hasLang).forEach(p ->
 					{
 						ResourceLocation path = p.getBlock().getRegistryName();

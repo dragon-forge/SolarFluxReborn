@@ -37,7 +37,7 @@ import tk.zeitheron.solarflux.proxy.SFRCommonProxy;
 @Mod(value = "solarflux")
 public class SolarFlux
 {
-	public static final ContainerType<SolarPanelContainer> SOLAR_PANEL_CONTAINER = IForgeContainerType.create((int windowId, PlayerInventory playerInv, PacketBuffer extraData) ->
+	public static final ContainerType<SolarPanelContainer> SOLAR_PANEL_CONTAINER = IForgeContainerType.create((windowId, playerInv, extraData) ->
 	{
 		TileEntity tile = playerInv.player.world.getTileEntity(extraData.readBlockPos());
 		if(tile instanceof SolarPanelTile)

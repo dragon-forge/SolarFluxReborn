@@ -30,6 +30,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.registries.ForgeRegistries;
 import tk.zeitheron.solarflux.items.ItemsSF;
+import tk.zeitheron.solarflux.panels.SolarPanel;
 import tk.zeitheron.solarflux.panels.SolarPanels;
 import tk.zeitheron.solarflux.shaded.hammerlib.api.OreDict;
 
@@ -65,6 +66,8 @@ public class RecipesSF
 		r.add(parseShaped(new ItemStack(ItemsSF.BLOCK_CHARGING_UPGRADE), "geg", "eue", "geg", 'g', "enderpearl", 'e', "blockRedstone", 'u', ItemsSF.DISPERSIVE_UPGRADE));
 		r.add(parseShaped(new ItemStack(ItemsSF.FURNACE_UPGRADE), "ccc", "cuc", "cfc", 'u', ItemsSF.BLANK_UPGRADE, 'c', Items.COAL, 'f', Blocks.FURNACE));
 		r.add(parseShaped(new ItemStack(ItemsSF.CAPACITY_UPGRADE), " r ", "rur", "rcr", 'u', ItemsSF.BLANK_UPGRADE, 'r', "dustRedstone", 'c', "blockDiamond"));
+		
+		SolarPanels.listPanels().flatMap(SolarPanel::recipes).forEach(r::add);
 	}
 	
 	@SubscribeEvent

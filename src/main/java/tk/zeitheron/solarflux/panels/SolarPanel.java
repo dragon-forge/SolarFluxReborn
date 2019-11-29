@@ -1,18 +1,30 @@
 package tk.zeitheron.solarflux.panels;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.network.PacketBuffer;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.MathHelper;
+import tk.zeitheron.solarflux.RecipesSF;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 
-public class SolarPanel
+public class SolarPanel implements IItemProvider
 {
 	public final String name;
 	public final SolarPanelData delegateData;
 	public SolarPanelData networkData;
+	
+	public List<Supplier<IRecipe<?>>> recipes = new ArrayList<>();
 	
 	public final boolean isCustom;
 	
@@ -55,6 +67,12 @@ public class SolarPanel
 		return block;
 	}
 	
+	@Override
+	public Item asItem()
+	{
+		return getBlock().asItem();
+	}
+	
 	public static Builder builder()
 	{
 		return new Builder();
@@ -82,6 +100,11 @@ public class SolarPanel
 		return langs;
 	}
 	
+	public RecipeBuilder recipeBuilder()
+	{
+		return new RecipeBuilder(this);
+	}
+	
 	public float computeSunIntensity(SolarPanelTile solar)
 	{
 		if(!solar.doesSeeSky())
@@ -95,6 +118,11 @@ public class SolarPanel
 		float displacement = 1.2F + (lowLightCount * .08F);
 		
 		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
+	}
+	
+	public Stream<IRecipe<?>> recipes()
+	{
+		return recipes == null ? Stream.empty() : recipes.stream().map(Supplier::get);
 	}
 	
 	public static class Builder
@@ -218,6 +246,44 @@ public class SolarPanel
 		}
 	}
 	
+	public static class RecipeBuilder
+	{
+		final SolarPanel panel;
+		
+		List<Object> args = new ArrayList<>();
+		
+		public RecipeBuilder(SolarPanel panel)
+		{
+			this.panel = panel;
+		}
+		
+		public RecipeBuilder shape(String... strings)
+		{
+			args.addAll(Arrays.asList(strings));
+			return this;
+		}
+		
+		public RecipeBuilder bind(String ch, Object output)
+		{
+			if(ch.length() != 1)
+				throw new IllegalArgumentException(ch + " is not a single character!");
+			args.add(ch.charAt(0));
+			args.add(output);
+			return this;
+		}
+		
+		public SolarPanel build()
+		{
+			return build(1);
+		}
+		
+		public SolarPanel build(int amount)
+		{
+			this.panel.recipes.add(() -> RecipesSF.parseShaped(new ItemStack(panel), args.toArray(new Object[args.size()])));
+			return this.panel;
+		}
+	}
+	
 	public static class SolarPanelData
 	{
 		public final long generation, capacity, transfer;
@@ -247,7 +313,7 @@ public class SolarPanel
 			buf.writeFloat(height);
 		}
 	}
-
+	
 	public SolarPanelInstance createInstance(SolarPanelTile tile)
 	{
 		SolarPanelInstance inst = new SolarPanelInstance();
@@ -256,7 +322,7 @@ public class SolarPanel
 		inst.reset();
 		return inst;
 	}
-
+	
 	public void accept(SolarPanelInstance t)
 	{
 		SolarPanelData data = getPanelData();
