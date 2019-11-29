@@ -36,7 +36,7 @@ import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.CapabilityItemHandler;
 import tk.zeitheron.solarflux.api.attribute.SimpleAttributeProperty;
 import tk.zeitheron.solarflux.container.SolarPanelContainer;
-import tk.zeitheron.solarflux.items.ItemUpgrade;
+import tk.zeitheron.solarflux.items.UpgradeItem;
 import tk.zeitheron.solarflux.panels.SolarPanel;
 import tk.zeitheron.solarflux.panels.SolarPanelInstance;
 import tk.zeitheron.solarflux.panels.SolarPanels;
@@ -83,9 +83,9 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	{
 		if(other == null)
 			return false;
-		if(other.instance == null || instance == null)
+		if(other.getDelegate() == null || getDelegate() == null)
 			return false;
-		return Objects.equals(other.instance.delegate, instance.delegate);
+		return Objects.equals(other.getDelegate(), getDelegate());
 	}
 	
 	public SolarPanel getDelegate()
@@ -124,12 +124,12 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 			stack = items.getStackInSlot(i);
 			if(!stack.isEmpty())
 			{
-				if(stack.getItem() instanceof ItemUpgrade && ((ItemUpgrade) stack.getItem()).canStayInPanel(this, stack, items))
+				if(stack.getItem() instanceof UpgradeItem && ((UpgradeItem) stack.getItem()).canStayInPanel(this, stack, items))
 				{
 					id = stack.getItem().getRegistryName();
 					if(!tickedUpgrades.contains(id))
 					{
-						ItemUpgrade iu = (ItemUpgrade) stack.getItem();
+						UpgradeItem iu = (UpgradeItem) stack.getItem();
 						iu.update(this, stack, getUpgrades(iu));
 						tickedUpgrades.add(id);
 					}
@@ -243,6 +243,8 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 				}
 			}
 		}
+		
+		world.updateComparatorOutputLevel(pos, getBlockState().getBlock());
 	}
 	
 	public int getGeneration()
@@ -289,7 +291,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	
 	private void writeNBT(CompoundNBT nbt)
 	{
-		nbt.putString("SPID", delegate.name);
+		nbt.putString("SPID", getDelegate().name);
 		items.writeToNBT(nbt, "Upgrades");
 		itemChargeable.writeToNBT(nbt, "Chargeable");
 		nbt.putLong("Energy", energy);

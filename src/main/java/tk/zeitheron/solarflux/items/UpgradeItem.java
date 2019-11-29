@@ -6,9 +6,9 @@ import tk.zeitheron.solarflux.SolarFlux;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.util.SimpleInventory;
 
-public abstract class ItemUpgrade extends Item
+public abstract class UpgradeItem extends Item
 {
-	public ItemUpgrade(int stackSize)
+	public UpgradeItem(int stackSize)
 	{
 		super(new Item.Properties().maxStackSize(stackSize).group(SolarFlux.ITEM_GROUP));
 	}

@@ -7,10 +7,13 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import tk.zeitheron.solarflux.SolarFlux;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
+import tk.zeitheron.solarflux.util.ComplexProgressManager;
 
 public class SolarPanelContainer extends Container
 {
 	public final SolarPanelTile panel;
+	
+	public final ComplexProgressManager progressHandler = new ComplexProgressManager(4 * 8 + 4, 0);
 	
 	public SolarPanelContainer(int id, PlayerInventory playerInv, SolarPanelTile tile)
 	{
@@ -42,8 +45,20 @@ public class SolarPanelContainer extends Container
 	@Override
 	public void detectAndSendChanges()
 	{
+		progressHandler.putLong(0, panel.energy);
+		progressHandler.putLong(8, panel.capacity.getValueL());
+		progressHandler.putLong(16, panel.currentGeneration);
+		progressHandler.putLong(24, panel.generation.getValueL());
+		progressHandler.putFloat(32, panel.sunIntensity);
 		
 		super.detectAndSendChanges();
+		progressHandler.detectAndSendChanges(this);
+	}
+	
+	@Override
+	public void updateProgressBar(int id, int data)
+	{
+		progressHandler.updateChange(id, data);
 	}
 	
 	@Override

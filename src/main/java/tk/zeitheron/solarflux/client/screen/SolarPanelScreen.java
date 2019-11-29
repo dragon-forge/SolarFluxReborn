@@ -18,6 +18,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.container.SolarPanelContainer;
+import tk.zeitheron.solarflux.util.ComplexProgressManager;
 
 public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 {
@@ -38,15 +39,32 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 	public final SolarPanelTile solar;
 	private final PlayerInventory pinv;
 	
+	public final ComplexProgressManager data;
+	
 	private List<String> tooltip = Lists.newArrayList();
 	
 	public SolarPanelScreen(SolarPanelContainer screenContainer, PlayerInventory inv, ITextComponent titleIn)
 	{
 		super(screenContainer, inv, titleIn);
+		this.data = screenContainer.progressHandler;
 		this.pinv = inv;
 		this.solar = screenContainer.panel;
 		xSize = 176;
 		ySize = 180;
+	}
+	
+	long energy, capacity, currentGeneration, generation;
+	float sunIntensity;
+	
+	@Override
+	public void tick()
+	{
+		energy = data.getLong(0);
+		capacity = data.getLong(8);
+		currentGeneration = data.getLong(16);
+		generation = data.getLong(24);
+		sunIntensity = data.getFloat(32);
+		super.tick();
 	}
 	
 	@Override
@@ -57,10 +75,10 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 		font.drawString(solar.getBlockState().getBlock().getNameTextComponent().getFormattedText(), BORDER_OFFSET, 4, 0x404040);
 		GL11.glTranslatef(BORDER_OFFSET, BORDER_OFFSET + 6, 0);
 		GL11.glScalef(.9F, .9F, .9F);
-		font.drawString(I18n.format("info.solarflux.energy.stored1", solar.energy), 0, 0, 0x404040);
-		font.drawString(I18n.format("info.solarflux.energy.capacity", solar.capacity.getValueL()), 0, 10, 0x404040);
-		font.drawString(I18n.format("info.solarflux.energy.generation", solar.currentGeneration), 0, 20, 0x404040);
-		font.drawString(I18n.format("info.solarflux.energy.efficiency", solar.generation.getValueL() > 0 ? Math.round(100D * solar.currentGeneration / solar.generation.getValueL()) : 0), 0, 30, 0x404040);
+		font.drawString(I18n.format("info.solarflux.energy.stored1", energy), 0, 0, 0x404040);
+		font.drawString(I18n.format("info.solarflux.energy.capacity", capacity), 0, 10, 0x404040);
+		font.drawString(I18n.format("info.solarflux.energy.generation", currentGeneration), 0, 20, 0x404040);
+		font.drawString(I18n.format("info.solarflux.energy.efficiency", generation > 0 ? Math.round(100D * currentGeneration / generation) : 0), 0, 30, 0x404040);
 		
 		GlStateManager.popMatrix();
 		
@@ -81,7 +99,7 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 			blit(x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 			
 			if(pinv.getItemStack().isEmpty())
-				drawMouseOver(I18n.format("info.solarflux.energy.stored2", solar.energy, solar.capacity.getValueL()));
+				drawMouseOver(I18n.format("info.solarflux.energy.stored2", energy, capacity));
 		}
 		
 		x = xSize - 2 * GAUGE_WIDTH - BORDER_OFFSET - BORDER_OFFSET / 2;
@@ -93,13 +111,13 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			fillGradient(x + 1, y + 1, x + GAUGE_WIDTH - 1, y + GAUGE_HEIGHT - 1, 0x88FFFFFF, 0x88FFFFFF);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
-
+			
 			GL11.glColor4f(1, 1, 1, 1);
 			minecraft.getTextureManager().bindTexture(ELEMENTS);
 			blit(x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 			
 			if(pinv.getItemStack().isEmpty())
-				drawMouseOver(I18n.format("info.solarflux.sun.intensity", Math.round(100 * solar.sunIntensity)));
+				drawMouseOver(I18n.format("info.solarflux.sun.intensity", Math.round(100 * sunIntensity)));
 		}
 	}
 	
@@ -141,7 +159,7 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 	{
 		blit(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y, GAUGE_INNER_SRC_X + GAUGE_INNER_WIDTH, GAUGE_INNER_SRC_Y, GAUGE_INNER_WIDTH, GAUGE_INNER_HEIGHT);
 		
-		double height = solar.energy * ((double) GAUGE_INNER_HEIGHT) / solar.capacity.getValueL();
+		double height = energy * ((double) GAUGE_INNER_HEIGHT) / capacity;
 		double offset = GAUGE_INNER_HEIGHT - height;
 		
 		drawTMR(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);
@@ -152,7 +170,7 @@ public class SolarPanelScreen extends ContainerScreen<SolarPanelContainer>
 	{
 		blit(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y, 32 + GAUGE_INNER_SRC_X + GAUGE_INNER_WIDTH, GAUGE_INNER_SRC_Y, GAUGE_INNER_WIDTH, GAUGE_INNER_HEIGHT);
 		
-		float height = GAUGE_INNER_HEIGHT * solar.sunIntensity;
+		float height = GAUGE_INNER_HEIGHT * sunIntensity;
 		float offset = GAUGE_INNER_HEIGHT - height;
 		
 		drawTMR(x + GAUGE_INNER_OFFSET_X, y + GAUGE_INNER_OFFSET_Y + offset, 32 + GAUGE_INNER_SRC_X, GAUGE_INNER_SRC_Y + offset, GAUGE_INNER_WIDTH, height);

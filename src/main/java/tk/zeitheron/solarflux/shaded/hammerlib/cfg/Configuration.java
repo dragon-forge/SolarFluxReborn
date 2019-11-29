@@ -94,7 +94,7 @@ public class Configuration
 				String r = reader.readLine();
 				while(r.startsWith("# "))
 					r = reader.readLine();
-				if(!r.startsWith("~ Saved With Hammer Lib "))
+				if(!r.startsWith("~ Saved With Solar FLux "))
 					throw new IOException("Config doesn't have version that it was saved with! (" + r + ")");
 				String ver = r.substring(24);
 				

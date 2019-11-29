@@ -28,6 +28,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import tk.zeitheron.solarflux.block.SolarPanelBlockItem;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.container.SolarPanelContainer;
+import tk.zeitheron.solarflux.items.ItemsSF;
 import tk.zeitheron.solarflux.net.SFNetwork;
 import tk.zeitheron.solarflux.panels.SolarPanels;
 import tk.zeitheron.solarflux.proxy.SFRClientProxy;
@@ -46,7 +47,7 @@ public class SolarFlux
 	
 	public static final Logger LOG = LogManager.getLogger();
 	public static final SFRCommonProxy PROXY = DistExecutor.runForDist(() -> () -> new SFRClientProxy(), () -> () -> new SFRCommonProxy());
-	public static final ItemGroup ITEM_GROUP = new ItemGroup("solarflux")
+	public static final ItemGroup ITEM_GROUP = new ItemGroup(InfoSF.MOD_ID)
 	{
 		@Override
 		public ItemStack createIcon()
@@ -101,6 +102,7 @@ public class SolarFlux
 		@SubscribeEvent
 		public static void registerItems(RegistryEvent.Register<Item> e)
 		{
+			ItemsSF.register(e.getRegistry());
 			SolarPanels.listPanelBlocks().forEach(b ->
 			{
 				SolarPanelBlockItem item = new SolarPanelBlockItem(b, new Item.Properties().group(ITEM_GROUP));

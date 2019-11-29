@@ -11,9 +11,13 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.InventoryHelper;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Hand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.math.shapes.ISelectionContext;
@@ -24,6 +28,7 @@ import net.minecraft.world.IEnviromentBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.common.ToolType;
 import net.minecraftforge.fml.network.NetworkHooks;
+import tk.zeitheron.solarflux.items.UpgradeItem;
 import tk.zeitheron.solarflux.panels.SolarPanel;
 
 public class SolarPanelBlock extends ContainerBlock
@@ -108,9 +113,47 @@ public class SolarPanelBlock extends ContainerBlock
 	public boolean onBlockActivated(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
 	{
 		TileEntity te = worldIn.getTileEntity(pos);
-		SolarPanelTile tile = te instanceof SolarPanelTile ? (SolarPanelTile) te : null;
-		if(player instanceof ServerPlayerEntity && tile != null)
-			NetworkHooks.openGui((ServerPlayerEntity) player, tile, buf -> buf.writeBlockPos(pos));
+		SolarPanelTile tbs = te instanceof SolarPanelTile ? (SolarPanelTile) te : null;
+		if(player instanceof ServerPlayerEntity && tbs != null)
+		{
+			ItemStack held = player.getHeldItem(handIn);
+			if(!held.isEmpty() && held.getItem() instanceof UpgradeItem)
+			{
+				int amt = tbs.getUpgrades(held.getItem());
+				UpgradeItem iu = (UpgradeItem) held.getItem();
+				if(amt < held.getMaxStackSize() && iu.canInstall(tbs, held, tbs.items))
+				{
+					boolean installed = false;
+					for(int i = 0; i < tbs.items.getSlots(); ++i)
+					{
+						ItemStack stack = tbs.items.getStackInSlot(i);
+						if(stack.isItemEqual(held) && ItemStack.areItemStackTagsEqual(stack, held))
+						{
+							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
+							stack.grow(allow);
+							held.shrink(allow);
+							installed = true;
+							break;
+						} else if(stack.isEmpty())
+						{
+							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), held.getCount());
+							ItemStack copy = held.copy();
+							held.shrink(allow);
+							copy.setCount(allow);
+							tbs.items.setStackInSlot(i, copy);
+							installed = true;
+							break;
+						}
+					}
+					if(installed)
+					{
+						worldIn.playSound(null, pos, SoundEvents.BLOCK_ANVIL_LAND, SoundCategory.BLOCKS, .1F, 1F);
+						return true;
+					}
+				}
+			}
+			NetworkHooks.openGui((ServerPlayerEntity) player, tbs, buf -> buf.writeBlockPos(pos));
+		}
 		return true;
 	}
 	
@@ -126,6 +169,38 @@ public class SolarPanelBlock extends ContainerBlock
 		if(world.getBlockState(pos.offset(face)).getBlock() == this)
 			return false;
 		return super.doesSideBlockRendering(state, world, pos, face);
+	}
+	
+	@Override
+	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
+	{
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if(tile instanceof SolarPanelTile)
+		{
+			SolarPanelTile sp = (SolarPanelTile) tile;
+			InventoryHelper.dropItems(worldIn, pos, sp.items.items);
+			InventoryHelper.dropItems(worldIn, pos, sp.itemChargeable.items);
+		}
+		super.onReplaced(state, worldIn, pos, newState, isMoving);
+	}
+	
+	@Override
+	public boolean hasComparatorInputOverride(BlockState state)
+	{
+		return true;
+	}
+	
+	@Override
+	public int getComparatorInputOverride(BlockState blockState, World worldIn, BlockPos pos)
+	{
+		TileEntity tile = worldIn.getTileEntity(pos);
+		if(tile instanceof SolarPanelTile)
+		{
+			SolarPanelTile sp = (SolarPanelTile) tile;
+			long cap = sp.capacity.getValueL();
+			return cap > 0L ? (int) Math.round(15D * sp.energy / cap) : 0;
+		}
+		return 0;
 	}
 	
 	@Override
