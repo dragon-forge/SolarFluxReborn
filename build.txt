@@ -1,6 +1,7 @@
 # Mod Info
 mod_id=solarflux
 archive_name=SolarFluxReborn
+mod_name=Solar Flux Reborn
 mod_version=14.1.2
 
 # MC Info
@@ -14,3 +15,5 @@ mcp_vr=20190719-1.14.3
 # Misc Info
 java=1.8
 certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
+cf_project=246974
+release_type=release

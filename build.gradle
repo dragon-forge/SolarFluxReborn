@@ -1,17 +1,20 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
+		maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+		classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
 
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
+apply plugin: "com.matthewprenger.cursegradle"
 
 ext.configFile = file "build.txt"
 
@@ -84,6 +87,28 @@ jar {
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
+}
+
+curseforge {
+	apiKey = System.env.CURSEFORGE_API_KEY
+	project {
+		id = "${config.cf_project}"
+		changelogType = 'html'
+		changelog = ""
+		releaseType = "${config.release_type}"
+		addGameVersion "${config.mc_version}"
+		addGameVersion "Forge"
+		mainArtifact(jar) {
+		  displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
+		}
+		relations {
+            optionalLibrary 'Baubles'
+			optionalLibrary 'Black-Hole-Storage'
+			optionalLibrary 'Avaritia-1-10'
+			optionalLibrary 'Thaumcraft'
+			optionalLibrary 'Draconic-Evolution'
+        }
+	}
 }
 
 def reobfFile = file("$buildDir/reobfJar/output.jar")
