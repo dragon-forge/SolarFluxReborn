@@ -10,13 +10,13 @@ public class SlotUpgrade extends SlotItemHandler
 	
 	public SlotUpgrade(SolarPanelTile inventoryIn, int index, int xPosition, int yPosition)
 	{
-		super(inventoryIn.items, index, xPosition, yPosition);
+		super(inventoryIn.upgradeInventory, index, xPosition, yPosition);
 		this.tile = inventoryIn;
 	}
 	
 	@Override
 	public boolean isItemValid(ItemStack stack)
 	{
-		return tile.items.isItemValid(getSlotIndex(), stack);
+		return tile.upgradeInventory.isItemValid(getSlotIndex(), stack);
 	}
 }

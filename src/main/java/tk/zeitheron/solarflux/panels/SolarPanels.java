@@ -45,6 +45,8 @@ public class SolarPanels
 		}
 	};
 	
+	public static double LOOSE_ENERGY;
+	
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
 	
 	public static File CONFIG_DIR;
@@ -75,6 +77,8 @@ public class SolarPanels
 		cfgs.setComment("Main configurration file fur Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
 		
 		ConfigEntryCategory spc = cfgs.getCategory("Solar Panels");
+		
+		LOOSE_ENERGY = spc.getFloatEntry("Pickup Energy Loss", 5, 0, 100).setDescription("How much energy (percent) will get lost while picking up the solar panel?").getValue();
 		
 		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{

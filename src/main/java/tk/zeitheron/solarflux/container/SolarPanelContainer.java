@@ -23,10 +23,10 @@ public class SolarPanelContainer extends Container
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
 		
-		for(int i = 0; i < tile.items.getSlots(); ++i)
+		for(int i = 0; i < tile.upgradeInventory.getSlots(); ++i)
 			addSlot(new SlotUpgrade(tile, i, i * 18 + 9, 61));
 		
-		addSlot(new SlotChargable(tile.itemChargeable, 0, 151, 9));
+		addSlot(new SlotChargable(tile.chargeInventory, 0, 151, 9));
 	}
 	
 	protected void addPlayerInventorySlotsToContainer(PlayerInventory pInventoryPlayer, int pLeft, int pTop)

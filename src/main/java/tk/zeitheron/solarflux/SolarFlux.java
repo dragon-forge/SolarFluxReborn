@@ -50,7 +50,7 @@ public class SolarFlux
 		@Override
 		public ItemStack createIcon()
 		{
-			return new ItemStack(SolarPanels.CORE_PANELS[0].getBlock());
+			return new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_3);
 		}
 	};
 	

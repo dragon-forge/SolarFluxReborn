@@ -9,9 +9,10 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.ContainerBlock;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.InventoryHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
@@ -39,6 +40,48 @@ public class SolarPanelBlock extends ContainerBlock
 	{
 		super(Properties.create(Material.IRON).harvestLevel(1).harvestTool(ToolType.PICKAXE).hardnessAndResistance(1.5F).variableOpacity().sound(SoundType.METAL));
 		this.panel = panel;
+	}
+	
+	@Override
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
+	{
+		if(stack.hasTag())
+		{
+			SolarPanelTile spt = null;
+			TileEntity tile = worldIn.getTileEntity(pos);
+			if(tile instanceof SolarPanelTile)
+				spt = (SolarPanelTile) tile;
+			else
+			{
+				spt = (SolarPanelTile) createNewTileEntity(worldIn);
+				worldIn.setTileEntity(pos, spt);
+			}
+			spt.loadFromItem(stack);
+		}
+	}
+	
+	@Override
+	public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player)
+	{
+		if(!canHarvestBlock(state, worldIn, pos, player))
+		{
+			super.onBlockHarvested(worldIn, pos, state, player);
+			return;
+		}
+		
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		if(tileentity instanceof SolarPanelTile)
+		{
+			SolarPanelTile te = (SolarPanelTile) tileentity;
+			if(!worldIn.isRemote)
+			{
+				ItemEntity itementity = new ItemEntity(worldIn, pos.getX() + 0.5, pos.getY() + panel.delegateData.height / 2F, pos.getZ() + 0.5, te.generateItem(panel));
+				itementity.setDefaultPickupDelay();
+				worldIn.addEntity(itementity);
+			}
+		}
+		
+		super.onBlockHarvested(worldIn, pos, state, player);
 	}
 	
 	@Override
@@ -121,12 +164,12 @@ public class SolarPanelBlock extends ContainerBlock
 			{
 				int amt = tbs.getUpgrades(held.getItem());
 				UpgradeItem iu = (UpgradeItem) held.getItem();
-				if(amt < held.getMaxStackSize() && iu.canInstall(tbs, held, tbs.items))
+				if(amt < held.getMaxStackSize() && iu.canInstall(tbs, held, tbs.upgradeInventory))
 				{
 					boolean installed = false;
-					for(int i = 0; i < tbs.items.getSlots(); ++i)
+					for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
 					{
-						ItemStack stack = tbs.items.getStackInSlot(i);
+						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
 						if(stack.isItemEqual(held) && ItemStack.areItemStackTagsEqual(stack, held))
 						{
 							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
@@ -140,7 +183,7 @@ public class SolarPanelBlock extends ContainerBlock
 							ItemStack copy = held.copy();
 							held.shrink(allow);
 							copy.setCount(allow);
-							tbs.items.setStackInSlot(i, copy);
+							tbs.upgradeInventory.setStackInSlot(i, copy);
 							installed = true;
 							break;
 						}
@@ -172,19 +215,6 @@ public class SolarPanelBlock extends ContainerBlock
 	}
 	
 	@Override
-	public void onReplaced(BlockState state, World worldIn, BlockPos pos, BlockState newState, boolean isMoving)
-	{
-		TileEntity tile = worldIn.getTileEntity(pos);
-		if(tile instanceof SolarPanelTile)
-		{
-			SolarPanelTile sp = (SolarPanelTile) tile;
-			InventoryHelper.dropItems(worldIn, pos, sp.items.items);
-			InventoryHelper.dropItems(worldIn, pos, sp.itemChargeable.items);
-		}
-		super.onReplaced(state, worldIn, pos, newState, isMoving);
-	}
-	
-	@Override
 	public boolean hasComparatorInputOverride(BlockState state)
 	{
 		return true;
@@ -206,6 +236,8 @@ public class SolarPanelBlock extends ContainerBlock
 	@Override
 	public TileEntity createNewTileEntity(IBlockReader worldIn)
 	{
-		return new SolarPanelTile();
+		SolarPanelTile tile = new SolarPanelTile();
+		tile.delegate = panel;
+		return tile;
 	}
 }

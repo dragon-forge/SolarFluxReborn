@@ -20,10 +20,12 @@ import net.minecraft.tileentity.ITickableTileEntity;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.Direction;
 import net.minecraft.util.Direction.Axis;
+import net.minecraft.util.IItemProvider;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.IModelData;
@@ -53,8 +55,8 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	public SolarPanel delegate;
 	public SolarPanelInstance instance;
 	
-	public final SimpleInventory items = new SimpleInventory(5);
-	public final SimpleInventory itemChargeable = new SimpleInventory(1);
+	public final SimpleInventory upgradeInventory = new SimpleInventory(5);
+	public final SimpleInventory chargeInventory = new SimpleInventory(1);
 	
 	public final List<BlockPosFace> traversal = new ArrayList<>();
 	
@@ -70,9 +72,9 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	public int getUpgrades(Item type)
 	{
 		int c = 0;
-		for(int i = 0; i < items.getSlots(); ++i)
+		for(int i = 0; i < upgradeInventory.getSlots(); ++i)
 		{
-			ItemStack stack = items.getStackInSlot(i);
+			ItemStack stack = upgradeInventory.getStackInSlot(i);
 			if(!stack.isEmpty() && stack.getItem() == type)
 				c += stack.getCount();
 		}
@@ -119,12 +121,12 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 		transfer.clearAttributes();
 		capacity.clearAttributes();
 		
-		for(int i = 0; i < items.getSlots(); ++i)
+		for(int i = 0; i < upgradeInventory.getSlots(); ++i)
 		{
-			stack = items.getStackInSlot(i);
+			stack = upgradeInventory.getStackInSlot(i);
 			if(!stack.isEmpty())
 			{
-				if(stack.getItem() instanceof UpgradeItem && ((UpgradeItem) stack.getItem()).canStayInPanel(this, stack, items))
+				if(stack.getItem() instanceof UpgradeItem && ((UpgradeItem) stack.getItem()).canStayInPanel(this, stack, upgradeInventory))
 				{
 					id = stack.getItem().getRegistryName();
 					if(!tickedUpgrades.contains(id))
@@ -137,18 +139,18 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 				{
 					// Why non-upgrade items would end up in this inventory?
 					// idk, let's drop them!
-					ItemStack s = items.getStackInSlot(i);
+					ItemStack s = upgradeInventory.getStackInSlot(i);
 					s.copy();
-					items.setStackInSlot(i, ItemStack.EMPTY);
+					upgradeInventory.setStackInSlot(i, ItemStack.EMPTY);
 					if(!world.isRemote)
 						world.addEntity(new ItemEntity(world, pos.getX() + .5, pos.getY() + .5, pos.getZ() + .5, stack));
 				}
 			}
 		}
 		
-		for(int i = 0; i < itemChargeable.getSlots(); ++i)
+		for(int i = 0; i < chargeInventory.getSlots(); ++i)
 		{
-			stack = itemChargeable.getStackInSlot(i);
+			stack = chargeInventory.getStackInSlot(i);
 			if(!stack.isEmpty())
 			{
 				stack.getCapability(CapabilityEnergy.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
@@ -172,11 +174,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 		if(blk instanceof SolarPanelBlock)
 			this.delegate = ((SolarPanelBlock) blk).panel;
 		else
-		{
-			world.removeTileEntity(pos);
-			world.destroyBlock(pos, true);
 			return;
-		}
 		
 		if(cache$seeSkyTimer > 0)
 			--cache$seeSkyTimer;
@@ -291,17 +289,15 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	
 	private void writeNBT(CompoundNBT nbt)
 	{
-		nbt.putString("SPID", getDelegate().name);
-		items.writeToNBT(nbt, "Upgrades");
-		itemChargeable.writeToNBT(nbt, "Chargeable");
+		upgradeInventory.writeToNBT(nbt, "Upgrades");
+		chargeInventory.writeToNBT(nbt, "Chargeable");
 		nbt.putLong("Energy", energy);
 	}
 	
 	private void readNBT(CompoundNBT nbt)
 	{
-		this.delegate = SolarPanels.PANELS.get(nbt.getString("SPID"));
-		items.readFromNBT(nbt, "Upgrades");
-		itemChargeable.readFromNBT(nbt, "Chargeable");
+		upgradeInventory.readFromNBT(nbt, "Upgrades");
+		chargeInventory.readFromNBT(nbt, "Chargeable");
 		energy = nbt.getLong("Energy");
 	}
 	
@@ -313,7 +309,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
 		{
 			if(chargeableItems == null)
-				chargeableItems = LazyOptional.of(() -> itemChargeable);
+				chargeableItems = LazyOptional.of(() -> chargeInventory);
 			return chargeableItems.cast();
 		} else if(cap == CapabilityEnergy.ENERGY)
 		{
@@ -393,7 +389,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	@Override
 	public ITextComponent getDisplayName()
 	{
-		return getBlockState().getBlock().getNameTextComponent();
+		return new TranslationTextComponent(getBlockState().getBlock().getTranslationKey());
 	}
 	
 	@Override
@@ -447,5 +443,25 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	public boolean canReceive()
 	{
 		return false;
+	}
+	
+	public ItemStack generateItem(IItemProvider item)
+	{
+		ItemStack stack = new ItemStack(item);
+		stack.setTag(new CompoundNBT());
+		stack.getTag().putLong("Energy", energy - Math.round(energy * SolarPanels.LOOSE_ENERGY / 100D));
+		upgradeInventory.writeToNBT(stack.getTag(), "Upgrades");
+		chargeInventory.writeToNBT(stack.getTag(), "Chargeable");
+		return stack;
+	}
+	
+	public void loadFromItem(ItemStack stack)
+	{
+		if(stack.hasTag())
+		{
+			energy = stack.getTag().getLong("Energy");
+			upgradeInventory.readFromNBT(stack.getTag(), "Upgrades");
+			chargeInventory.readFromNBT(stack.getTag(), "Chargeable");
+		}
 	}
 }

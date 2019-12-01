@@ -1,7 +1,7 @@
 # Mod Info
 mod_id=solarflux
 archive_name=SolarFluxReborn
-mod_version=14.1.0
+mod_version=14.1.2
 
 # MC Info
 mc_version=1.14.4

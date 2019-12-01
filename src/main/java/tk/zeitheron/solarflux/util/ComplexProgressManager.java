@@ -7,6 +7,8 @@ import java.util.function.BiConsumer;
 
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.IContainerListener;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 
 public class ComplexProgressManager
 {
@@ -25,7 +27,7 @@ public class ComplexProgressManager
 	
 	public void detectAndSendChanges(Container owner)
 	{
-		Field f = Container.class.getDeclaredFields()[9];
+		Field f = Container.class.getDeclaredFields()[FMLEnvironment.dist == Dist.DEDICATED_SERVER ? 8 : 9];
 		f.setAccessible(true);
 		try
 		{

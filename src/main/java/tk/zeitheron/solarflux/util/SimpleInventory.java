@@ -1,7 +1,9 @@
 package tk.zeitheron.solarflux.util;
 
+import java.util.Iterator;
 import java.util.function.BiPredicate;
 import java.util.function.ToIntFunction;
+import java.util.stream.Stream;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
@@ -11,7 +13,7 @@ import net.minecraftforge.common.util.Constants.NBT;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class SimpleInventory implements IItemHandlerModifiable
+public class SimpleInventory implements IItemHandlerModifiable, Iterable<ItemStack>
 {
 	public final NonNullList<ItemStack> items;
 	
@@ -205,5 +207,16 @@ public class SimpleInventory implements IItemHandlerModifiable
 			if(slot >= 0 && slot < items.size())
 				items.set(slot, stack);
 		}
+	}
+	
+	@Override
+	public Iterator<ItemStack> iterator()
+	{
+		return items.iterator();
+	}
+	
+	public Stream<ItemStack> stream()
+	{
+		return items.stream();
 	}
 }
