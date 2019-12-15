@@ -148,19 +148,20 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 			}
 		}
 		
-		for(int i = 0; i < chargeInventory.getSlots(); ++i)
-		{
-			stack = chargeInventory.getStackInSlot(i);
-			if(!stack.isEmpty())
+		if(energy > 0L && getInstance() != null)
+			for(int i = 0; i < chargeInventory.getSlots(); ++i)
 			{
-				stack.getCapability(CapabilityEnergy.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
+				stack = chargeInventory.getStackInSlot(i);
+				if(!stack.isEmpty())
 				{
-					transfer.setBaseValue(instance.transfer);
-					int transfer = this.transfer.getValueI();
-					energy -= e.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
-				});
+					stack.getCapability(CapabilityEnergy.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
+					{
+						transfer.setBaseValue(getInstance().transfer);
+						int transfer = this.transfer.getValueI();
+						energy -= e.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
+					});
+				}
 			}
-		}
 		
 		tickedUpgrades.clear();
 	}
@@ -188,7 +189,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 		tickUpgrades();
 		
 		int gen = getGeneration();
-		capacity.setBaseValue(instance.cap);
+		capacity.setBaseValue(getInstance().cap);
 		energy += Math.min(capacity.getValueL() - energy, gen);
 		currentGeneration = gen;
 		
@@ -202,7 +203,7 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 						autoBalanceEnergy((SolarPanelTile) tile);
 				}
 			
-			transfer.setBaseValue(instance.transfer);
+			transfer.setBaseValue(getInstance().transfer);
 			int transfer = this.transfer.getValueI();
 			
 			for(Direction hor : Direction.values())
