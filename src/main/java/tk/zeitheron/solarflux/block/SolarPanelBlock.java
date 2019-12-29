@@ -103,7 +103,7 @@ public class SolarPanelBlock extends ContainerBlock
 		SolarPanelTile spt = tile instanceof SolarPanelTile ? (SolarPanelTile) tile : null;
 		if(spt != null)
 			return spt.getShape(this);
-		return recalcShape(world, pos);
+		return VoxelShapes.create(0, 0, 0, 1, panel.networkData.height, 1);
 	}
 	
 	@Override
