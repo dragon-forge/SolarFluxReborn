@@ -22,7 +22,7 @@ public class ItemDispersiveUpgrade extends UpgradeItem
 		for(ServerPlayerEntity mp : tile.getWorld().getEntitiesWithinAABB(ServerPlayerEntity.class, new AxisAlignedBB(tile.getPos()).grow(16)))
 		{
 			float mod = Math.max(0, 1F - (float) (mp.getDistanceSq(tile.getPos().getX() + 0.5F, tile.getPos().getY() + 0.5F, tile.getPos().getZ() + 0.5F) / 256));
-			tile.transfer.setBaseValue(tile.instance.transfer);
+			tile.transfer.setBaseValue(tile.getInstance().transfer);
 			int transfer = Math.round(tile.transfer.getValueI() * mod);
 			int sent = Math.min(Math.round(tile.energy * mod), transfer);
 			int fe = sent - ItemChargeHelper.chargePlayer(mp, new FECharge(sent), false).FE;

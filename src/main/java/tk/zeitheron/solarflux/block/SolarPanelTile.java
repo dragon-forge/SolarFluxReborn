@@ -51,9 +51,9 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 	
 	public long currentGeneration;
 	public float sunIntensity;
-	
-	public SolarPanel delegate;
-	public SolarPanelInstance instance;
+
+	private SolarPanel delegate;
+	private SolarPanelInstance instance;
 	
 	public final SimpleInventory upgradeInventory = new SimpleInventory(5);
 	public final SimpleInventory chargeInventory = new SimpleInventory(1);
@@ -464,5 +464,10 @@ public class SolarPanelTile extends TileEntity implements ITickableTileEntity, I
 			upgradeInventory.readFromNBT(stack.getTag(), "Upgrades");
 			chargeInventory.readFromNBT(stack.getTag(), "Chargeable");
 		}
+	}
+
+	public void setDelegate(SolarPanel delegate)
+	{
+		this.delegate = delegate;
 	}
 }

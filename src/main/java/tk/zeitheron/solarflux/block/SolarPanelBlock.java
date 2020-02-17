@@ -237,7 +237,7 @@ public class SolarPanelBlock extends ContainerBlock
 	public TileEntity createNewTileEntity(IBlockReader worldIn)
 	{
 		SolarPanelTile tile = new SolarPanelTile();
-		tile.delegate = panel;
+		tile.setDelegate(panel);
 		return tile;
 	}
 }
