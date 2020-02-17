@@ -1,256 +1,174 @@
 package com.zeitheron.solarflux.init;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
-
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonStreamParser;
-import com.zeitheron.solarflux.InfoSF;
+import com.zeitheron.solarflux.SolarFlux;
 import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
+import com.zeitheron.solarflux.api.SolarScriptEngine;
 import com.zeitheron.solarflux.block.BlockBaseSolar;
-
+import com.zeitheron.solarflux.block.ItemBlockBaseSolar;
+import com.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
+import com.zeitheron.solarflux.shaded.hammerlib.cfg.Configuration;
 import net.minecraft.block.Block;
-import net.minecraft.crash.CrashReport;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.util.ReportedException;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import javax.script.ScriptException;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class SolarsSF
 {
-	public static final SolarInfo SOLAR_1 = new SolarInfo(1, 8, 25_000).setRegistryName(InfoSF.MOD_ID, "1");
-	public static final SolarInfo SOLAR_2 = new SolarInfo(8, 64, 125_000).setRegistryName(InfoSF.MOD_ID, "2");
-	public static final SolarInfo SOLAR_3 = new SolarInfo(32, 256, 425_000).setRegistryName(InfoSF.MOD_ID, "3");
-	public static final SolarInfo SOLAR_4 = new SolarInfo(128, 1_024, 2_000_000).setRegistryName(InfoSF.MOD_ID, "4");
-	public static final SolarInfo SOLAR_5 = new SolarInfo(512, 4_096, 8_000_000).setRegistryName(InfoSF.MOD_ID, "5");
-	public static final SolarInfo SOLAR_6 = new SolarInfo(2_048, 16_384, 32_000_000).setRegistryName(InfoSF.MOD_ID, "6");
-	public static final SolarInfo SOLAR_7 = new SolarInfo(8_192, 64_000, 64_000_000).setRegistryName(InfoSF.MOD_ID, "7");
-	public static final SolarInfo SOLAR_8 = new SolarInfo(32_768, 256_000, 128_000_000).setRegistryName(InfoSF.MOD_ID, "8");
-	
-	private static File cfgDir;
-	
-	public static File getCfgDir()
+	public static final SolarInfo[] CORE_PANELS = new SolarInfo[8];
+
+	private static File CONFIG_DIR;
+	public static double LOOSE_ENERGY;
+
+	public static File getConfigDir()
 	{
-		return cfgDir;
+		return CONFIG_DIR;
 	}
-	
-	public static File getCustomCfgDir()
-	{
-		File ccfg = new File(getCfgDir(), "_custom");
-		if(!ccfg.isDirectory())
-			ccfg.mkdirs();
-		File rdm = new File(ccfg, "README.txt");
-		
-		String internalMarker = "~ README v1.1 ~";
-		
-		boolean write = !rdm.isFile();
-		if(!write)
-			try(BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(rdm))))
-			{
-				if(!br.readLine().equals(internalMarker))
-					write = true;
-			} catch(Throwable err)
-			{
-			}
-		
-		try(FileOutputStream fos = new FileOutputStream(rdm))
-		{
-			fos.write((internalMarker + System.lineSeparator()).getBytes());
-			fos.write("This directory enables pack developers to add custom solar panels, with custom textures. Read this guide to understand, how to do so...\n\n\nThe first this you want to do is create a folder with internal solar panel name (registry ID). In-game, you would be able to give it to yourself using /give @p solarflux:custom_solar_panel_{NAME}\nAfter you've created the folder, make a new file called \"panel.json\"\nThere, fill out the following template:\n\n{\n\t\"capacity\": 0,\n\t\"generation\": 0,\n\t\"transfer\": 0,\n\t\"thickness\": 6,\n\t\"connected_textures\": true,\n\t\"localizations\": {\n\t\t\"en_us\": \"NAME Solar Panel\"\n\t}\n}\n\nWhen you're done, save it to \"panel.json\"\nOh also, please fill out the numerical fields to be greater than zero, or you'll run into troubles.\nSmall tips for the JSON:\n- You can remove \"thickness\" if you want to use standard 6-pixel thickness.\n- You can remove \"connected_textures\" if you want the panels to connect anyway.\n- Any language is supported, but the fallback is always \"en_us\", so keep that in place!\n\n\nNext up: textures!\nIn your panel folder, you're going to need 3 texture files: \"top.png\", \"top_full.png\" and \"base.png\".\nLet's have a quick look through each file...\n- base.png - The base texture. It's applied to sides and bottom of the solar panel.\n- top.png - this is what you would expect, the top face of the solar panel. HOWEVER! This texture MUST have borders of the \"base.png\", because this texture is rendered in the inventory.\n- top_full.png - this is the same as \"top.png\", but without any borders.\nThese textures can be animated, if provided with the NAME.mcmeta files, and fill them as in default minecraft resource packs.\n\n\nIf you're lazy enough to read all of this, I made a tutorial video, explaining all of this in details:\nhttps://youtu.be/AhEaUzP4ozk\n\n\nSincerely, Zeitheron.\nhttps://www.curseforge.com/projects/246974".getBytes());
-		} catch(IOException ioe)
-		{
-		}
-		
-		return ccfg;
-	}
-	
+
 	public static Ingredient getGeneratingSolars(long gen)
 	{
 		return Ingredient.fromStacks(SolarFluxAPI.SOLAR_PANELS.getValuesCollection().stream().filter(s -> s.maxGeneration == gen).map(SolarInfo::getBlock).map(ItemStack::new).collect(Collectors.toList()).toArray(new ItemStack[0]));
 	}
-	
-	public static void preInit(File file)
+
+	public static final List<SolarInfo> modSolars = new ArrayList<>();
+
+	public static void preInit(File solarflux)
 	{
-		String apath = file.getAbsolutePath();
-		cfgDir = new File(apath.substring(0, apath.lastIndexOf('.')));
-		if(!cfgDir.isDirectory())
-			cfgDir.mkdirs();
-		
+		CONFIG_DIR = solarflux;
+		if(!CONFIG_DIR.isDirectory()) CONFIG_DIR.mkdirs();
+
+		int[] generations = new int[]{
+				1,
+				8,
+				32,
+				128,
+				512,
+				2048,
+				8192,
+				32768
+		};
+		int[] transfers = new int[]{
+				8,
+				64,
+				256,
+				1024,
+				4096,
+				16348,
+				65536,
+				262144
+		};
+		int[] capacities = new int[]{
+				25000,
+				125000,
+				425000,
+				2000000,
+				8000000,
+				32000000,
+				64000000,
+				128000000
+		};
+
 		IForgeRegistry<Block> blocks = ForgeRegistries.BLOCKS;
 		IForgeRegistry<Item> items = ForgeRegistries.ITEMS;
 		IForgeRegistry<SolarInfo> solars = SolarFluxAPI.SOLAR_PANELS;
-		
-		Arrays.stream(SolarsSF.class.getDeclaredFields()).filter(f -> SolarInfo.class.isAssignableFrom(f.getType())).forEach(f ->
+
+		Configuration cfgs = new Configuration(new File(solarflux, "main.hlc"));
+		cfgs.setComment("Main configuration file fur Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
+		ConfigEntryCategory spc = cfgs.getCategory("Solar Panels");
+		LOOSE_ENERGY = spc.getFloatEntry("Pickup Energy Loss", 5, 0, 100).setDescription("How much energy (percent) will get lost while picking up the solar panel?").getValue();
+		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{
+			ConfigEntryCategory spsc = spc.getCategory("Solar Panel " + (i + 1));
+
+			long gen = spsc.getLongEntry("Generation Rate", generations[i], 1, Long.MAX_VALUE).getValue();
+			long transfer = spsc.getLongEntry("Transfer Rate", transfers[i], 1, Long.MAX_VALUE).getValue();
+			long capacity = spsc.getLongEntry("Capacity", capacities[i], 1, Long.MAX_VALUE).getValue();
+			CORE_PANELS[i] = SolarInfo.builder().name(Integer.toString(i + 1)).generation(gen).transfer(transfer).capacity(capacity).buildAndRegister();
+		}
+		if(cfgs.hasChanged())
+			cfgs.save();
+
+		File textures = new File(CONFIG_DIR, "textures");
+		if(!textures.isDirectory())
+		{
+			textures.mkdirs();
+
+			int r;
+			byte[] buf = new byte[768];
+
+			try(FileOutputStream out = new FileOutputStream(new File(textures, "example_base.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/solar_panel_example_base.png"))
+			{
+				while((r = in.read(buf)) > 0)
+					out.write(buf, 0, r);
+			} catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+
+			try(FileOutputStream out = new FileOutputStream(new File(textures, "example_top.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/solar_panel_example_top.png"))
+			{
+				while((r = in.read(buf)) > 0)
+					out.write(buf, 0, r);
+			} catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+
+		File custom_panels = new File(solarflux, "custom_panels.js");
+		if(!custom_panels.isFile())
+			try(FileOutputStream fos = new FileOutputStream(custom_panels))
+			{
+				fos.write(Base64.getMimeDecoder().decode("LyoNCiogVGhpcyBKYXZhU2NyaXB0IGZpbGUgY2FuIGJlIHVzZWQgdG8gaW5pdGlhbGl6ZSB5b3VyIG93biBzb2xhciBwYW5lbHMuDQoqIEZpcnN0IG9mZiwgYWxsIG1ldGhvZHMgaGF2ZSByZXR1cm4gdHlwZXMgKHRoZXkgYXJlIHNwZWNpZmllZCBhZnRlciB0aGUgIj0+IikNCiogSG93LXRvOiAob3Igd2F0Y2ggdGhlIHR1dG9yaWFsIGh0dHBzOi8veW91dHUuYmUvV1ZyNi0zRTdsQTggOzMpDQoqIDEuIFRvIGNyZWF0ZSBhIG5ldyBwYW5lbCwgeW91IG5lZWQgdG8gbWFrZSBhIGJ1aWxkZXIsIGNhbGwgcGFuZWwoKT0+U29sYXJQYW5lbEJ1aWxkZXIgdG8gYmVnaW4gdGhlIGJ1aWxkZXIgY2hhaW4uDQoqIDIuIENoYWluIGVsZW1lbnRzOg0KKiAgICAtIC5uYW1lKCJ5b3VybmFtZSIpPT5Tb2xhclBhbmVsQnVpbGRlciAvLyBtYW5kYXRvcnkNCiogICAgLSAuaGVpZ2h0KGZsb2F0KT0+U29sYXJQYW5lbEJ1aWxkZXIgLy8gb3B0aW9uYWwsIGZsb2F0IHZhbHVlIGlzIGJldHdlZW4gWzA7MV0NCiogICAgLSAuZ2VuZXJhdGlvbigiYW1vdW50Iik9PlNvbGFyUGFuZWxCdWlsZGVyIC8vIG1hbmRhdG9yeSwgcGFzcyB0aGUgbnVtYmVyIGFzIGEgc3RyaW5nDQoqICAgIC0gLmNhcGFjaXR5KCJhbW91bnQiKT0+U29sYXJQYW5lbEJ1aWxkZXIgLy8gbWFuZGF0b3J5LCBwYXNzIHRoZSBudW1iZXIgYXMgYSBzdHJpbmcNCiogICAgLSAudHJhbnNmZXIoImFtb3VudCIpPT5Tb2xhclBhbmVsQnVpbGRlciAvLyBtYW5kYXRvcnksIHBhc3MgdGhlIG51bWJlciBhcyBhIHN0cmluZw0KKiAzLiBBdCB0aGUgZW5kIG9mIHRoZSBjaGFpbiwgY2FsbCAuYnVpbGQoKT0+U29sYXJQYW5lbCAoYWx0ZXJuYXRpdmVseSwgLmJ1aWxkQW5kUmVnaXN0ZXIoKT0+U29sYXJQYW5lbCwgdG8gc2tpcCBzdGVwICM1KQ0KKiA0LiBMYW5ndWFnZXM6IGNhbGwgYWZ0ZXIgYnVpbGQgY2hhaW4gZW5kIChvcGVyYXRlIG9uIHBhbmVsKSwgc3RhcnQgbGFuZ3VhZ2UgY2hhaW4gd2l0aCAubGFuZ0J1aWxkZXIoKT0+TGFuZ3VhZ2VCdWlsZGVyDQoqICAgIC0gLnB1dCgiZW5fdXMiLCAiWW91ciBTb2xhciBQYW5lbCBOYW1lIik9Pkxhbmd1YWdlQnVpbGRlcg0KKiAgICBBZnRlciB0aGF0LCBjYWxsIGFzIG1hbnkgbGFuZyBhc3NpZ25zIGFzIHlvdSB3YW50Og0KKiAgICAtIC5wdXQoImxhbmciLCAiWW91ciBTb2xhciBQYW5lbCBOYW1lIik9Pkxhbmd1YWdlQnVpbGRlcg0KKiAgICBFbmQgY2hhaW4gd2l0aCAuYnVpbGQoKT0+U29sYXJQYW5lbA0KKiA1LiBSZWNpcGVzOiBjYWxsIGFmdGVyIGJ1aWxkIGNoYWluIGVuZCAob3BlcmF0ZSBvbiBwYW5lbCksIHN0YXJ0IHJlY2lwZSBjaGFpbiB3aXRoIC5yZWNpcGVCdWlsZGVyKCk9PlJlY2lwZUJ1aWxkZXINCiogICAgLSAuc2hhcGUoc3RyaW5nLi4uKT0+UmVjaXBlQnVpbGRlciAvLyBTcGVjaWZ5IHRoZSBuZWVkZWQgc3RyaW5nIGFtb3VudCAoMSBzdHJpbmcgPSAxIHJvdykNCiogICAgQWZ0ZXIgeW91IHNwZWNpZmllZCB0aGUgcmVjaXBlIHNoYXBlLCBiaW5kIGFsbCBpbmdyZWRpZW50czoNCiogICAgLSAuYmluZCgnYycsIGl0ZW0oIm1vZGlkIiwgIml0ZW1fbmFtZSIpKT0+UmVjaXBlQnVpbGRlcg0KKiAgICBFbmQgY2hhaW4gd2l0aCAuYnVpbGQoQU1PVU5UKT0+U29sYXJQYW5lbCAvLyBBTU9VTlQgaXMgdGhlIGludCB2YWx1ZSAoMDs2NF0gb2YgaXRlbXMgaW4gdGhlIHJlY2lwZSBvdXRwdXQsIGlmIG9taXR0ZWQsIHdpbGwgYmUgZGVmYXVsdGVkIHRvIDEuDQoqIDYuIFRvIHJlZ2lzdGVyIHRoZSBwYW5lbCwgYXBwZW5kIC5yZWdpc3RlcigpPT5Tb2xhclBhbmVsIGFmdGVyIGVuZGluZyB0aGUgY2hhaW4uDQoqIDcuIFRleHR1cmluZzogKGFsbCB0ZXh0dXJlcyBhcmUgc3RvcmVkIGluICJ0ZXh0dXJlcyIgZm9sZGVyKQ0KKiAgICAgICJ5b3VybmFtZV9iYXNlLnBuZyIsIG9wdGlvbmFsbHkgd2l0aCAieW91cm5hbWVfYmFzZS5tY21ldGEiIChmb3IgYW5pbWF0aW9ucykNCiogICAgICAieW91cm5hbWVfdG9wLnBuZyIsIG9wdGlvbmFsbHkgd2l0aCAieW91cm5hbWVfdG9wLm1jbWV0YSIgKGZvciBhbmltYXRpb25zKQ0KKiANCiogQWRkaXRpb25hbCBtZXRob2RzICYgZmVhdHVyZXM6DQoqICAgLSBpc01vZExvYWRlZCgibW9kaWQiKT0+Ym9vbGVhbiAvLyByZXR1cm5zIGlmIHRoZSBzcGVjaWZpZWQgbW9kIGlzIGxvYWRlZC4gQ291bGQgYmUgdXNlZnVsIGZvciBzZXR0aW5nIHVwIG1vZC1kZXBlbmRlbnQgc29sYXIgcGFuZWxzLg0KKiAgIC0geW91IGNhbiBoYXZlIGEgbGluZSAiaW1wb3J0IHBhdGgudG8uQ2xhc3M7IiAgdG8gYXZvaWQgdXNpbmcgSmF2YS50eXBlKCJwYXRoLnRvLkNsYXNzIikgc3R1ZmYuIENyZWF0ZWQgb3V0c2lkZSBvZiBhbnkgZnVuY3Rpb25zLCBkZWNsYXJlcyBhIG5ldyB2YXJpYWJsZSB3aXRoIHRoZSBzaW1wbGUgY2xhc3MgbmFtZS4NCiogICAtIHlvdSBjYW4gaGF2ZSBhIGxpbmUgImRlZmluZSBhX2tleSAhdmFsdWUhIiB0byBtYWtlIHRoZSBjb21waWxlciByZXBsYWNlIGFsbCBhX2tleSB3aXRoICF2YWx1ZSEgYXQgcnVudGltZS4NCiovDQoNCmRlZmluZSBmdW5jIGZ1bmN0aW9uDQpkZWZpbmUgZW5nbGlzaCAiZW5fdXMiDQoNCi8qKiBUaGlzIGZ1bmN0aW9uIGlzIGNhbGxlZCB3aGVuIG1vZCBpcyBiZWluZyBjb25zdHJ1Y3RlZCAqLw0KZnVuYyBpbml0KCkNCnsNCgkvLyBFeGFtcGxlOiAodGV4dHVyZXMgYXJlIGV4dHJhY3RlZCBpbiAvdGV4dHVyZXMvIGJ5IGRlZmF1bHQpLCB1bmNvbW1lbnQgdG8gdHJ5IGl0IG91dCEgKFJlcXVpcmVzIGdhbWUgcmVzdGFydCkNCgkNCgkvKg0KCXBhbmVsKCkNCgkJLm5hbWUoImV4YW1wbGUiKQ0KCQkuaGVpZ2h0KDggLyAxNi4wKQ0KCQkuZ2VuZXJhdGlvbigiODM4ODYwOCIpDQoJCS5jYXBhY2l0eSgiMzM1NTQ0MzIwMCIpDQoJCS50cmFuc2ZlcigiNTAzMzE2NDgiKQ0KCS5idWlsZEFuZFJlZ2lzdGVyKCkNCgkJLmxhbmdCdWlsZGVyKCkNCgkJCS5wdXQoZW5nbGlzaCwgIkV4YW1wbGUgU29sYXIgUGFuZWwiKQ0KCQkJLmJ1aWxkKCkNCgkJLnJlY2lwZUJ1aWxkZXIoKQ0KCQkJLnNoYXBlKCJwcHAiLCAiOGM4IiwgIjhoOCIpDQoJCQkuYmluZCgncCcsIGl0ZW0oInNvbGFyZmx1eCIsICJwaG90b3ZvbHRhaWNfY2VsbF82IikpDQoJCQkuYmluZCgnOCcsIGl0ZW0oInNvbGFyZmx1eDpzb2xhcl9wYW5lbF84IikpDQoJCQkuYmluZCgnYycsIGl0ZW0oImNob3J1c19mcnVpdCIpKQ0KCQkJLmJpbmQoJ2gnLCBpdGVtKCJza3VsbCIsIDUpKQ0KCQkuYnVpbGQoMik7DQoJKi8NCn0"));
+			} catch(IOException e)
+			{
+				throw new RuntimeException(e);
+			}
+
+		try
+		{
+			SolarScriptEngine engine = new SolarScriptEngine(Files.readAllLines(custom_panels.toPath(), StandardCharsets.UTF_8).stream());
+			engine.callFunction("init");
+		} catch(IOException | ScriptException | ReflectiveOperationException e)
+		{
+			throw new RuntimeException(e);
+		}
+
+		for(SolarInfo si : modSolars)
 			try
 			{
-				SolarInfo si = (SolarInfo) f.get(null);
 				solars.register(si);
 				BlockBaseSolar block = si.getBlock();
 				blocks.register(block);
-				Item model = new ItemBlock(block);
-				model.setRegistryName(block.getRegistryName());
-				items.register(model);
-				SolarFluxAPI.renderRenderer.accept(model);
+				Item ib = new ItemBlockBaseSolar(block);
+				ib.setRegistryName(block.getRegistryName());
+				ib.setCreativeTab(SolarFluxAPI.tab);
+				items.register(ib);
+				SolarFluxAPI.renderRenderer.accept(ib);
+				SolarFlux.proxy.onPanelRegistered(si);
 			} catch(Throwable err)
 			{
 				err.printStackTrace();
 			}
-		});
-		
-		File[] customPanels = getCustomCfgDir().listFiles(f -> f.isDirectory());
-		
-		for(File cpdir : customPanels)
-		{
-			File inf = new File(cpdir, "panel.json");
-			
-			if(inf.isFile())
-			{
-				SolarInfo si = new SolarInfo(0, 0, 0);
-				si.setRegistryName(new ResourceLocation("solarflux", cpdir.getName()));
-				si.isCustom = true;
-				
-				try(FileReader reader = new FileReader(inf))
-				{
-					JsonStreamParser j = new JsonStreamParser(reader);
-					JsonObject cfg = j.next().getAsJsonObject();
-					
-					String err;
-					
-					JsonElement je = cfg.get("capacity");
-					if(je == null || je.getAsLong() <= 0L)
-						throw new ReportedException(new CrashReport(err = ((je == null ? "\"capacity\" FIELD IS NOT FOUND" : "\"capacity\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
-					si.maxCapacity = je.getAsLong();
-					
-					je = cfg.get("generation");
-					if(je == null || je.getAsLong() <= 0L)
-						throw new ReportedException(new CrashReport(err = ((je == null ? "\"generation\" FIELD IS NOT FOUND" : "\"generation\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
-					si.maxGeneration = je.getAsLong();
-					
-					je = cfg.get("transfer");
-					if(je == null || je.getAsLong() <= 0L)
-						throw new ReportedException(new CrashReport(err = ((je == null ? "\"transfer\" FIELD IS NOT FOUND" : "\"transfer\" FIELD IS LESS THAN OR EQUAL TO ZERO") + " IN CUSTOM SOLAR PANEL: " + cpdir.getName()), new RuntimeException(err)));
-					si.maxTransfer = je.getAsInt();
-					
-					je = cfg.get("thickness");
-					si.thiccness = je == null ? 6 : je.getAsInt();
-					
-					JsonElement connected_textures = cfg.get("connected_textures");
-					si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
-					
-					try
-					{
-						solars.register(si);
-						BlockBaseSolar block = si.getBlock();
-						blocks.register(block);
-						Item model = new ItemBlock(block);
-						model.setRegistryName(block.getRegistryName());
-						items.register(model);
-						SolarFluxAPI.renderRenderer.accept(model);
-					} catch(Throwable thr)
-					{
-						thr.printStackTrace();
-					}
-				} catch(IOException ioe)
-				{
-					ioe.printStackTrace();
-				}
-			}
-		}
 	}
-	
-	public static void reloadConfigs()
+
+	public static Collection<SolarInfo> listPanels()
 	{
-		IForgeRegistry<SolarInfo> infos = SolarFluxAPI.SOLAR_PANELS;
-		
-		for(SolarInfo si : infos.getValuesCollection())
-		{
-			si.getBlock().setCreativeTab(SolarFluxAPI.tab);
-			ResourceLocation rn = si.getRegistryName();
-			
-			File f;
-			
-			if(si.isCustom)
-			{
-				f = new File(getCustomCfgDir(), si.getRegistryName().getPath() + File.separator + "panel.json");
-			} else
-			{
-				f = new File(cfgDir, si.getCompatMod() != null ? si.getCompatMod() : rn.getNamespace());
-				if(!f.isDirectory())
-					f.mkdirs();
-				f = new File(f, rn.getPath().replaceAll("/", "_") + ".json");
-			}
-			
-			if(!f.isFile())
-				try(FileWriter j = new FileWriter(f))
-				{
-					j.append('{');
-					
-					String nln = System.lineSeparator() + "\t";
-					char s = '\"';
-					
-					j.append(nln + s + "capacity" + s + ": " + si.maxCapacity + ",");
-					j.append(nln + s + "generation" + s + ": " + si.maxGeneration + ",");
-					j.append(nln + s + "transfer" + s + ": " + si.maxTransfer + ",");
-					j.append(nln + s + "thickness" + s + ": " + si.thiccness + ",");
-					j.append(nln + s + "connected_textures" + s + ": " + si.connectTextures + System.lineSeparator());
-					
-					j.append('}');
-					j.flush();
-				} catch(IOException e)
-				{
-					e.printStackTrace();
-				}
-			
-			try(InputStreamReader reader = new InputStreamReader(new FileInputStream(f), StandardCharsets.UTF_8))
-			{
-				JsonStreamParser j = new JsonStreamParser(reader);
-				JsonObject cfg = j.next().getAsJsonObject();
-				
-				si.maxCapacity = cfg.get("capacity").getAsLong();
-				si.maxGeneration = cfg.get("generation").getAsLong();
-				si.maxTransfer = cfg.get("transfer").getAsInt();
-				
-				JsonElement thickness = cfg.get("thickness");
-				si.thiccness = thickness == null ? 6 : thickness.getAsInt();
-				
-				JsonElement connected_textures = cfg.get("connected_textures");
-				si.connectTextures = connected_textures == null || connected_textures.getAsBoolean();
-				
-				if(si.isCustom)
-				{
-					JsonElement localsElem = cfg.get("localizations");
-					if(localsElem != null)
-					{
-						JsonObject locals = localsElem.getAsJsonObject();
-						Map<String, String> lmap = new HashMap<>();
-						for(Map.Entry<String, JsonElement> langs : locals.entrySet())
-							lmap.put(langs.getKey().toLowerCase(), langs.getValue().getAsString());
-						si.localizations = Collections.unmodifiableMap(lmap);
-					}
-				}
-			} catch(IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
+		return SolarFluxAPI.SOLAR_PANELS.getValuesCollection();
 	}
 }

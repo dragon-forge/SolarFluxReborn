@@ -1,43 +1,38 @@
 package com.zeitheron.solarflux.block;
 
-import java.util.List;
-
 import com.zeitheron.solarflux.SolarFlux;
-import com.zeitheron.solarflux.api.SolarFluxAPI;
 import com.zeitheron.solarflux.api.SolarInfo;
 import com.zeitheron.solarflux.api.SolarInstance;
 import com.zeitheron.solarflux.block.tile.TileBaseSolar;
 import com.zeitheron.solarflux.items.ItemUpgrade;
-
+import com.zeitheron.solarflux.utils.PositionedStateImplementation;
+import morph.avaritia.tile.TileBase;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockFaceShape;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.SoundEvents;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockBaseSolar extends Block implements ITileEntityProvider
+public class BlockBaseSolar
+		extends Block
+		implements ITileEntityProvider
 {
 	public final SolarInfo solarInfo;
-	
+
 	public BlockBaseSolar(SolarInfo solarInfo)
 	{
 		super(Material.IRON);
@@ -49,35 +44,35 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 		setHardness(4F);
 		setHarvestLevel("pickaxe", 2);
 	}
-	
+
 	protected AxisAlignedBB aabb = new AxisAlignedBB(0, 0, 0, 1, 0.375, 1);
-	
+
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
-		if(Math.abs(solarInfo.thiccness / 16F - aabb.maxY) > 1.0E-4)
-			aabb = new AxisAlignedBB(0, 0, 0, 1, solarInfo.thiccness / 16F, 1);
+		if(Math.abs(solarInfo.height / 16F - aabb.maxY) > 1.0E-4)
+			aabb = new AxisAlignedBB(0, 0, 0, 1, solarInfo.height + 1 / 64F, 1);
 		return aabb;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isFullBlock(IBlockState state)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isFullCube(IBlockState state)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public BlockFaceShape getBlockFaceShape(IBlockAccess worldIn, IBlockState state, BlockPos pos, EnumFacing face)
 	{
@@ -85,13 +80,13 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 			return BlockFaceShape.SOLID;
 		return BlockFaceShape.UNDEFINED;
 	}
-	
+
 	@Override
 	public boolean isSideSolid(IBlockState base_state, IBlockAccess world, BlockPos pos, EnumFacing side)
 	{
 		return side == EnumFacing.DOWN;
 	}
-	
+
 	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items)
 	{
@@ -99,16 +94,7 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 			return;
 		super.getSubBlocks(tab, items);
 	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	public void addInformation(ItemStack stack, World worldIn, List<String> tooltip, ITooltipFlag flagIn)
-	{
-		tooltip.add(I18n.format("info.solarflux.energy.generation", solarInfo.maxGeneration));
-		tooltip.add(I18n.format("info.solarflux.energy.transfer", solarInfo.maxTransfer));
-		tooltip.add(I18n.format("info.solarflux.energy.capacity", solarInfo.maxCapacity));
-	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World worldIn, int meta)
 	{
@@ -117,19 +103,58 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 		i.reset();
 		return new TileBaseSolar(i);
 	}
-	
+
 	@Override
-	public void breakBlock(World worldIn, BlockPos pos, IBlockState state)
+	public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack)
 	{
-		TileBaseSolar tbs = (TileBaseSolar) worldIn.getTileEntity(pos);
-		if(tbs != null)
+		if(stack.hasTagCompound())
 		{
-			tbs.items.drop(worldIn, pos);
-			tbs.itemChargeable.drop(worldIn, pos);
+			TileBaseSolar spt = null;
+			TileEntity tile = worldIn.getTileEntity(pos);
+			if(tile instanceof TileBase) spt = (TileBaseSolar) tile;
+			else
+			{
+				spt = (TileBaseSolar) createNewTileEntity(worldIn, 0);
+				worldIn.setTileEntity(pos, spt);
+			}
+			spt.loadFromItem(stack);
 		}
-		super.breakBlock(worldIn, pos, state);
 	}
-	
+
+	@Override
+	public void onBlockHarvested(World worldIn, BlockPos pos, IBlockState state, EntityPlayer player)
+	{
+		if(!canHarvestBlock(worldIn, pos, player))
+		{
+			super.onBlockHarvested(worldIn, pos, state, player);
+			return;
+		}
+
+		TileEntity tileentity = worldIn.getTileEntity(pos);
+		if(tileentity instanceof TileBaseSolar)
+		{
+			TileBaseSolar te = (TileBaseSolar) tileentity;
+			if(!worldIn.isRemote)
+			{
+				if(!player.isSneaking())
+				{
+					te.upgradeInventory.drop(worldIn, pos);
+					te.chargeInventory.drop(worldIn, pos);
+				}
+				EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + getPanelData().height / 2F, pos.getZ() + 0.5, player.isSneaking() ? te.generateItem(Item.getItemFromBlock(this)) : new ItemStack(this));
+				item.setDefaultPickupDelay();
+				worldIn.spawnEntity(item);
+			}
+		}
+
+		super.onBlockHarvested(worldIn, pos, state, player);
+	}
+
+	@Override
+	public void getDrops(NonNullList<ItemStack> drops, IBlockAccess world, BlockPos pos, IBlockState state, int fortune)
+	{
+	}
+
 	@Override
 	public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
 	{
@@ -141,12 +166,12 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 				TileBaseSolar tbs = (TileBaseSolar) worldIn.getTileEntity(pos);
 				int amt = tbs.getUpgrades(held.getItem());
 				ItemUpgrade iu = (ItemUpgrade) held.getItem();
-				if(amt < iu.getMaxUpgrades() && iu.canInstall(tbs, held, tbs.items))
+				if(amt < iu.getMaxUpgrades() && iu.canInstall(tbs, held, tbs.upgradeInventory))
 				{
 					boolean installed = false;
-					for(int i = 0; i < tbs.items.getSizeInventory(); ++i)
+					for(int i = 0; i < tbs.upgradeInventory.getSizeInventory(); ++i)
 					{
-						ItemStack stack = tbs.items.getStackInSlot(i);
+						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
 						if(stack.isItemEqual(held) && ItemStack.areItemStackTagsEqual(stack, held))
 						{
 							int allow = Math.min(iu.getMaxUpgrades() - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
@@ -160,7 +185,7 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 							ItemStack copy = held.copy();
 							held.shrink(allow);
 							copy.setCount(allow);
-							tbs.items.setInventorySlotContents(i, copy);
+							tbs.upgradeInventory.setInventorySlotContents(i, copy);
 							installed = true;
 							break;
 						}
@@ -175,5 +200,16 @@ public class BlockBaseSolar extends Block implements ITileEntityProvider
 			playerIn.openGui(SolarFlux.instance, 0, worldIn, pos.getX(), pos.getY(), pos.getZ());
 		}
 		return true;
+	}
+
+	@Override
+	public IBlockState getExtendedState(IBlockState state, IBlockAccess world, BlockPos pos)
+	{
+		return PositionedStateImplementation.actualize(state, world, pos);
+	}
+
+	public SolarInfo getPanelData()
+	{
+		return solarInfo;
 	}
 }

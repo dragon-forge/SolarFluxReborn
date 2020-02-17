@@ -11,8 +11,7 @@ public class SolarInstance implements INBTSerializable<NBTTagCompound>
 {
 	public SolarInfo infoDelegate;
 	public ResourceLocation delegate;
-	public long gen, cap;
-	public int transfer;
+	public long gen, cap, transfer;
 	public boolean valid = false;
 	
 	public SolarInfo getDelegate()

@@ -43,6 +43,6 @@ public class CompatBlackHoleStorage implements ISolarFluxCompat
 	public void registerRecipes(IForgeRegistry<IRecipe> ifr)
 	{
 		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(dmPhotovoltaicCell), "ppp", "bmb", "gcg", 'p', Blocks.SEA_LANTERN, 'g', "glowstone", 'm', "matterDark", 'c', ItemsSF.PHOTOVOLTAIC_CELL_6, 'b', Items.BLAZE_ROD).setRegistryName(InfoSF.MOD_ID, "photovoltaic_cell_dark_matter"));
-		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(darkMatter.getBlock(), 2), "ccc", "sds", "sds", 'c', dmPhotovoltaicCell, 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_8.maxGeneration), 'd', "matterDark").setRegistryName(InfoSF.MOD_ID, "solar_panel_dark_matter"));
+		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(darkMatter.getBlock(), 2), "ccc", "sds", "sds", 'c', dmPhotovoltaicCell, 's', SolarsSF.getGeneratingSolars(SolarsSF.CORE_PANELS[7].maxGeneration), 'd', "matterDark").setRegistryName(InfoSF.MOD_ID, "solar_panel_dark_matter"));
 	}
 }

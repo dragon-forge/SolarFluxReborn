@@ -1,5 +1,6 @@
 package com.zeitheron.solarflux.proxy;
 
+import com.zeitheron.solarflux.api.SolarInfo;
 import net.minecraft.item.Item;
 
 public interface ISFProxy
@@ -21,6 +22,10 @@ public interface ISFProxy
 	}
 	
 	default void render(Item item)
+	{
+	}
+
+	default void onPanelRegistered(SolarInfo info)
 	{
 	}
 	

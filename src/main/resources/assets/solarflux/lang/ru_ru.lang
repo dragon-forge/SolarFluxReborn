@@ -38,6 +38,8 @@ info.solarflux.sun.intensity=Уровень освещённости: %d%%
 info.solarflux.hold.for.info=Удерживайте %s для просмотра деталей
 info.solarflux.shift=Shift
 info.solarflux.maximum=Максимум
+info.solarflux.contentretained=Контент сохранен
+info.solarflux.pickuptip=Подсказка: если вам нужно сохранить энергию и предметы, соберите панель, присев.
 info.solarflux.decreasingReturnsToScale=Decreasing returns to scale
 info.solarflux.constantReturnsToScale=Constant returns to scale
 info.solarflux.increasingReturnsToScale=Increasing returns to scale
@@ -49,26 +51,22 @@ info.solarflux.upgrade.transfer=Увеличивают скорость пере
 info.solarflux.upgrade.capacity=Увеличивают внутреннюю ёмкость на %.2f%%.
 info.solarflux.upgrade.furnace=Накапливает энергию для нагрева ванильных печей.
 info.solarflux.craftitem=Ингредиент в рецептах.
-################
 
-## AVARITIA ##
+# # AVARITIA ##
 tile.solarflux:solar_panel_neutronium.name=Нейтрониевая солнечная панель
 tile.solarflux:solar_panel_infinity.name=Солнечная панель Бесконечности
-##############
 
-## DRACONIC EVOLUTION ##
+# # DRACONIC EVOLUTION ##
 tile.solarflux:solar_panel_wyvern.name=Солнечная панель Виверны
 tile.solarflux:solar_panel_draconic.name=Солнечная панель Дракона
 tile.solarflux:solar_panel_chaotic.name=Солнечная панель Хаоса
-########################
 
-## BLACK HOLE STORAGE ##
+# # BLACK HOLE STORAGE ##
 tile.solarflux:solar_panel_dark_matter.name=Солнечная панель из тёмной материи
 tile.solarflux:solar_panel_anti_matter.name=Солнечная панель из анти-материи
 item.solarflux:photovoltaic_cell_dark_matter.name=Фотоэлектрическая ячейка из тёмной материи
-########################
 
-## THAUMCRAFT ##
+# # THAUMCRAFT ##
 tc.aspect.sol=Солнце, Солнечный свет
 tc.research_category.SOLARFLUX=Solar Flux
 
@@ -77,7 +75,6 @@ tile.solarflux:solar_panel_alchemical_brass.name=Латунная солнечн
 tile.solarflux:solar_panel_thaumium.name=Солнечная панель из таумиума
 tile.solarflux:solar_panel_void_metal.name=Солнечная панель из пустотного металла
 
-# THEORYCRAFT STUFF
 
 card.solarflux:solar_panel.name=Солнечный свет
 card.solarflux:solar_panel.text=Вы чувствуете тепло, исходящее от рядом стоящей солнечной панели. Вы получаете от %,d до %,d в категории Solar Flux и берёте дополнительную карту. Время от времени Вы также можете получить 1 очко вдохновения.
@@ -85,7 +82,6 @@ card.solarflux:solar_panel.text=Вы чувствуете тепло, исход
 card.solarflux:photovoltaic_cell.name=Фотоэлектрические свойства
 card.solarflux:photovoltaic_cell.text=Вы внимательно и осторожно осматриваете фотоэлектрическую ячейку. Вы получаете от %,d до %,d в категории Solar Flux и берёте дополнительную карту.
 
-# RESEARCH
 
 research_name.solarflux:solarflux=Погружение в Solar Flux
 research_stage.solarflux:solarflux.1=После нескольких сборок панелей я понял, что могу улучшить их, используя магию. И тауматургия может помочь мне с этим!
@@ -103,4 +99,3 @@ research_name.solarflux:void_metal_solar_panel=Солнечная панель �
 research_stage.solarflux:void_metal_solar_panel.1=Я начинаю подумывать о том, что мои солнечные панели из таумиума могут быть улучшены ещё больше! Теперь, когда я знаю о пустотном металле, я могу попытаться нанести его на мою панель из таумиума.
 research_stage.solarflux:void_metal_solar_panel.2=Похоже, пустотный металл хорошо сочетается с третьим уровней фотоэлектрических ячеек, если использовать процесс наполнения. И хоть процесс и будет довольно нестабильным, панель, кажется, должна получиться весьма эффективной.
 
-################

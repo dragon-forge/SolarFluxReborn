@@ -119,7 +119,7 @@ public class GuiBaseSolar extends GuiContainer
 		drawPower(xStart + xSize - GAUGE_WIDTH - BORDER_OFFSET, yStart + BORDER_OFFSET + 32, mouseX, mouseY);
 		drawSun(xStart + xSize - 2 * GAUGE_WIDTH - BORDER_OFFSET - BORDER_OFFSET / 2, yStart + BORDER_OFFSET + 32, mouseX, mouseY);
 		
-		for(int i = 0; i < solar.items.getSizeInventory(); ++i)
+		for(int i = 0; i < solar.upgradeInventory.getSizeInventory(); ++i)
 		{
 			drawTexturedModalRect(xStart + i * 18 + 8, yStart + 60, 18, 0, 18, 18);
 		}

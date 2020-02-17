@@ -26,10 +26,10 @@ public class ContainerBaseSolar extends Container
 		addPlayerInventorySlotsToContainer(playerInv, 8, 98);
 		addPlayerActionSlotsToContainer(playerInv, 8, 156);
 		
-		for(int i = 0; i < tile.items.getSizeInventory(); ++i)
+		for(int i = 0; i < tile.upgradeInventory.getSizeInventory(); ++i)
 			addSlotToContainer(new SlotUpgrade(tile, i, i * 18 + 9, 61));
 		
-		addSlotToContainer(new SlotChargable(tile.itemChargeable, 0, 151, 9));
+		addSlotToContainer(new SlotChargable(tile.chargeInventory, 0, 151, 9));
 		
 		if(playerInv.player instanceof EntityPlayerMP)
 			networking = new ExpandedContainerListener((EntityPlayerMP) playerInv.player);
@@ -92,7 +92,7 @@ public class ContainerBaseSolar extends Container
 	@Override
 	public boolean canInteractWith(EntityPlayer playerIn)
 	{
-		return tile.items.isUsableByPlayer(playerIn, tile.getPos());
+		return tile.upgradeInventory.isUsableByPlayer(playerIn, tile.getPos());
 	}
 	
 	@Override

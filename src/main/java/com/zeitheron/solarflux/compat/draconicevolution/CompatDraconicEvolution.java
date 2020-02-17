@@ -43,7 +43,7 @@ public class CompatDraconicEvolution implements ISolarFluxCompat
 	@Override
 	public void registerRecipes(IForgeRegistry<IRecipe> ifr)
 	{
-		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(wyvern.getBlock(), 2), "sps", "pcp", "sps", 's', SolarsSF.getGeneratingSolars(SolarsSF.SOLAR_8.maxGeneration), 'p', new ItemStack(DEFeatures.wyvernEnergyCore), 'c', new ItemStack(DEFeatures.wyvernCore)).setRegistryName(InfoSF.MOD_ID, "solar_panel_wyvern"));
+		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(wyvern.getBlock(), 2), "sps", "pcp", "sps", 's', SolarsSF.getGeneratingSolars(SolarsSF.CORE_PANELS[7].maxGeneration), 'p', new ItemStack(DEFeatures.wyvernEnergyCore), 'c', new ItemStack(DEFeatures.wyvernCore)).setRegistryName(InfoSF.MOD_ID, "solar_panel_wyvern"));
 		ifr.register(new ShapedOreRecipe(new ResourceLocation(InfoSF.MOD_ID), new ItemStack(draconic.getBlock(), 2), "sps", "pcp", "sps", 's', SolarsSF.getGeneratingSolars(wyvern.maxGeneration), 'p', new ItemStack(DEFeatures.draconicEnergyCore), 'c', new ItemStack(DEFeatures.awakenedCore)).setRegistryName(InfoSF.MOD_ID, "solar_panel_draconic"));
 	}
 }
