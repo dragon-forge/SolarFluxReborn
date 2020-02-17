@@ -1,6 +1,6 @@
 {
-  "pack": {
-    "pack_format": 1,
-    "description": "Resources used for Solar Flux Reborn"
-  }
+    "pack": {
+        "description": "SolarFlux provided resources",
+        "pack_format": 4
+    }
 }

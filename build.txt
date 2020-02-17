@@ -1,17 +1,23 @@
-#Project info
-author=Zeitheron
-
-#Runtime info
-forge_version=14.23.5.2838
-minecraft_version=1.12.2
-mcp=stable_39
-bhs_version=30a
-jei_version=4.11.0.206
-
-#Mod info
+# Mod Info
 mod_id=solarflux
-mod_id_fancy=SolarFluxReborn
+archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=4.35r
-cf_project=246974
-release_type=release
+mod_version=15.0.0
+
+# MC Info
+mc_version=1.15.2
+forge_version=31.1.12
+
+# MCP Info
+mcp_ch=snapshot
+mcp_vr=20200217-1.15.1
+
+# Misc Info
+java=1.8
+certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
+
+# Project ID on CurseForge
+cf_project=0
+
+# alpha, beta, release
+release_type=alpha

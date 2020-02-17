@@ -16,14 +16,10 @@ out
 # gradle
 build
 .gradle
-/gradle.properties
-*.html
 
 # other
 eclipse
 run
-libs
-libs_src
-*.rar
-*.jks
-/Draconic-Evolution-1.12.2-2.3.18.329-src.jar
+
+# Files from Forge MDK
+forge*changelog.txt

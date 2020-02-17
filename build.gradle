@@ -1,26 +1,20 @@
 buildscript {
     repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+		maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
-		maven {
-            name = "sonatype"
-            url = "https://oss.sonatype.org/content/repositories/snapshots/"
-        }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+		classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
 
-plugins {
-    id 'com.matthewprenger.cursegradle' version '1.1.0'
-	id 'se.bjurr.gitchangelog.git-changelog-gradle-plugin' version '1.56'
-}
-
-apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
+apply plugin: "com.matthewprenger.cursegradle"
 
 ext.configFile = file "build.txt"
 
@@ -30,91 +24,54 @@ configFile.withReader {
     project.ext.config = new ConfigSlurper().parse prop
 }
 
-version = "${config.mod_version}"
-group = "com.pengu.${config.mod_id}"
-archivesBaseName = "${config.mod_id_fancy}_${config.minecraft_version}"
+version = config.mod_version
+group = "tk.zeitheron.${config.mod_id}"
+archivesBaseName = "${config.archive_name}-${config.mc_version}"
 
-sourceCompatibility = targetCompatibility = "1.8"
-compileJava {
-    sourceCompatibility = targetCompatibility = "1.8"
-}
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = config.java
 
 minecraft {
-    version = "${config.minecraft_version}-${config.forge_version}"
-    runDir = "run"
-    mappings = "${config.mcp}"
-    makeObfSourceJar = false
-    replace '@VERSION@', "${config.mod_version}"
-	replace '@FINGERPRINT@', project.findProperty('signSHA1')
-}
-
-repositories {
-	mavenCentral()
-    maven {
-        name = "thiakil"
-        url = "http://maven.thiakil.com"
-    }
-    maven {
-        name = "CoFH Maven"
-        url = "http://maven.covers1624.net"
-    }
-    maven {
-        name = "CurseForge"
-        url = "https://minecraft.curseforge.com/api/maven/"
-    }
-    maven {
-        name = "jei"
-        url =  "http://dvs1.progwml6.com/files/maven"
+    mappings channel: config.mcp_ch, version: config.mcp_vr
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    runs {
+        client {
+            workingDirectory project.file('run/client')
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
+		
+        server {
+            workingDirectory project.file('run/server')
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                examplemod {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 
 dependencies {
-	deobfCompile "black-hole-storage:BlackHoleStorage_${config.minecraft_version}:${config.bhs_version}:deobf"
-    runtime "mezz.jei:jei_${config.minecraft_version}:${config.jei_version}"
-	deobfCompile "com.azanor.baubles:Baubles:1.12-1.5.2"
-}
-
-processResources
-{
-    inputs.property "version", project.version
-    inputs.property "mcversion", config.minecraft_version
-    from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-		include 'pack.mcmeta'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
-    }
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
-		exclude 'pack.mcmeta'
-    }
-	rename "mod_id_at.cfg", "META-INF/${config.mod_id}_at.cfg"
-}
-
-task deobfJar(type: Jar) {
-    from sourceSets.main.output
-    classifier = 'deobf'
-    manifest {
-        attributes 'FMLAT': "${config.mod_id}_at.cfg"
-    }
-}
-
-task srcJar(type: Jar, dependsOn: classes) {
-    from sourceSets.main.allSource
-    classifier = 'sources'
-	manifest {
-        attributes 'FMLAT': "${config.mod_id}_at.cfg"
-    }
+    minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 }
 
 jar {
-	manifest {
-		attributes 'FMLAT': "${config.mod_id}_at.cfg"
-	}
-}
-
-artifacts {
-    archives deobfJar
-	archives srcJar
+    manifest {
+        attributes([
+            "Specification-Title": "${config.mod_id}",
+            "Specification-Vendor": "Zeitheron",
+            "Specification-Version": "1",
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"Zeitheron",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
 curseforge {
@@ -124,26 +81,17 @@ curseforge {
 		changelogType = 'html'
 		changelog = ""
 		releaseType = "${config.release_type}"
-		addGameVersion "${config.minecraft_version}"
+		addGameVersion "${config.mc_version}"
+		addGameVersion "Forge"
 		mainArtifact(jar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} - ${config.mod_version}"
-		}
-		addArtifact(deobfJar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} (Deobfuscated) - ${config.mod_version}"
-		}
-		addArtifact(srcJar) {
-		  displayName = "[${config.minecraft_version}] ${config.mod_name} (Sources) - ${config.mod_version}"
+		  displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
 		}
 		relations {
-            optionalLibrary 'Baubles'
-			optionalLibrary 'Black-Hole-Storage'
-			optionalLibrary 'Avaritia-1-10'
-			optionalLibrary 'Thaumcraft'
-			optionalLibrary 'Draconic-Evolution'
         }
 	}
 }
 
+/*
 task signJar(type: SignJar, dependsOn: reobfJar) {
     onlyIf {
         project.hasProperty('keyStore')
@@ -151,41 +99,28 @@ task signJar(type: SignJar, dependsOn: reobfJar) {
     keyStore = project.findProperty('keyStore')
     alias = project.findProperty('keyStoreAlias')
     storePass = project.findProperty('keyStorePass')
-    keyPass = project.findProperty('keyStoreKeyPass')
+    keyPass = project.findProperty('keyStorePass')
     inputFile = jar.archivePath
     outputFile = jar.archivePath
 }
-
-task signDeobfJar(type: SignJar, dependsOn: deobfJar) {
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
-    keyStore = project.findProperty('keyStore')
-    alias = project.findProperty('keyStoreAlias')
-    storePass = project.findProperty('keyStorePass')
-    keyPass = project.findProperty('keyStoreKeyPass')
-    inputFile = deobfJar.archivePath
-    outputFile = deobfJar.archivePath
-}
-
-task signSrcJar(type: SignJar, dependsOn: srcJar) {
-    onlyIf {
-        project.hasProperty('keyStore')
-    }
-    keyStore = project.findProperty('keyStore')
-    alias = project.findProperty('keyStoreAlias')
-    storePass = project.findProperty('keyStorePass')
-    keyPass = project.findProperty('keyStoreKeyPass')
-    inputFile = srcJar.archivePath
-    outputFile = srcJar.archivePath
-}
-
 build.dependsOn signJar
-build.dependsOn signDeobfJar
-build.dependsOn signSrcJar
+*/
 
-afterEvaluate {
-	tasks["curseforge${config.cf_project}"].dependsOn.add(signJar)
-	tasks["curseforge${config.cf_project}"].dependsOn.add(signDeobfJar)
-	tasks["curseforge${config.cf_project}"].dependsOn.add(signSrcJar)
+def reobfFile = file("$buildDir/reobfJar/output.jar")
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'reobfJar'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifact reobfArtifact
+        }
+    }
+    repositories {
+        maven {
+            url "file:///${project.projectDir}/mcmodsrepo"
+        }
+    }
 }
