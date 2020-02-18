@@ -46,7 +46,7 @@ import java.lang.reflect.Modifier;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "4d7b29cd19124e986da685107d16ce4b49bc0a97", updateJSON = "https://dccg.herokuapp.com/api/fmluc/246974", dependencies = "after:thaumcraft@[6.1.BETA26,);after:avaritia@[3.3.0,);after:draconicevolution@[2.3.18,)")
+@Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "9f5e2a811a8332a842b34f6967b7db0ac4f24856", updateJSON = "https://dccg.herokuapp.com/api/fmluc/246974", dependencies = "after:thaumcraft@[6.1.BETA26,);after:avaritia@[3.3.0,);after:draconicevolution@[2.3.18,)")
 public class SolarFlux
 {
 	public static final Logger LOG = LogManager.getLogger(InfoSF.MOD_ID);

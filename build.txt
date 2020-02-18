@@ -12,6 +12,6 @@ jei_version=4.11.0.206
 mod_id=solarflux
 mod_id_fancy=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=12.3.6
+mod_version=12.3.7
 cf_project=246974
 release_type=release
