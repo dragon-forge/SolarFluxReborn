@@ -38,9 +38,9 @@ public class ItemBlockBaseSolar
 	@SideOnly(Side.CLIENT)
 	public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn)
 	{
-		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", panelBlock.getPanelData().maxGeneration));
-		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.transfer", panelBlock.getPanelData().maxTransfer));
-		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", panelBlock.getPanelData().maxCapacity));
+		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.generation", panelBlock.getPanelData().getGeneration()));
+		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.transfer", panelBlock.getPanelData().getTransfer()));
+		tooltip.add(I18n.format("info." + InfoSF.MOD_ID + ".energy.capacity", panelBlock.getPanelData().getCapacity()));
 
 		if(stack.hasTagCompound() && (stack.getTagCompound().hasKey("Upgrades") || stack.getTagCompound().hasKey("Energy") || stack.getTagCompound().hasKey("Chargeable")))
 		{

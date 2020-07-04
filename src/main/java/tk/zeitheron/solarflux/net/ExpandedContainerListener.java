@@ -7,6 +7,8 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 
+import javax.annotation.Nonnull;
+
 public class ExpandedContainerListener implements IContainerListener
 {
 	public final EntityPlayerMP player;
@@ -34,7 +36,7 @@ public class ExpandedContainerListener implements IContainerListener
 		sendWindowProperty2(containerIn, varToUpdate, newValue);
 	}
 	
-	public void sendWindowProperty2(Container containerIn, int varToUpdate, long newValue)
+	public void sendWindowProperty2(@Nonnull Container containerIn, int varToUpdate, long newValue)
 	{
 		NetworkSF.INSTANCE.sendWindowProperty(player, containerIn, varToUpdate, newValue);
 	}

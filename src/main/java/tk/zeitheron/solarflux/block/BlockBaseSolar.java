@@ -1,11 +1,5 @@
 package tk.zeitheron.solarflux.block;
 
-import tk.zeitheron.solarflux.SolarFlux;
-import tk.zeitheron.solarflux.api.SolarInfo;
-import tk.zeitheron.solarflux.api.SolarInstance;
-import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
-import tk.zeitheron.solarflux.items.ItemUpgrade;
-import tk.zeitheron.solarflux.utils.PositionedStateImplementation;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.SoundType;
@@ -25,6 +19,13 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import tk.zeitheron.solarflux.SolarFlux;
+import tk.zeitheron.solarflux.api.SolarFluxAPI;
+import tk.zeitheron.solarflux.api.SolarInfo;
+import tk.zeitheron.solarflux.api.SolarInstance;
+import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
+import tk.zeitheron.solarflux.items.ItemUpgrade;
+import tk.zeitheron.solarflux.utils.PositionedStateImplementation;
 
 public class BlockBaseSolar
 		extends Block
@@ -35,6 +36,7 @@ public class BlockBaseSolar
 	public BlockBaseSolar(SolarInfo solarInfo)
 	{
 		super(Material.IRON);
+		setCreativeTab(SolarFluxAPI.tab);
 		setSoundType(SoundType.METAL);
 		this.solarInfo = solarInfo;
 		ResourceLocation r = solarInfo.getRegistryName();
@@ -49,8 +51,8 @@ public class BlockBaseSolar
 	@Override
 	public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos)
 	{
-		if(Math.abs(solarInfo.height / 16F - aabb.maxY) > 1.0E-4)
-			aabb = new AxisAlignedBB(0, 0, 0, 1, solarInfo.height + 1 / 64F, 1);
+		if(Math.abs(solarInfo.getHeight() / 16F - aabb.maxY) > 1.0E-4)
+			aabb = new AxisAlignedBB(0, 0, 0, 1, solarInfo.getHeight() + 1 / 64F, 1);
 		return aabb;
 	}
 
@@ -89,7 +91,7 @@ public class BlockBaseSolar
 	@Override
 	public void getSubBlocks(CreativeTabs tab, NonNullList<ItemStack> items)
 	{
-		if(solarInfo.maxGeneration <= 0 || solarInfo.maxCapacity <= 0 || solarInfo.maxTransfer <= 0)
+		if(solarInfo.getGeneration() <= 0 || solarInfo.getCapacity() <= 0 || solarInfo.getTransfer() <= 0)
 			return;
 		super.getSubBlocks(tab, items);
 	}
@@ -140,7 +142,7 @@ public class BlockBaseSolar
 					te.upgradeInventory.drop(worldIn, pos);
 					te.chargeInventory.drop(worldIn, pos);
 				}
-				EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + getPanelData().height / 2F, pos.getZ() + 0.5, player.isSneaking() ? te.generateItem(Item.getItemFromBlock(this)) : new ItemStack(this));
+				EntityItem item = new EntityItem(worldIn, pos.getX() + 0.5, pos.getY() + getPanelData().getHeight() / 2F, pos.getZ() + 0.5, player.isSneaking() ? te.generateItem(Item.getItemFromBlock(this)) : new ItemStack(this));
 				item.setDefaultPickupDelay();
 				worldIn.spawnEntity(item);
 			}

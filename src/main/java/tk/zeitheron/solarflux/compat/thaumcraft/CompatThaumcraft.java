@@ -141,7 +141,7 @@ public class CompatThaumcraft implements ISolarFluxCompat
 		appendAspects(new ItemStack(Blocks.TORCH), new AspectList().add(SOL, 1));
 		appendAspects(new ItemStack(Items.GLOWSTONE_DUST), new AspectList().add(SOL, 10));
 		appendAspects(new ItemStack(ItemsSF.MIRROR), new AspectList().add(SOL, 15));
-		SolarFluxAPI.SOLAR_PANELS.forEach(si -> appendAspects(new ItemStack(si.getBlock()), new AspectList().add(SOL, 5 + (int) Math.ceil(si.maxGeneration))));
+		SolarFluxAPI.SOLAR_PANELS.forEach(si -> appendAspects(new ItemStack(si.getBlock()), new AspectList().add(SOL, 5 + (int) Math.ceil(si.getGeneration()))));
 	}
 	
 	private static void appendAspects(String oreDict, AspectList toAdd)

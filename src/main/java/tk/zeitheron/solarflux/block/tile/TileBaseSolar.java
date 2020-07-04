@@ -192,9 +192,9 @@ public class TileBaseSolar
 		if(getBlockType() instanceof BlockBaseSolar)
 		{
 			SolarInfo si = ((BlockBaseSolar) getBlockType()).solarInfo;
-			renderConnectedTextures = si.connectTextures;
+			renderConnectedTextures = si.hasConnectedTextures();
 
-			if(si.maxGeneration <= 0)
+			if(si.getGeneration() <= 0)
 			{
 				world.destroyBlock(pos, true);
 				return;
@@ -206,6 +206,8 @@ public class TileBaseSolar
 				si.accept(instance);
 				return;
 			}
+
+			instance.reset();
 		}
 
 		if(world.isRemote)

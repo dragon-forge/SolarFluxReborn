@@ -33,7 +33,7 @@ public class CompatAvaritia implements ISolarFluxCompat
 	@Override
 	public void preInit()
 	{
-		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_neutronium"), new ItemStack(neutronium.getBlock(), 2), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'i', ModItems.infinity_catalyst.copy(), 's', SolarsSF.getGeneratingSolars(SolarsSF.CORE_PANELS[7].maxGeneration));
+		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_neutronium"), new ItemStack(neutronium.getBlock(), 2), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'i', ModItems.infinity_catalyst.copy(), 's', SolarsSF.getGeneratingSolars(SolarsSF.CORE_PANELS[7].getGeneration()));
 		extremeShaped(new ResourceLocation(InfoSF.MOD_ID, "solar_panel_infinity"), new ItemStack(infinity.getBlock(), 3), "  nn nn  ", " nccsccn ", "nc  g  cn", "nc pip cn", " sgiFigs ", "nc pip cn", "nc  g  cn", " nccsccn ", "  nn nn  ", 'n', ModItems.neutronium_ingot.copy(), 'c', ModItems.crystal_matrix_ingot.copy(), 'g', ModItems.neutron_nugget.copy(), 'p', ModItems.neutron_pile.copy(), 'F', new ItemStack(neutronium.getBlock()), 'i', ModItems.infinity_ingot.copy(), 's', new ItemStack(ModBlocks.resource));
 	}
 	

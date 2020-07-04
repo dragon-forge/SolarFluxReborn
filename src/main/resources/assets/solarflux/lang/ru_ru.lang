@@ -51,6 +51,7 @@ info.solarflux.upgrade.transfer=Увеличивают скорость пере
 info.solarflux.upgrade.capacity=Увеличивают внутреннюю ёмкость на %.2f%%.
 info.solarflux.upgrade.furnace=Накапливает энергию для нагрева ванильных печей.
 info.solarflux.craftitem=Ингредиент в рецептах.
+info.solarflux.reload=[СЕРВЕР] Перезагрузка настроек солнечных панелей...
 
 # # AVARITIA ##
 tile.solarflux:solar_panel_neutronium.name=Нейтрониевая солнечная панель

@@ -54,7 +54,7 @@ public class SolarFluxResourcePack
 		ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/" + reg.getPath() + ".json");
 		ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 
-		float thicc = si.height * 16F;
+		float thicc = si.getHeight() * 16F;
 		float thic2 = thicc + 0.25F;
 		float reverseThicc = 16 - thicc;
 

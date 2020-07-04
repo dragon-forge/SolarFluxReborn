@@ -1,12 +1,5 @@
 package tk.zeitheron.solarflux.proxy;
 
-import tk.zeitheron.solarflux.SolarFlux;
-import tk.zeitheron.solarflux.api.SolarFluxAPI;
-import tk.zeitheron.solarflux.api.SolarInfo;
-import tk.zeitheron.solarflux.client.SolarFluxResourcePack;
-import tk.zeitheron.solarflux.client.SolarPanelBakedModel;
-import tk.zeitheron.solarflux.gui.ContainerBaseSolar;
-import tk.zeitheron.solarflux.init.SolarsSF;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -18,11 +11,21 @@ import net.minecraft.item.Item;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.GuiScreenEvent.InitGuiEvent;
 import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import tk.zeitheron.solarflux.SolarFlux;
+import tk.zeitheron.solarflux.api.SolarFluxAPI;
+import tk.zeitheron.solarflux.api.SolarInfo;
+import tk.zeitheron.solarflux.client.SolarFluxResourcePack;
+import tk.zeitheron.solarflux.client.SolarPanelBakedModel;
+import tk.zeitheron.solarflux.gui.ContainerBaseSolar;
+import tk.zeitheron.solarflux.init.SolarsSF;
+import tk.zeitheron.solarflux.net.NetworkSF;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -133,6 +136,30 @@ public class ClientProxy
 				.stream()
 				.map(SolarInfo::getBlock)
 				.forEach(spb -> e.getModelRegistry().putObject(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb)));
+	}
+
+	public boolean renderedWorld;
+
+	@SubscribeEvent
+	public void renderWorldLast(RenderWorldLastEvent e)
+	{
+		if(!renderedWorld)
+		{
+			renderedWorld = true;
+			NetworkSF.INSTANCE.requestConfigs();
+		}
+	}
+
+	@SubscribeEvent
+	public void clientTick(TickEvent.ClientTickEvent e)
+	{
+		if(Minecraft.getMinecraft().world == null && renderedWorld)
+		{
+			renderedWorld = false;
+
+			SolarFlux.LOG.info("Resetting configs to local.");
+			SolarFluxAPI.SOLAR_PANELS.forEach(SolarInfo::resetConfigInstance);
+		}
 	}
 
 	private void registerRender(Item item)

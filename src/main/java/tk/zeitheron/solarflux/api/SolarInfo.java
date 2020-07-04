@@ -1,13 +1,9 @@
 package tk.zeitheron.solarflux.api;
 
 import com.google.common.reflect.TypeToken;
-import tk.zeitheron.solarflux.InfoSF;
-import tk.zeitheron.solarflux.block.BlockBaseSolar;
-import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
-import tk.zeitheron.solarflux.init.SolarsSF;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.fml.common.FMLContainer;
@@ -17,6 +13,11 @@ import net.minecraftforge.fml.common.ModContainer;
 import net.minecraftforge.oredict.ShapedOreRecipe;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import net.minecraftforge.registries.IRegistryDelegate;
+import tk.zeitheron.solarflux.InfoSF;
+import tk.zeitheron.solarflux.block.BlockBaseSolar;
+import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
+import tk.zeitheron.solarflux.init.SolarsSF;
+import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
 
 import javax.annotation.Nullable;
 import java.util.*;
@@ -30,26 +31,46 @@ public class SolarInfo
 
 	public String compatMod;
 
-	public long maxGeneration;
-	public long maxTransfer;
-	public long maxCapacity;
-	public float height = 6 / 16F;
+	/**
+	 * Base values supplied by the constructor.
+	 */
+
+	public long baseGeneration, baseTransfer, baseCapacity;
+	public float baseHeight = 6 / 16F;
+	public boolean baseConnectTextures = true;
+
+	/**
+	 * Internal properties that may store custom properties
+	 */
 
 	public boolean isCustom = false;
 	public Map<String, String> localizations = null;
 
-	public boolean connectTextures = true;
+	/**
+	 * Accessible config instance of this panel. Represents in-world panel properties.
+	 * The properties like {@link #baseGeneration}, {@link #baseTransfer}, {@link #baseCapacity}, {@link #baseHeight} and {@link #baseConnectTextures} are only for boot time and config setup.
+	 * They are the base values, that are sent from host to client.
+	 */
+	public SolarConfigInstance configInstance;
 
 	public SolarInfo(long mgen, long mtranf, long mcap)
 	{
-		this.maxGeneration = mgen;
-		this.maxTransfer = mtranf;
-		this.maxCapacity = mcap;
+		this.baseGeneration = mgen;
+		this.baseTransfer = mtranf;
+		this.baseCapacity = mcap;
+	}
+
+	public SolarInfo(long mgen, long mtranf, long mcap, float height)
+	{
+		this.baseGeneration = mgen;
+		this.baseTransfer = mtranf;
+		this.baseCapacity = mcap;
+		this.baseHeight = height;
 	}
 
 	public SolarInfo noConnectTexture()
 	{
-		connectTextures = false;
+		baseConnectTextures = false;
 		return this;
 	}
 
@@ -80,9 +101,11 @@ public class SolarInfo
 	@Override
 	public void accept(SolarInstance t)
 	{
-		t.gen = maxGeneration;
-		t.cap = maxCapacity;
-		t.transfer = maxTransfer;
+		SolarConfigInstance data = getConfigInstance();
+		t.gen = data.generation;
+		t.cap = data.capacity;
+		t.transfer = data.transfer;
+		t.infoDelegate = this;
 		t.delegate = getRegistryName();
 	}
 
@@ -97,18 +120,40 @@ public class SolarInfo
 		return compatMod;
 	}
 
-	public void read(PacketBuffer buf)
+	public float getHeight()
 	{
-		maxGeneration = buf.readLong();
-		maxTransfer = buf.readLong();
-		maxCapacity = buf.readLong();
+		return getConfigInstance().height;
 	}
 
-	public void write(PacketBuffer buf)
+	public long getGeneration()
 	{
-		buf.writeLong(maxGeneration);
-		buf.writeLong(maxTransfer);
-		buf.writeLong(maxCapacity);
+		return getConfigInstance().generation;
+	}
+
+	public long getTransfer()
+	{
+		return getConfigInstance().transfer;
+	}
+
+	public long getCapacity()
+	{
+		return getConfigInstance().capacity;
+	}
+
+	public void configureBase(ConfigEntryCategory cat)
+	{
+		this.configInstance = new SolarConfigInstance(cat, this);
+	}
+
+	public void resetConfigInstance()
+	{
+		this.configInstance = new SolarConfigInstance(this);
+	}
+
+	public SolarConfigInstance getConfigInstance()
+	{
+		if(configInstance == null) resetConfigInstance();
+		return configInstance;
 	}
 
 	public float computeSunIntensity(TileBaseSolar solar)
@@ -205,6 +250,11 @@ public class SolarInfo
 		return new RecipeBuilder(this);
 	}
 
+	public boolean hasConnectedTextures()
+	{
+		return getConfigInstance().connectTextures;
+	}
+
 	public static class Builder
 	{
 		String name;
@@ -285,7 +335,7 @@ public class SolarInfo
 			SolarInfo info = new SolarInfo(generation, transfer, capacity);
 			info.isCustom = custom;
 			info.setRegistryName(name);
-			info.height = height;
+			info.baseHeight = height;
 			return info;
 		}
 
@@ -379,33 +429,48 @@ public class SolarInfo
 		}
 	}
 
-	public static class SolarPanelData
+	public static class SolarConfigInstance
 	{
 		public final long generation, capacity, transfer;
 		public final float height;
+		public final boolean connectTextures;
 
-		public SolarPanelData(PacketBuffer buf)
+		public SolarConfigInstance(ConfigEntryCategory cat, SolarInfo base)
 		{
-			this.generation = buf.readLong();
-			this.capacity = buf.readLong();
-			this.transfer = buf.readLong();
-			this.height = buf.readFloat();
+			this.generation = cat.getLongEntry("Generation Rate", base.baseGeneration, 1, Long.MAX_VALUE).setDescription("How many RF/FE does this solar panel produce per tick?").getValue();
+			this.transfer = cat.getLongEntry("Transfer Rate", base.baseTransfer, 1, Long.MAX_VALUE).setDescription("How many RF/FE does this solar panel emit to other blocks, per tick?").getValue();
+			this.capacity = cat.getLongEntry("Capacity", base.baseCapacity, 1, Long.MAX_VALUE).setDescription("How many RF/FE does this solar panel store?").getValue();
+			this.connectTextures = cat.getBooleanEntry("Connected Texture", base.baseConnectTextures).setDescription("Does this solar panel connect textures with other panels of this type?").getValue();
+			this.height = cat.getFloatEntry("Height", base.baseHeight * 16F, 0, 16).setDescription("How high is this solar panel?").getValue() / 16F;
 		}
 
-		public SolarPanelData(long generation, long capacity, long transfer, float height)
+		public SolarConfigInstance(SolarInfo base)
+		{
+			this.generation = base.baseGeneration;
+			this.capacity = base.baseCapacity;
+			this.transfer = base.baseTransfer;
+			this.height = base.baseHeight;
+			this.connectTextures = base.baseConnectTextures;
+		}
+
+		public SolarConfigInstance(long generation, long capacity, long transfer, float height, boolean connectTextures)
 		{
 			this.generation = generation;
 			this.capacity = capacity;
 			this.transfer = transfer;
 			this.height = height;
+			this.connectTextures = connectTextures;
 		}
 
-		public void write(PacketBuffer buf)
+		public NBTTagCompound serialize()
 		{
-			buf.writeLong(generation);
-			buf.writeLong(capacity);
-			buf.writeLong(transfer);
-			buf.writeFloat(height);
+			NBTTagCompound nbt = new NBTTagCompound();
+			nbt.setLong("MG", generation);
+			nbt.setLong("MC", capacity);
+			nbt.setLong("MT", transfer);
+			nbt.setFloat("SH", height);
+			nbt.setBoolean("CT", connectTextures);
+			return nbt;
 		}
 	}
 }

@@ -1,5 +1,12 @@
 package tk.zeitheron.solarflux.init;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.Ingredient;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.registries.IForgeRegistry;
 import tk.zeitheron.solarflux.SolarFlux;
 import tk.zeitheron.solarflux.api.SolarFluxAPI;
 import tk.zeitheron.solarflux.api.SolarInfo;
@@ -8,12 +15,6 @@ import tk.zeitheron.solarflux.block.BlockBaseSolar;
 import tk.zeitheron.solarflux.block.ItemBlockBaseSolar;
 import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
 import tk.zeitheron.solarflux.shaded.hammerlib.cfg.Configuration;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -26,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Base64;
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class SolarsSF
 {
@@ -42,7 +42,13 @@ public class SolarsSF
 
 	public static Ingredient getGeneratingSolars(long gen)
 	{
-		return Ingredient.fromStacks(SolarFluxAPI.SOLAR_PANELS.getValuesCollection().stream().filter(s -> s.maxGeneration == gen).map(SolarInfo::getBlock).map(ItemStack::new).collect(Collectors.toList()).toArray(new ItemStack[0]));
+		return Ingredient.fromStacks(
+				SolarFluxAPI.SOLAR_PANELS.getValuesCollection()
+						.stream()
+						.filter(s -> s.getGeneration() == gen)
+						.map(SolarInfo::getBlock)
+						.map(ItemStack::new)
+						.toArray(ItemStack[]::new));
 	}
 
 	public static final List<SolarInfo> modSolars = new ArrayList<>();
@@ -93,11 +99,9 @@ public class SolarsSF
 		LOOSE_ENERGY = spc.getFloatEntry("Pickup Energy Loss", 5, 0, 100).setDescription("How much energy (percent) will get lost while picking up the solar panel?").getValue();
 		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{
-			ConfigEntryCategory spsc = spc.getCategory("Solar Panel " + (i + 1));
-
-			long gen = spsc.getLongEntry("Generation Rate", generations[i], 1, Long.MAX_VALUE).getValue();
-			long transfer = spsc.getLongEntry("Transfer Rate", transfers[i], 1, Long.MAX_VALUE).getValue();
-			long capacity = spsc.getLongEntry("Capacity", capacities[i], 1, Long.MAX_VALUE).getValue();
+			long gen = generations[i];
+			long transfer = transfers[i];
+			long capacity = capacities[i];
 			CORE_PANELS[i] = SolarInfo.builder().name(Integer.toString(i + 1)).generation(gen).transfer(transfer).capacity(capacity).buildAndRegister();
 		}
 		if(cfgs.hasChanged())
@@ -165,6 +169,21 @@ public class SolarsSF
 			{
 				err.printStackTrace();
 			}
+	}
+
+	public static void refreshConfigs()
+	{
+		Configuration panels = new Configuration(new File(SolarFlux.CONFIG_DIR, "panels.hlc"));
+
+		SolarFluxAPI.SOLAR_PANELS.forEach(i ->
+		{
+			ConfigEntryCategory cat;
+			if(i.getCompatMod() == null) cat = panels.getCategory("Solar Flux");
+			else cat = panels.getCategory(Loader.instance().getIndexedModList().get(i.getCompatMod()).getName());
+			i.configureBase(cat.getCategory(i.getRegistryName().toString()));
+		});
+
+		if(panels.hasChanged()) panels.save();
 	}
 
 	public static Collection<SolarInfo> listPanels()

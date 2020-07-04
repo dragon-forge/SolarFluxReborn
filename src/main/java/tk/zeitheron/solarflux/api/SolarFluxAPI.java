@@ -40,7 +40,7 @@ public class SolarFluxAPI
 					if(ib.getBlock() instanceof BlockBaseSolar)
 					{
 						BlockBaseSolar bs = (BlockBaseSolar) ib.getBlock();
-						if(bs.solarInfo.maxGeneration <= 0)
+						if(bs.solarInfo.getGeneration() <= 0)
 						{
 							sub.remove(i);
 							--i;
@@ -59,7 +59,7 @@ public class SolarFluxAPI
 					{
 						BlockBaseSolar abs = (BlockBaseSolar) aib.getBlock();
 						BlockBaseSolar bbs = (BlockBaseSolar) bib.getBlock();
-						return (int) Math.max(Math.min(abs.solarInfo.maxGeneration - bbs.solarInfo.maxGeneration, Integer.MAX_VALUE), Integer.MIN_VALUE);
+						return (int) Math.max(Math.min(abs.solarInfo.getGeneration() - bbs.solarInfo.getGeneration(), Integer.MAX_VALUE), Integer.MIN_VALUE);
 					}
 				}
 

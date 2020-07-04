@@ -1,26 +1,11 @@
 package tk.zeitheron.solarflux;
 
-import tk.zeitheron.solarflux.api.SolarFluxAPI;
-import tk.zeitheron.solarflux.api.SolarInfo;
-import tk.zeitheron.solarflux.api.compat.ISolarFluxCompat;
-import tk.zeitheron.solarflux.api.compat.SFCompat;
-import tk.zeitheron.solarflux.block.BlockBaseSolar;
-import tk.zeitheron.solarflux.block.ItemBlockBaseSolar;
-import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
-import tk.zeitheron.solarflux.gui.GuiHandlerSF;
-import tk.zeitheron.solarflux.init.ItemsSF;
-import tk.zeitheron.solarflux.init.RecipesSF;
-import tk.zeitheron.solarflux.init.SolarsSF;
-import tk.zeitheron.solarflux.net.NetworkSF;
-import tk.zeitheron.solarflux.proxy.ISFProxy;
-import tk.zeitheron.solarflux.utils.charging.ItemChargeHelper;
 import net.minecraft.item.Item;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.translation.LanguageMap;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
@@ -35,6 +20,23 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.registries.RegistryBuilder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import tk.zeitheron.solarflux.api.SolarFluxAPI;
+import tk.zeitheron.solarflux.api.SolarInfo;
+import tk.zeitheron.solarflux.api.compat.ISolarFluxCompat;
+import tk.zeitheron.solarflux.api.compat.SFCompat;
+import tk.zeitheron.solarflux.block.BlockBaseSolar;
+import tk.zeitheron.solarflux.block.ItemBlockBaseSolar;
+import tk.zeitheron.solarflux.block.tile.TileBaseSolar;
+import tk.zeitheron.solarflux.command.CommandSolarFlux;
+import tk.zeitheron.solarflux.gui.GuiHandlerSF;
+import tk.zeitheron.solarflux.init.ItemsSF;
+import tk.zeitheron.solarflux.init.RecipesSF;
+import tk.zeitheron.solarflux.init.SolarsSF;
+import tk.zeitheron.solarflux.net.NetworkSF;
+import tk.zeitheron.solarflux.proxy.ISFProxy;
+import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
+import tk.zeitheron.solarflux.shaded.hammerlib.cfg.Configuration;
+import tk.zeitheron.solarflux.utils.charging.ItemChargeHelper;
 
 import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
@@ -48,7 +50,9 @@ import java.util.*;
 @Mod(modid = InfoSF.MOD_ID, name = "Solar Flux Reborn", version = InfoSF.VERSION, certificateFingerprint = "9f5e2a811a8332a842b34f6967b7db0ac4f24856", updateJSON = "https://dccg.herokuapp.com/api/fmluc/246974", dependencies = "after:thaumcraft@[6.1.BETA26,);after:avaritia@[3.3.0,);after:draconicevolution@[2.3.18,)")
 public class SolarFlux
 {
-	public static final Logger LOG = LogManager.getLogger(InfoSF.MOD_ID);
+	public static final Logger LOG = LogManager.getLogger("SolarFlux");
+
+	public static final File CONFIG_DIR = null;
 
 	@SidedProxy(clientSide = InfoSF.PROXY_CLIENT, serverSide = InfoSF.PROXY_SERVER)
 	public static ISFProxy proxy;
@@ -75,7 +79,6 @@ public class SolarFlux
 		Map<String, ISolarFluxCompat> cmap = new HashMap<>();
 		List<String> clist = new ArrayList<>();
 
-		Configuration integrations = new Configuration();
 		for(ASMData data : e.getAsmData().getAll(SFCompat.class.getCanonicalName()))
 			try
 			{
@@ -120,17 +123,21 @@ public class SolarFlux
 				err.printStackTrace();
 			}
 
+		File cfgDir = new File(e.getModConfigurationDirectory(), InfoSF.MOD_ID);
+		if(!cfgDir.isDirectory()) cfgDir.mkdirs();
+		FinalFieldHelper.setStaticFinalField(SolarFlux.class, "CONFIG_DIR", cfgDir);
+
 		{
-			File modCfgFile = new File(e.getModConfigurationDirectory(), InfoSF.MOD_ID);
-			if(!modCfgFile.isDirectory()) modCfgFile.mkdirs();
-			modCfgFile = new File(modCfgFile, "compats.cfg");
+			File modCfgFile = new File(cfgDir, "compats.hlc");
 			Configuration compatConfigs = new Configuration(modCfgFile);
+
+			ConfigEntryCategory states = compatConfigs.getCategory("States").setDescription("If you are a pack developer, ensure that client and server have the same compats enabled/disabled to connect!");
 
 			for(String modid : clist)
 			{
 				String modname = Loader.isModLoaded(modid) ? Loader.instance().getIndexedModList().get(modid).getName() : modid;
 
-				boolean a = 1 == compatConfigs.getInt(modid, "States", modname != null ? 1 : 0, 0, 1, "Should Solar Flux Reborn enable compat for '" + modname + "'?\n1 - Enable, 0 - Disable.");
+				boolean a = states.getBooleanEntry(modid, true).setDescription("Should Solar Flux Reborn enable compat for '" + modname + "'?").getValue();
 				if(!a && cmap.containsKey(modid))
 				{
 					compats.remove(cmap.get(modid));
@@ -138,9 +145,6 @@ public class SolarFlux
 					LOG.info("Disable SolarFlux compat - " + cmap.get(modid).getClass().getCanonicalName());
 				}
 			}
-
-			compatConfigs.getCategory("States").setComment("If you are a pack developer, ensure that client and server have the same compats enabled/disabled to connect!");
-			compatConfigs.getCategory("States").setRequiresMcRestart(true);
 
 			if(compatConfigs.hasChanged())
 				compatConfigs.save();
@@ -150,6 +154,7 @@ public class SolarFlux
 
 		// Register plugin's panels
 		List<SolarInfo> subs = new ArrayList<>();
+
 		compats.forEach(i ->
 		{
 			List<SolarInfo> lo = new ArrayList<>();
@@ -158,6 +163,7 @@ public class SolarFlux
 			lo.forEach(si -> si.setCompatMod(i.getClass().getAnnotation(SFCompat.class).modid()));
 			subs.addAll(lo);
 		});
+
 		subs.forEach(si ->
 		{
 			SolarFluxAPI.SOLAR_PANELS.register(si);
@@ -169,6 +175,7 @@ public class SolarFlux
 			SolarFluxAPI.renderRenderer.accept(ib);
 			proxy.onPanelRegistered(si);
 		});
+
 		subs.clear();
 
 		ItemsSF.preInit();
@@ -184,6 +191,8 @@ public class SolarFlux
 		LanguageMap.inject(new ByteArrayInputStream(en_us_lang.toString().getBytes(StandardCharsets.UTF_8)));
 
 		proxy.preInit();
+
+		SolarsSF.refreshConfigs();
 	}
 
 	@SubscribeEvent
@@ -236,6 +245,12 @@ public class SolarFlux
 				return;
 			err.printStackTrace();
 		}
+	}
+
+	@EventHandler
+	public void serverStarting(FMLServerStartingEvent e)
+	{
+		e.registerServerCommand(new CommandSolarFlux());
 	}
 
 	public static class FinalFieldHelper

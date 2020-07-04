@@ -1,7 +1,5 @@
 package tk.zeitheron.solarflux.client;
 
-import tk.zeitheron.solarflux.block.BlockBaseSolar;
-import tk.zeitheron.solarflux.utils.PositionedStateImplementation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.*;
@@ -12,6 +10,8 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.util.vector.Vector3f;
+import tk.zeitheron.solarflux.block.BlockBaseSolar;
+import tk.zeitheron.solarflux.utils.PositionedStateImplementation;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -44,6 +44,8 @@ public class SolarPanelBakedModel
 			pos = pstate.getPos();
 		} else return Collections.emptyList();
 
+		boolean ctn = block.getPanelData().hasConnectedTextures();
+
 		List<BakedQuad> quads = new ArrayList<>();
 		EnumFacing[] sides = sideIn == null ? EnumFacing.VALUES : new EnumFacing[]{ sideIn };
 		for(EnumFacing side : sides)
@@ -51,7 +53,7 @@ public class SolarPanelBakedModel
 			{
 				TextureAtlasSprite top = t_top(), base = t_base();
 
-				float h = block.getPanelData().height * 16F;
+				float h = block.getPanelData().getHeight() * 16F;
 
 				quads.add(COOKER.makeBakedQuad( //
 						new Vector3f(0, 0, 0), new Vector3f(16, h, 16), //
@@ -69,7 +71,7 @@ public class SolarPanelBakedModel
 
 				boolean west = false, east = false, north = false, south = false;
 
-				if(west = world.getBlockState(pos.west()).getBlock() != block)
+				if(west = world.getBlockState(pos.west()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(side != EnumFacing.UP ? new float[]{
@@ -85,7 +87,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(east = world.getBlockState(pos.east()).getBlock() != block)
+				if(east = world.getBlockState(pos.east()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(side != EnumFacing.UP ? new float[]{
@@ -101,7 +103,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(north = world.getBlockState(pos.north()).getBlock() != block)
+				if(north = world.getBlockState(pos.north()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
@@ -112,7 +114,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(south = world.getBlockState(pos.south()).getBlock() != block)
+				if(south = world.getBlockState(pos.south()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
@@ -123,7 +125,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block)
+				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
@@ -134,7 +136,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block)
+				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
@@ -145,7 +147,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block)
+				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
@@ -156,7 +158,7 @@ public class SolarPanelBakedModel
 							}, 4)), //
 							base, side, ModelRotation.X0_Y0, null, true, true));
 
-				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block)
+				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block || !ctn)
 					quads.add(COOKER.makeBakedQuad( //
 							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
 							new BlockPartFace(null, 0, "#0", new BlockFaceUV(new float[]{
