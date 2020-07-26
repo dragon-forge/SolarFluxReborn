@@ -86,8 +86,6 @@ curseforge {
 		mainArtifact(jar) {
 		  displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
 		}
-		relations {
-        }
 	}
 }
 

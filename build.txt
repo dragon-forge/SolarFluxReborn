@@ -2,7 +2,7 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=15.0.0
+mod_version=15.2.3
 
 # MC Info
 mc_version=1.15.2
@@ -20,4 +20,4 @@ certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
 cf_project=246974
 
 # alpha, beta, release
-release_type=alpha
+release_type=release

@@ -1,1 +1,1 @@
-gradlew cleanEclipse eclipse genEclipseRuns
+gradlew clean idea genIntellijRuns

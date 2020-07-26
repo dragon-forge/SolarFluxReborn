@@ -17,33 +17,36 @@ import net.minecraft.util.math.MathHelper;
 import tk.zeitheron.solarflux.RecipesSF;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
+import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
 
 public class SolarPanel implements IItemProvider
 {
+	private final SolarPanelData delegateDataBase;
 	public final String name;
-	public final SolarPanelData delegateData;
+	public SolarPanelData delegateData;
 	public SolarPanelData networkData;
+	private String compatMod;
 	
 	public List<Supplier<IRecipe<?>>> recipes = new ArrayList<>();
 	
 	public final boolean isCustom;
 	
 	private SolarPanelBlock block;
-	
+
 	private LanguageData langs;
-	
+
 	public SolarPanel(String name, SolarPanelData data, boolean isCustom)
 	{
-		this.delegateData = networkData = data;
+		this.delegateData = this.delegateDataBase = networkData = data;
 		this.name = (isCustom ? "custom_" : "") + name;
 		this.isCustom = isCustom;
 	}
-	
+
 	public SolarPanelData getPanelData()
 	{
 		return networkData != null ? networkData : delegateData;
 	}
-	
+
 	public SolarPanel register()
 	{
 		if(SolarPanels.PANELS.containsKey(name))
@@ -51,12 +54,28 @@ public class SolarPanel implements IItemProvider
 		SolarPanels.PANELS.put(name, this);
 		return this;
 	}
-	
+
+	public SolarPanel setCompatMod(String compatMod)
+	{
+		this.compatMod = compatMod;
+		return this;
+	}
+
+	public String getCompatMod()
+	{
+		return compatMod;
+	}
+
+	public void configureBase(ConfigEntryCategory category)
+	{
+		this.delegateData = new SolarPanelData(category, this);
+	}
+
 	protected SolarPanelBlock createBlock()
 	{
 		return new SolarPanelBlock(this);
 	}
-	
+
 	public SolarPanelBlock getBlock()
 	{
 		if(block == null)
@@ -66,65 +85,65 @@ public class SolarPanel implements IItemProvider
 		}
 		return block;
 	}
-	
+
 	@Override
 	public Item asItem()
 	{
 		return getBlock().asItem();
 	}
-	
+
 	public static Builder builder()
 	{
 		return new Builder();
 	}
-	
+
 	public static Builder customBuilder()
 	{
 		Builder b = new Builder();
 		b.custom = true;
 		return b;
 	}
-	
+
 	public LanguageData langBuilder()
 	{
 		return new LanguageData(this);
 	}
-	
+
 	public boolean hasLang()
 	{
 		return langs != null;
 	}
-	
+
 	public LanguageData getLang()
 	{
 		return langs;
 	}
-	
+
 	public RecipeBuilder recipeBuilder()
 	{
 		return new RecipeBuilder(this);
 	}
-	
+
 	public float computeSunIntensity(SolarPanelTile solar)
 	{
 		if(!solar.doesSeeSky())
 			return 0F;
-		
+
 		float celestialAngleRadians = solar.getWorld().getCelestialAngleRadians(1F);
 		if(celestialAngleRadians > Math.PI)
 			celestialAngleRadians = (float) (2 * Math.PI - celestialAngleRadians);
 		int lowLightCount = 0;
 		float multiplicator = 1.5F - (lowLightCount * .122F);
 		float displacement = 1.2F + (lowLightCount * .08F);
-		
+
 		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
 	}
-	
+
 	public Stream<IRecipe<?>> recipes()
 	{
 		return recipes == null ? Stream.empty() : recipes.stream().map(Supplier::get);
 	}
-	
+
 	public static class Builder
 	{
 		String name;
@@ -304,7 +323,15 @@ public class SolarPanel implements IItemProvider
 			this.transfer = transfer;
 			this.height = height;
 		}
-		
+
+		public SolarPanelData(ConfigEntryCategory cat, SolarPanel base)
+		{
+			this.generation = cat.getLongEntry("Generation Rate", base.delegateDataBase.generation, 1, Long.MAX_VALUE).setDescription("How much FE does this solar panel produce per tick?").getValue();
+			this.transfer = cat.getLongEntry("Transfer Rate", base.delegateDataBase.transfer, 1, Long.MAX_VALUE).setDescription("How much FE does this solar panel emit to other blocks, per tick?").getValue();
+			this.capacity = cat.getLongEntry("Capacity", base.delegateDataBase.capacity, 1, Long.MAX_VALUE).setDescription("How much FE does this solar panel store?").getValue();
+			this.height = cat.getFloatEntry("Height", base.delegateDataBase.height * 16F, 0, 16).setDescription("How high is this solar panel?").getValue() / 16F;
+		}
+
 		public void write(PacketBuffer buf)
 		{
 			buf.writeLong(generation);

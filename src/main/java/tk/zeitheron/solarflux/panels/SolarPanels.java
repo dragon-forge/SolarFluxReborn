@@ -4,9 +4,10 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
+import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import tk.zeitheron.solarflux.SolarFlux;
-import tk.zeitheron.solarflux.api.attribute.SolarScriptEngine;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
@@ -163,6 +164,23 @@ public class SolarPanels
 		{
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static void refreshConfigs()
+	{
+		Configuration panels = new Configuration(new File(CONFIG_DIR, "panels.hlc"));
+
+		listPanels().forEach(i ->
+		{
+			ConfigEntryCategory cat;
+			if(i.isCustom) cat = panels.getCategory("Solar Flux: Custom");
+			else if(i.getCompatMod() == null) cat = panels.getCategory("Solar Flux");
+			else
+				cat = panels.getCategory(ModList.get().getMods().stream().filter(m -> m.getModId().equals(i.getCompatMod())).findFirst().map(ModInfo::getDisplayName).orElse("Unknown"));
+			i.configureBase(cat.getCategory(i.name));
+		});
+
+		if(panels.hasChanged()) panels.save();
 	}
 
 	public static Ingredient getGeneratingSolars(long generation)

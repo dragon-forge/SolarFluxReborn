@@ -1,4 +1,4 @@
-package tk.zeitheron.solarflux.api.attribute;
+package tk.zeitheron.solarflux.panels;
 
 import net.minecraftforge.fml.ModList;
 import tk.zeitheron.solarflux.panels.JSHelper;

@@ -14,8 +14,8 @@ public class ItemCapacityUpgrade extends UpgradeItem
 		super(10);
 		setRegistryName(InfoSF.MOD_ID, "capacity_upgrade");
 	}
-	
-	public static final UUID CAPACITY_ATTRIBUTE_UUID = UUID.fromString("a85f5b2f-35e2b-e364f-338af-837a6b8f5a8f");
+
+	public static final UUID CAPACITY_ATTRIBUTE_UUID = new UUID(-6314227893548403121L, 4084627948862134927L);
 	
 	@Override
 	public void update(SolarPanelTile tile, ItemStack stack, int amount)

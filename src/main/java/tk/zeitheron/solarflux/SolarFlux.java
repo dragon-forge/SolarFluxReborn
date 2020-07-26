@@ -1,9 +1,7 @@
 package tk.zeitheron.solarflux;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import net.minecraft.block.Block;
+import net.minecraft.command.Commands;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
@@ -22,7 +20,11 @@ import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import tk.zeitheron.solarflux.block.SolarPanelBlockItem;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.container.SolarPanelContainer;
@@ -42,7 +44,7 @@ public class SolarFlux
 			return new SolarPanelContainer(windowId, playerInv, (SolarPanelTile) tile);
 		return null;
 	});
-	
+
 	public static final Logger LOG = LogManager.getLogger();
 	public static final SFRCommonProxy PROXY = DistExecutor.runForDist(() -> () -> new SFRClientProxy(), () -> () -> new SFRCommonProxy());
 	public static final ItemGroup ITEM_GROUP = new ItemGroup(InfoSF.MOD_ID)
@@ -53,7 +55,7 @@ public class SolarFlux
 			return new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_3);
 		}
 	};
-	
+
 	public SolarFlux()
 	{
 		FMLJavaModLoadingContext.get().getModEventBus().register(this);
@@ -61,21 +63,38 @@ public class SolarFlux
 		MinecraftForge.EVENT_BUS.register(this);
 		SolarPanels.init();
 	}
-	
+
 	@SubscribeEvent
 	public void commonSetup(FMLCommonSetupEvent e)
 	{
 		PROXY.commonSetup();
 		SFNetwork.init();
 	}
-	
+
+	@SubscribeEvent
+	public void loadComplete(FMLLoadCompleteEvent e)
+	{
+		SolarPanels.refreshConfigs();
+	}
+
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
 	public void clientSetup(FMLClientSetupEvent e)
 	{
 		PROXY.clientSetup();
 	}
-	
+
+	@SubscribeEvent
+	public void startServer(FMLServerStartingEvent e)
+	{
+		e.getCommandDispatcher().register(Commands.literal("solarflux").then(Commands.literal("reload").executes(src ->
+		{
+			SolarPanels.refreshConfigs();
+			src.getSource().getServer().getPlayerList().getPlayers().forEach(SFNetwork::sendAllPanels);
+			return 1;
+		})));
+	}
+
 	@EventBusSubscriber(bus = Bus.MOD)
 	public static class Registration
 	{
@@ -84,19 +103,19 @@ public class SolarFlux
 		{
 			e.getRegistry().register(SolarPanels.SOLAR_PANEL_TYPE);
 		}
-		
+
 		@SubscribeEvent
 		public static void registerContainers(RegistryEvent.Register<ContainerType<?>> e)
 		{
 			e.getRegistry().register(SOLAR_PANEL_CONTAINER.setRegistryName("solar_panel"));
 		}
-		
+
 		@SubscribeEvent
 		public static void registerBlocks(RegistryEvent.Register<Block> e)
 		{
 			SolarPanels.listPanelBlocks().forEach(e.getRegistry()::register);
 		}
-		
+
 		@SubscribeEvent
 		public static void registerItems(RegistryEvent.Register<Item> e)
 		{
