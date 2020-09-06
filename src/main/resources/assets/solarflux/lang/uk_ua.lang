@@ -1,0 +1,101 @@
+itemGroup.solarflux=Solar Flux Reborn
+
+tile.solarflux:solar_panel_1.name=Сонячна панель I
+tile.solarflux:solar_panel_2.name=Сонячна панель II
+tile.solarflux:solar_panel_3.name=Сонячна панель III
+tile.solarflux:solar_panel_4.name=Сонячна панель IV
+tile.solarflux:solar_panel_5.name=Сонячна панель V
+tile.solarflux:solar_panel_6.name=Сонячна панель VI
+tile.solarflux:solar_panel_7.name=Сонячна панель VII
+tile.solarflux:solar_panel_8.name=Сонячна панель VIII
+
+item.solarflux:mirror.name=Дзеркало
+item.solarflux:photovoltaic_cell_1.name=Фотоелектричний осередок I
+item.solarflux:photovoltaic_cell_2.name=Фотоелектричний осередок II
+item.solarflux:photovoltaic_cell_3.name=Фотоелектричний осередок III
+item.solarflux:photovoltaic_cell_4.name=Фотоелектричний осередок IV
+item.solarflux:photovoltaic_cell_5.name=Фотоелектричний осередок V
+item.solarflux:photovoltaic_cell_6.name=Фотоелектричний осередок VI
+item.solarflux:blank_upgrade.name=Шаблон покращення
+item.solarflux:efficiency_upgrade.name=Покращення: Ефективність
+item.solarflux:low_light_upgrade.name=Покращення: Слабке освітлення
+item.solarflux:traversal_upgrade.name=Покращення: Розподіл по машинам
+item.solarflux:transfer_rate_upgrade.name=Покращення: Швидкість передачі
+item.solarflux:capacity_upgrade.name=Покращення: Ємність
+item.solarflux:furnace_upgrade.name=Покращення: Піч
+item.solarflux:dispersive_upgrade.name=Покращення: Розсіювання
+item.solarflux:block_charging_upgrade.name=Покращення: Зарядка блоку
+
+### TOOLTIPS ###
+info.solarflux.energy.stored1=Зберігається: %,d FE
+info.solarflux.energy.stored2=Зберігається: %,d/%,d FE
+info.solarflux.energy.generation=Генерація: %,d FE/тік
+info.solarflux.energy.transfer=Передача: %,d FE/тік
+info.solarflux.energy.capacity=Ємність: %,d FE
+info.solarflux.energy.efficiency=Ефективність: %,d%%
+info.solarflux.upgrades.installed=Покращення
+info.solarflux.sun.intensity=Рівень освітленості: %d%%
+info.solarflux.hold.for.info=Утримуйте %s для перегляду деталей
+info.solarflux.shift=Shift
+info.solarflux.maximum=Максимум
+info.solarflux.contentretained=Вміст збережений!
+info.solarflux.pickuptip=Підказка: якщо вам потрібно зберегти енергію і предмети, зберіть панель, присівши.
+info.solarflux.decreasingReturnsToScale=Зменшення віддачі до масштабу
+info.solarflux.constantReturnsToScale=Постійне повернення до масштабу
+info.solarflux.increasingReturnsToScale=Збільшення віддачі до масштабу
+info.solarflux.solar.panel.upgrade=Поліпшення для сонячної панелі
+info.solarflux.upgrade.efficiency=Збільшує кількість FE, яке виробляє %.2f%%.
+info.solarflux.upgrade.low.light=Генерує більше FE при слабкому освітленні, але менше - при максимальному.
+info.solarflux.upgrade.traversal=Розподіляє енергію в %d додаткову(-і) приєднану(-і) машину(-и).
+info.solarflux.upgrade.transfer=Збільшують швидкість передачі на %.2f%%.
+info.solarflux.upgrade.capacity=Збільшують внутрішню ємність на %.2f%%.
+info.solarflux.upgrade.furnace=Накопичує енергію для нагріву ванільних печей.
+info.solarflux.craftitem=Інгредієнт в рецептах.
+
+# # AVARITIA ##
+tile.solarflux:solar_panel_neutronium.name=Нейтронова сонячна панель
+tile.solarflux:solar_panel_infinity.name=Сонячна панель Нескінченності
+
+# # DRACONIC EVOLUTION ##
+tile.solarflux:solar_panel_wyvern.name=Сонячна панель Віверни
+tile.solarflux:solar_panel_draconic.name=Сонячна панель Дракона
+tile.solarflux:solar_panel_chaotic.name=Сонячна панель Хаосу
+
+# # BLACK HOLE STORAGE ##
+tile.solarflux:solar_panel_dark_matter.name=Сонячна панель з темної матерії
+tile.solarflux:solar_panel_anti_matter.name=Сонячна панель з анти-матерії
+item.solarflux:photovoltaic_cell_dark_matter.name=Фотоелектричний осередок з темної матерії
+
+# # THAUMCRAFT ##
+tc.aspect.sol=Сонце, Сонячне світло
+tc.research_category.SOLARFLUX=Solar Flux
+
+tile.solarflux:solar_panel_alchemical.name=Алхемічна сонячна панель
+tile.solarflux:solar_panel_alchemical_brass.name=Латунна сонячна панель
+tile.solarflux:solar_panel_thaumium.name=Сонячна панель з тауміума
+tile.solarflux:solar_panel_void_metal.name=Сонячна панель з металу порожнечі
+
+
+card.solarflux:solar_panel.name=Сонячне світло
+card.solarflux:solar_panel.text=Ви відчуваєте тепло, яке дає сонячна панель, біля вас. Ви отримуєте від %,d до %,d в категорії Solar Flux і берете додаткову карту. Час від часу, ви також можете отримати 1 бал натхнення.
+
+card.solarflux:photovoltaic_cell.name=Фотоелектричні властивості
+card.solarflux:photovoltaic_cell.text=Ви ретельно і обережно розглядаєте фотоелектричний осередок. Ви отримуєте від %,d до %,d в категорії Solar Flux і берете додаткову карту.
+
+
+research_name.solarflux:solarflux=Занурення в Solar Flux
+research_stage.solarflux:solarflux.1=Після декількох сонячних панелей, я зрозумів, що можу покращити їх, використовуючи магію. І тауматургія допоможе мені з цим!
+research_stage.solarflux:solarflux.2=Схоже, що сонячні панелі мають в собі незвичайний аспект - Sol. Він може бути ключовим елементом для наповнення їх магією.
+
+research_name.solarflux:brass_solar_panel=Латунна сонячна панель
+research_stage.solarflux:brass_solar_panel.1=Я зрозумів, що сонячну панель другого рівня, можна магічним способом покращити за допомогою латуні. Це буде набагато дешевше, но мотім таку панель не можна буде покращити до четвертого рівня.
+research_stage.solarflux:brass_solar_panel.2=Сонячну панель другого рівня дуже легко покращити за допомогою латуні. Думаю, що використовуючи магію, я зможу зробити в майбутьньому альтернативний спосіб покращення сонячних панелей.
+
+research_name.solarflux:thaumium_solar_panel=Сонячна панель з тауміума
+research_stage.solarflux:thaumium_solar_panel.1=Мені здається, що все частіше, я задумуюсь про сонячні панелі, я дізнаюсь більше в магічному напрямку їх покращення. Думаю, що наступним кроком для мене стане використовування тауміума.
+research_stage.solarflux:thaumium_solar_panel.2=Я прийшов до того, що латунна сонячна панель відкидає спроби покращення її тауміумом, принаймі, на містичному верстаці. Тому мені доведеться робити це, використовуючи наповнюючу матрицю. Тим не менш, цей процес потрибує аспект Sol, а таокж буде трохи нестабільним.
+
+research_name.solarflux:void_metal_solar_panel=Сонячна панель з металу порожнечі
+research_stage.solarflux:void_metal_solar_panel.1=Я починаю думати про те, що мої сонячні панелі з тауміума можуть бути покращені ще більше! Тепер, коли я знаю про метал порожнечі, я можу нанести його на мою панель з тауміума.
+research_stage.solarflux:void_metal_solar_panel.2=Схоже, метал порожнечі дуже добре у поєднанні з третім рівнем фотоелектричних осередків, якщо використовувати процес наповнення. І хоча процес і буде достатньо нестабільним, панель, здається, повинна получитися достатньо ефективною.
+

@@ -74,7 +74,7 @@ public class SolarsSF
 				256,
 				1024,
 				4096,
-				16348,
+				16384,
 				65536,
 				262144
 		};
@@ -178,7 +178,8 @@ public class SolarsSF
 		SolarFluxAPI.SOLAR_PANELS.forEach(i ->
 		{
 			ConfigEntryCategory cat;
-			if(i.getCompatMod() == null) cat = panels.getCategory("Solar Flux");
+			if(i.isCustom) cat = panels.getCategory("Solar Flux: Custom");
+			else if(i.getCompatMod() == null) cat = panels.getCategory("Solar Flux");
 			else cat = panels.getCategory(Loader.instance().getIndexedModList().get(i.getCompatMod()).getName());
 			i.configureBase(cat.getCategory(i.getRegistryName().toString()));
 		});

@@ -1,0 +1,2 @@
+java -jar gradle/FGMavenGen.jar -artifact SolarFluxReborn-1.12.2 -group tk.zeitheron.SolarFluxReborn -src build/libs -mvn D:\Code\Minecraft\Maven -version.props build.txt -version.props.name mod_version
+pause
