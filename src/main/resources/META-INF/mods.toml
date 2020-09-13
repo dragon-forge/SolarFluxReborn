@@ -1,0 +1,28 @@
+modLoader="javafml" #mandatory
+loaderVersion="[33,)" #mandatory (34 is current forge version)
+issueTrackerURL="https://gitlab.com/DragonForge/SolarFluxReborn/issues" #optional
+license="All rights reserved"
+[[mods]] #mandatory
+modId="solarflux" #mandatory
+version="${file.jarVersion}" #mandatory
+displayName="Solar Flux Reborn" #mandatory
+updateJSONURL="https://dccg.herokuapp.com/api/fmluc/246974" #optional
+displayURL="https://www.curseforge.com/project/246974" #optional
+# logoFile="assets/solarflux/textures/logo.png" #optional
+credits="Nauktis for original Solar Flux for 1.7" #optional
+authors="Zeitheron" #optional
+description='''
+Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providing modpack devs the ability to create their own panels with ease!
+'''
+[[dependencies.solarflux]] #optional
+    modId="forge" #mandatory
+    mandatory=true #mandatory
+    versionRange="[33,)" #mandatory
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.solarflux]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.16.2,1.17)"
+    ordering="NONE"
+    side="BOTH"
