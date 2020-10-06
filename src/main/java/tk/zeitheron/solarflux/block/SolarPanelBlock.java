@@ -7,6 +7,8 @@ import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.loot.LootContext;
+import net.minecraft.loot.LootParameters;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
@@ -56,27 +58,19 @@ public class SolarPanelBlock
 	}
 
 	@Override
-	public void onBlockHarvested(World worldIn, BlockPos pos, BlockState state, PlayerEntity player)
+	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
 	{
-		if(!canHarvestBlock(state, worldIn, pos, player))
-		{
-			super.onBlockHarvested(worldIn, pos, state, player);
-			return;
-		}
+		NonNullList<ItemStack> stacks = NonNullList.create();
 
-		TileEntity tileentity = worldIn.getTileEntity(pos);
+		TileEntity tileentity = builder.get(LootParameters.BLOCK_ENTITY);
 		if(tileentity instanceof SolarPanelTile)
 		{
 			SolarPanelTile te = (SolarPanelTile) tileentity;
-			if(!worldIn.isRemote && !player.abilities.isCreativeMode)
-			{
-				ItemEntity itementity = new ItemEntity(worldIn, pos.getX() + 0.5, pos.getY() + panel.delegateData.height / 2F, pos.getZ() + 0.5, te.generateItem(panel));
-				itementity.setDefaultPickupDelay();
-				worldIn.addEntity(itementity);
-			}
-		}
+			stacks.add(te.generateItem(panel));
+		} else
+			stacks.add(new ItemStack(panel));
 
-		super.onBlockHarvested(worldIn, pos, state, player);
+		return stacks;
 	}
 
 	@Override

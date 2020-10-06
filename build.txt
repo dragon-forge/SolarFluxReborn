@@ -2,7 +2,7 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=16.1.1
+mod_version=16.1.2
 
 # MC Info
 mc_version=1.16.3
