@@ -9,10 +9,12 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelBakeEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -36,8 +38,9 @@ import tk.zeitheron.solarflux.net.SFNetwork;
 import tk.zeitheron.solarflux.panels.SolarPanels;
 import tk.zeitheron.solarflux.proxy.SFRClientProxy;
 import tk.zeitheron.solarflux.proxy.SFRCommonProxy;
+import tk.zeitheron.solarflux.util.TagIngredient;
 
-@Mod(value = "solarflux")
+@Mod("solarflux")
 public class SolarFlux
 {
 	public static final ContainerType<SolarPanelContainer> SOLAR_PANEL_CONTAINER = IForgeContainerType.create((windowId, playerInv, extraData) ->
@@ -49,7 +52,7 @@ public class SolarFlux
 	});
 
 	public static final Logger LOG = LogManager.getLogger();
-	public static final SFRCommonProxy PROXY = DistExecutor.runForDist(() -> () -> new SFRClientProxy(), () -> () -> new SFRCommonProxy());
+	public static final SFRCommonProxy PROXY = DistExecutor.runForDist(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
 	public static final ItemGroup ITEM_GROUP = new ItemGroup(InfoSF.MOD_ID)
 	{
 		@Override
@@ -71,6 +74,9 @@ public class SolarFlux
 	{
 		PROXY.commonSetup();
 		SFNetwork.init();
+		CraftingHelper.register(new ResourceLocation("solarflux", "tag"), TagIngredient.SERIALIZER);
+
+		RecipesSF.addRecipes();
 	}
 
 	@SubscribeEvent

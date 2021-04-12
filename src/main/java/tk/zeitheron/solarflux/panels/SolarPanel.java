@@ -1,36 +1,31 @@
 package tk.zeitheron.solarflux.panels;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-import java.util.stream.Stream;
-
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IItemProvider;
 import net.minecraft.util.math.MathHelper;
-import tk.zeitheron.solarflux.RecipesSF;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
+import tk.zeitheron.solarflux.util.RecipeHelper;
 
-public class SolarPanel implements IItemProvider
+import java.util.*;
+import java.util.function.Consumer;
+
+public class SolarPanel
+		implements IItemProvider
 {
 	private final SolarPanelData delegateDataBase;
 	public final String name;
 	public SolarPanelData delegateData;
 	public SolarPanelData networkData;
 	private String compatMod;
-	
-	public List<Supplier<IRecipe<?>>> recipes = new ArrayList<>();
-	
+
+	public List<Consumer<RecipeHelper>> recipes = new ArrayList<>();
+
 	public final boolean isCustom;
-	
+
 	private SolarPanelBlock block;
 
 	private LanguageData langs;
@@ -139,9 +134,10 @@ public class SolarPanel implements IItemProvider
 		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
 	}
 
-	public Stream<IRecipe<?>> recipes()
+	public void recipes(RecipeHelper helper)
 	{
-		return recipes == null ? Stream.empty() : recipes.stream().map(Supplier::get);
+		if(recipes != null)
+			recipes.forEach(c -> c.accept(helper));
 	}
 
 	public static class Builder
@@ -150,19 +146,19 @@ public class SolarPanel implements IItemProvider
 		Long generation, capacity, transfer;
 		float height = 6 / 16F;
 		boolean custom = false;
-		
+
 		public Builder name(String s)
 		{
 			this.name = s;
 			return this;
 		}
-		
+
 		public Builder height(float f)
 		{
 			this.height = f;
 			return this;
 		}
-		
+
 		public Builder generation(Number n)
 		{
 			if(n instanceof Long)
@@ -172,13 +168,13 @@ public class SolarPanel implements IItemProvider
 			}
 			return generation(Long.toString(n.longValue()));
 		}
-		
+
 		public Builder generation(String s)
 		{
 			this.generation = new Long(s);
 			return this;
 		}
-		
+
 		public Builder capacity(Number n)
 		{
 			if(n instanceof Long)
@@ -188,13 +184,13 @@ public class SolarPanel implements IItemProvider
 			}
 			return capacity(Long.toString(n.longValue()));
 		}
-		
+
 		public Builder capacity(String s)
 		{
 			this.capacity = new Long(s);
 			return this;
 		}
-		
+
 		public Builder transfer(Number n)
 		{
 			if(n instanceof Long)
@@ -204,13 +200,13 @@ public class SolarPanel implements IItemProvider
 			}
 			return transfer(Long.toString(n.longValue()));
 		}
-		
+
 		public Builder transfer(String s)
 		{
 			this.transfer = new Long(s);
 			return this;
 		}
-		
+
 		public SolarPanel build()
 		{
 			if(name == null)
@@ -223,25 +219,25 @@ public class SolarPanel implements IItemProvider
 				throw new NullPointerException("transfer == null");
 			return new SolarPanel(name, new SolarPanelData(generation, capacity, transfer, height), custom);
 		}
-		
+
 		public SolarPanel buildAndRegister()
 		{
 			return build().register();
 		}
 	}
-	
+
 	public static class LanguageData
 	{
 		public final Map<String, String> langToName = new HashMap<>();
 		public String def;
-		
+
 		final SolarPanel panel;
-		
+
 		public LanguageData(SolarPanel panel)
 		{
 			this.panel = panel;
 		}
-		
+
 		public LanguageData put(String lang, String loc)
 		{
 			lang = lang.toLowerCase();
@@ -250,12 +246,12 @@ public class SolarPanel implements IItemProvider
 			langToName.put(lang, loc);
 			return this;
 		}
-		
+
 		public String getName(String lang)
 		{
 			return langToName.getOrDefault(lang, def);
 		}
-		
+
 		public SolarPanel build()
 		{
 			if(def == null)
@@ -264,24 +260,24 @@ public class SolarPanel implements IItemProvider
 			return panel;
 		}
 	}
-	
+
 	public static class RecipeBuilder
 	{
 		final SolarPanel panel;
-		
+
 		List<Object> args = new ArrayList<>();
-		
+
 		public RecipeBuilder(SolarPanel panel)
 		{
 			this.panel = panel;
 		}
-		
+
 		public RecipeBuilder shape(String... strings)
 		{
 			args.addAll(Arrays.asList(strings));
 			return this;
 		}
-		
+
 		public RecipeBuilder bind(String ch, Object output)
 		{
 			if(ch.length() != 1)
@@ -290,24 +286,24 @@ public class SolarPanel implements IItemProvider
 			args.add(output);
 			return this;
 		}
-		
+
 		public SolarPanel build()
 		{
 			return build(1);
 		}
-		
+
 		public SolarPanel build(int amount)
 		{
-			this.panel.recipes.add(() -> RecipesSF.parseShaped(new ItemStack(panel), args.toArray(new Object[args.size()])));
+			this.panel.recipes.add(helper -> helper.addKeyShaped(new ItemStack(panel, amount), args.toArray(new Object[args.size()])));
 			return this.panel;
 		}
 	}
-	
+
 	public static class SolarPanelData
 	{
 		public final long generation, capacity, transfer;
 		public final float height;
-		
+
 		public SolarPanelData(PacketBuffer buf)
 		{
 			this.generation = buf.readLong();
@@ -315,7 +311,7 @@ public class SolarPanel implements IItemProvider
 			this.transfer = buf.readLong();
 			this.height = buf.readFloat();
 		}
-		
+
 		public SolarPanelData(long generation, long capacity, long transfer, float height)
 		{
 			this.generation = generation;
@@ -340,7 +336,7 @@ public class SolarPanel implements IItemProvider
 			buf.writeFloat(height);
 		}
 	}
-	
+
 	public SolarPanelInstance createInstance(SolarPanelTile tile)
 	{
 		SolarPanelInstance inst = new SolarPanelInstance();
@@ -349,7 +345,7 @@ public class SolarPanel implements IItemProvider
 		inst.reset();
 		return inst;
 	}
-	
+
 	public void accept(SolarPanelInstance t)
 	{
 		SolarPanelData data = getPanelData();

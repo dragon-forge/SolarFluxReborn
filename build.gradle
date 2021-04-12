@@ -99,7 +99,7 @@ curseforge {
 		addGameVersion "${config.mc_version}"
 		addGameVersion "Forge"
 		mainArtifact(jar) {
-		  displayName = "[1.16.2-1.16.3] ${config.mod_name} - ${config.mod_version}"
+		  displayName = "[1.16.2-1.16.5] ${config.mod_name} - ${config.mod_version}"
 		}
 	}
 }

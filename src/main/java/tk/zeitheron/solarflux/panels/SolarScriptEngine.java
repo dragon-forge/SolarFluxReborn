@@ -56,11 +56,10 @@ public class SolarScriptEngine
 	{
 		// Retrieve jdk nashorn engine
 		ScriptEngine se = new ScriptEngineManager(null).getEngineByName("Nashorn"); 
-		if (se == null) {
-			// Fix for jdk15:
-			// retrieve engine from forge's nashorn-core-compat when not found in java platform
+		// Fix for jdk15:
+		// retrieve engine from forge's nashorn-core-compat when not found in java platform
+		if (se == null)
 			se = new ScriptEngineManager().getEngineByName("Nashorn");
-		}
 		try
 		{
 			se.put("panel", se.eval("function(){return Java.type('" + SolarPanel.class.getName() + "').customBuilder();}"));
