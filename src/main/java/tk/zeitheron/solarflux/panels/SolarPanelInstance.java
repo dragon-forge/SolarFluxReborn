@@ -26,17 +26,17 @@ public class SolarPanelInstance implements INBTSerializable<CompoundNBT>
 			return infoDelegate.computeSunIntensity(solar);
 		
 		// If delegate cannot be found for odd reason:
-		
+
 		if(!solar.doesSeeSky())
 			return 0F;
-		
+
 		float celestialAngleRadians = solar.getWorld().getCelestialAngleRadians(1F);
 		if(celestialAngleRadians > Math.PI)
 			celestialAngleRadians = (float) (2 * Math.PI - celestialAngleRadians);
 		int lowLightCount = 0;
 		float multiplicator = 1.5F - (lowLightCount * .122F);
 		float displacement = 1.2F + (lowLightCount * .08F);
-		
+
 		return MathHelper.clamp(multiplicator * MathHelper.cos(celestialAngleRadians / displacement), 0, 1);
 	}
 	

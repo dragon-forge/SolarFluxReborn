@@ -185,7 +185,7 @@ public class SolarPanelTile
 		if(world.isRemote)
 			return;
 
-		if(world.getDayTime() % 20L == 0L)
+		if(world.getGameTime() % 20L == 0L)
 			traversal.clear();
 
 		tickUpgrades();
@@ -246,15 +246,38 @@ public class SolarPanelTile
 		}
 
 		world.updateComparatorOutputLevel(pos, getBlockState().getBlock());
+
+		if(effCacheTime > 0) --effCacheTime;
 	}
+
+	int effCacheTime;
+	float effCache;
 
 	public int getGeneration()
 	{
-		float eff = getInstance().computeSunIntensity(this);
-		if(!world.isRemote)
-			sunIntensity = eff;
-		float energyGeneration = getInstance().gen * eff;
-		generation.setBaseValue(energyGeneration);
+		float eff = effCache;
+		if(effCacheTime <= 0)
+		{
+			eff = getInstance().computeSunIntensity(this);
+			{
+				float raining = world.getRainStrength(1F);
+				raining = raining > 0.2F ? (raining - 0.2F) / 0.8F : 0F;
+				raining = (float) Math.sin(raining * Math.PI / 2F);
+				raining = 1F - raining * (1F - SolarPanels.RAIN_MULTIPLIER);
+
+				float thundering = world.getThunderStrength(1F);
+				thundering = thundering > 0.75F ? (thundering - 0.75F) / 0.25F : 0F;
+				thundering = (float) Math.sin(thundering * Math.PI / 2F);
+				thundering = 1F - thundering * (1F - SolarPanels.THUNDER_MULTIPLIER);
+
+				eff *= raining * thundering;
+			}
+			effCache = eff;
+			effCacheTime = 2;
+		}
+		if(!world.isRemote) sunIntensity = eff;
+		float gen = getInstance().gen * eff;
+		generation.setBaseValue(gen);
 		return generation.getValueI();
 	}
 

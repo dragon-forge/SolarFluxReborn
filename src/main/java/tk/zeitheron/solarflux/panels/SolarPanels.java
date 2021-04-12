@@ -42,6 +42,8 @@ public class SolarPanels
 
 	public static double LOOSE_ENERGY;
 
+	public static float RAIN_MULTIPLIER = 0.6F, THUNDER_MULTIPLIER = 0.4F;
+
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
 
 	public static File CONFIG_DIR;
@@ -115,6 +117,11 @@ public class SolarPanels
 
 			CORE_PANELS[i] = SolarPanel.builder().name(Integer.toString(i + 1)).generation(gen).transfer(transfer).capacity(capacity).buildAndRegister();
 		}
+
+		ConfigEntryCategory main = cfgs.getCategory("Main");
+
+		RAIN_MULTIPLIER = main.getFloatEntry("Rain Multiplier", 0.6F, 0F, 1F).setDescription("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.").getValue();
+		THUNDER_MULTIPLIER = main.getFloatEntry("Thunder Multiplier", 0.4F, 0F, 1F).setDescription("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.").getValue();
 
 		if(cfgs.hasChanged())
 			cfgs.save();
