@@ -133,12 +133,14 @@ public class SolarFluxResourcePack
 	@Override
 	public <T> T getMetadata(IMetadataSectionSerializer<T> deserializer) throws IOException
 	{
-		JsonObject obj = new JsonObject();
-
-		obj.addProperty("pack_format", 6);
-		obj.addProperty("description", "Generated resources for SolarFlux");
-
-		return deserializer.deserialize(obj);
+		if(deserializer.getSectionName().equals("pack"))
+		{
+			JsonObject obj = new JsonObject();
+			obj.addProperty("pack_format", 6);
+			obj.addProperty("description", "Generated resources for SolarFlux");
+			return deserializer.deserialize(obj);
+		}
+		return null;
 	}
 
 	@Override
