@@ -15,6 +15,7 @@ import net.minecraftforge.common.crafting.IIngredientSerializer;
 import net.minecraftforge.common.crafting.VanillaIngredientSerializer;
 import net.minecraftforge.registries.IForgeRegistryEntry;
 import tk.zeitheron.solarflux.SolarFlux;
+import tk.zeitheron.solarflux.panels.SolarPanels;
 import tk.zeitheron.solarflux.shaded.hammerlib.api.OreDict;
 
 import java.util.*;
@@ -65,6 +66,9 @@ public class RecipeHelper
 
 	public static void addRecipe(IRecipe<?> rec)
 	{
+		if(rec != null && !SolarPanels.isRecipeActive(rec.getId()))
+			return;
+
 		synchronized(recipes)
 		{
 			if(rec == null)
@@ -76,13 +80,13 @@ public class RecipeHelper
 		}
 	}
 
-	public void addShapeless(Object output, Object... inputs)
+	public void addShapeless(ResourceLocation id, Object output, Object... inputs)
 	{
 		ItemStack out = makeStack(output);
-		addRecipe(new ShapelessRecipe(nextId(out.getItem()), modid, out, createInput(false, inputs)));
+		addRecipe(new ShapelessRecipe(id, modid, out, createInput(false, inputs)));
 	}
 
-	public void addKeyShaped(Object output, Object... recipeComponents)
+	public void addKeyShaped(ResourceLocation id, Object output, Object... recipeComponents)
 	{
 		String s = "";
 		int i = 0;
@@ -132,7 +136,7 @@ public class RecipeHelper
 		}
 
 		ItemStack out = makeStack(output);
-		addRecipe(new ShapedRecipe(nextId(out.getItem()), "", j, k, input, out));
+		addRecipe(new ShapedRecipe(id, "", j, k, input, out));
 	}
 
 	public static Ingredient fromComponent(Object comp)
@@ -159,24 +163,23 @@ public class RecipeHelper
 		return ingr;
 	}
 
-	public void addShaped(Object output, Object... input)
+	public void addShaped(ResourceLocation id, Object output, Object... input)
 	{
-		addShaped(output, 3, 3, input);
+		addShaped(id, output, 3, 3, input);
 	}
 
-	public void addShaped(Object output, int width, int height, Object... input)
+	public void addShaped(ResourceLocation id, Object output, int width, int height, Object... input)
 	{
-		addRecipe(genShaped(makeStack(output), width, height, input));
+		addRecipe(genShaped(id, makeStack(output), width, height, input));
 	}
 
-	public ShapedRecipe genShaped(ItemStack output, int l, int w, Object... input)
+	public ShapedRecipe genShaped(ResourceLocation id, ItemStack output, int l, int w, Object... input)
 	{
 		if(l * w != input.length)
 			throw new UnsupportedOperationException("Attempted to add invalid shaped recipe.  Complain to the author of " + modid);
-		return new ShapedRecipe(nextId(output.getItem()), modid, l, w, createInput(true, input), output);
+		return new ShapedRecipe(id, modid, l, w, createInput(true, input), output);
 	}
 
-	@SuppressWarnings("unchecked")
 	public NonNullList<Ingredient> createInput(boolean allowEmpty, Object... input)
 	{
 		NonNullList<Ingredient> inputL = NonNullList.create();
@@ -240,13 +243,5 @@ public class RecipeHelper
 			return VanillaIngredientSerializer.INSTANCE;
 		}
 
-	}
-
-	static int lastRecipeID;
-
-	private static ResourceLocation nextId(Item item)
-	{
-		ResourceLocation rl = item.getRegistryName();
-		return new ResourceLocation(rl.getNamespace(), (++lastRecipeID) + "/" + rl.getPath());
 	}
 }

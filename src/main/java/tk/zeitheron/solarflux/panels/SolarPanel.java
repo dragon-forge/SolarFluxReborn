@@ -4,7 +4,9 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.IItemProvider;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.MathHelper;
+import tk.zeitheron.solarflux.InfoSF;
 import tk.zeitheron.solarflux.block.SolarPanelBlock;
 import tk.zeitheron.solarflux.block.SolarPanelTile;
 import tk.zeitheron.solarflux.shaded.hammerlib.cfg.ConfigEntryCategory;
@@ -294,7 +296,7 @@ public class SolarPanel
 
 		public SolarPanel build(int amount)
 		{
-			this.panel.recipes.add(helper -> helper.addKeyShaped(new ItemStack(panel, amount), args.toArray(new Object[args.size()])));
+			this.panel.recipes.add(helper -> helper.addKeyShaped(new ResourceLocation(InfoSF.MOD_ID, "builtin/generated_" + System.nanoTime()), new ItemStack(panel, amount), args.toArray(new Object[args.size()])));
 			return this.panel;
 		}
 	}

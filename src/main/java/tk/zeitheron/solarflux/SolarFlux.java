@@ -76,6 +76,8 @@ public class SolarFlux
 		SFNetwork.init();
 		CraftingHelper.register(new ResourceLocation("solarflux", "tag"), TagIngredient.SERIALIZER);
 
+		RecipesSF.indexRecipes();
+		SolarPanels.refreshRecipes();
 		RecipesSF.addRecipes();
 	}
 

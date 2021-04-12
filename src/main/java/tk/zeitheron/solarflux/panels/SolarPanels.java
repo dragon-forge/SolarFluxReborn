@@ -4,6 +4,7 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.tileentity.TileEntityType;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
@@ -20,10 +21,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.util.Base64;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Stream;
 
 public class SolarPanels
@@ -57,6 +55,9 @@ public class SolarPanels
 	{
 		return listPanels().map(SolarPanel::getBlock);
 	}
+
+	public static final List<ResourceLocation> RECIPE_KEYS = new ArrayList<>();
+	private static final List<ResourceLocation> ENABLED_RECIPES = new ArrayList<>();
 
 	public static void init()
 	{
@@ -98,7 +99,7 @@ public class SolarPanels
 
 		Configuration cfgs = new Configuration(new File(solarflux, "main.hlc"));
 
-		cfgs.setComment("Main configuration file fur Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
+		cfgs.setComment("Main configuration file for Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
 
 		ConfigEntryCategory spc = cfgs.getCategory("Solar Panels");
 
@@ -181,6 +182,28 @@ public class SolarPanels
 		});
 
 		if(panels.hasChanged()) panels.save();
+	}
+
+	public static void refreshRecipes()
+	{
+		Configuration recipes = new Configuration(new File(CONFIG_DIR, "recipes.hlc"));
+		ConfigEntryCategory cat = recipes.getCategory("recipes");
+		RECIPE_KEYS.forEach(recipe ->
+		{
+			boolean enabled = cat.getBooleanEntry(recipe.toString(), true).setDescription("Enable this recipe?").getValue();
+			if(enabled) ENABLED_RECIPES.add(recipe);
+		});
+		recipes.save();
+	}
+
+	public static boolean isRecipeActive(ResourceLocation id)
+	{
+		return ENABLED_RECIPES.contains(id);
+	}
+
+	public static void indexRecipes(ResourceLocation... ids)
+	{
+		RECIPE_KEYS.addAll(Arrays.asList(ids));
 	}
 
 	public static Ingredient getGeneratingSolars(long generation)
