@@ -2,18 +2,20 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=16.2.4
+mod_version=16.3.6
+build_candidate=false
 
 # MC Info
-mc_version=1.16.3
-forge_version=34.0.0
+mc_version=1.16.5
+forge_version=36.1.32
 
 # MCP Info
-mcp_ch=snapshot
-mcp_vr=20200707-1.16.1
+mcp_ch=official
+mcp_vr=1.16.5
 
 # Misc Info
 java=1.8
+hl_version=16.3.22
 certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
 
 # Project ID on CurseForge

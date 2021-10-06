@@ -1,29 +1,32 @@
 buildscript {
     repositories {
-        maven { url = 'https://files.minecraftforge.net/maven' }
+        maven { url = 'https://maven.minecraftforge.net' }
 		maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
 		classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: "com.matthewprenger.cursegradle"
 
-ext.configFile = file "build.txt"
-
+ext.configFile = file("build.txt")
 configFile.withReader {
     def prop = new Properties()
     prop.load(it)
-    project.ext.config = new ConfigSlurper().parse prop
+    project.ext.config = new ConfigSlurper().parse(prop)
+    project.ext.hasConfig = { key ->
+        return config.isSet(key);
+    }
 }
 
 version = config.mod_version
-group = "tk.zeitheron.${config.mod_id}"
+group = "org.zeith.${config.mod_id}"
 archivesBaseName = "${config.archive_name}-${config.mc_version}"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
@@ -37,7 +40,6 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
                 examplemod {
@@ -48,7 +50,6 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             mods {
                 examplemod {
@@ -59,7 +60,6 @@ minecraft {
 
         data {
             workingDirectory project.file('run')
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
             args '--mod', 'examplemod', '--all', '--output', file('src/generated/resources/')
             mods {
@@ -71,8 +71,35 @@ minecraft {
     }
 }
 
+repositories {
+    maven {
+        name = "DragonForge"
+        url = "https://zeith.org/maven"
+    }
+    flatDir {
+        dirs 'runtimeMods'
+    }
+}
+
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
+
+    implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    if (file("runtimeMods").isDirectory()) {
+        file("runtimeMods").eachFile { file ->
+            def splitPos = file.name.lastIndexOf("-")
+            def modartifact = file.name.substring(0, splitPos)
+            def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
+            def modreference = "lib:$modartifact:$modversion"
+
+            dependencies {
+                implementation fg.deobf(project.dependencies.create(modreference) {
+                    transitive = false
+                })
+            }
+        }
+    } else file("runtimeMods").mkdir();
 }
 
 jar {
@@ -82,9 +109,24 @@ jar {
             "Specification-Vendor": "Zeitheron",
             "Specification-Version": "1",
             "Implementation-Title": project.name,
-            "Implementation-Version": "${version}",
+            "Implementation-Version": archiveVersion,
             "Implementation-Vendor" :"Zeitheron",
             "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+task deobfJar(type: Jar) {
+    classifier = 'deobf'
+    from sourceSets.main.output
+    manifest {
+        attributes(["Specification-Title"     : "${config.mod_id}",
+                    "Specification-Vendor"    : "Zeitheron",
+                    "Specification-Version"   : "1",
+                    "Implementation-Title"    : project.name,
+                    "Implementation-Version"  : archiveVersion,
+                    "Implementation-Vendor"   : "Zeitheron",
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -99,22 +141,73 @@ curseforge {
 		addGameVersion "${config.mc_version}"
 		addGameVersion "Forge"
 		mainArtifact(jar) {
-		  displayName = "[1.16.2-1.16.5] ${config.mod_name} - ${config.mod_version}"
+		  displayName = "[1.16.5] ${config.mod_name} - ${config.mod_version}"
 		}
+        relations {
+            requiredDependency 'Hammer-Lib'
+            optionalDependency 'Draconic-Evolution'
+        }
 	}
+}
+
+import net.minecraftforge.gradle.common.task.SignJar
+
+task signJar(type: SignJar, dependsOn: jar) {
+    onlyIf {
+        System.env.MC_KS_PASS != null
+    }
+    keyStore = System.env.MC_KS_PATH
+    alias = System.env.MC_KS_ALIAS
+    storePass = System.env.MC_KS_PASS
+    keyPass = System.env.MC_KS_PASS
+    inputFile = jar.archiveFile
+    outputFile = jar.archiveFile
+}
+
+def reobfFile = jar.archiveFile.get().asFile
+def reobfArtifact = artifacts.add('default', reobfFile) {
+    type 'jar'
+    builtBy 'signJar'
 }
 
 jar.finalizedBy('reobfJar')
 
+build.dependsOn signJar
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
-            artifact jar
+            groupId = config.maven_group
+            artifactId = config.archive_name + "-" + config.mc_version
+
+            artifact reobfArtifact
+            artifact deobfJar
         }
     }
     repositories {
         maven {
-            url "file:///${project.projectDir}/mcmodsrepo"
+            url "file:///SERVER//Maven"
         }
     }
+}
+
+// This piece of garbage will ensure that the build number is updated after build is executed.
+tasks.build.doLast {
+    if(!hasConfig("build_candidate") || !Boolean.parseBoolean(config.build_candidate))
+    {
+        def buildTxt = configFile.toPath();
+        List<String> lines = Files.readAllLines buildTxt;
+        lines.replaceAll { String ln ->
+            if(ln.startsWith("mod_version"))
+            {
+                def version = ln.split("=")[1];
+                def dot = version.lastIndexOf('.') + 1;
+                def newVersion = version.substring(0, dot);
+                def lastOne = Integer.parseInt(version.substring(dot)) + 1;
+                return "mod_version=" + newVersion + lastOne;
+            }
+            return ln;
+        }
+        Files.write buildTxt, lines, StandardOpenOption.CREATE;
+    } else println "Build candidate enabled, we are not increasing build number after this."
 }
