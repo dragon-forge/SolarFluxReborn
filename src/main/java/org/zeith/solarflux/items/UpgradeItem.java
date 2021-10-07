@@ -20,7 +20,7 @@ public abstract class UpgradeItem
 
 	public boolean canStayInPanel(SolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
 	{
-		return true;
+		return canInstall(tile, stack, upgradeInv);
 	}
 
 	public boolean canInstall(SolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)

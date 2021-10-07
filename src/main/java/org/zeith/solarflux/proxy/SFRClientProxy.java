@@ -1,6 +1,5 @@
 package org.zeith.solarflux.proxy;
 
-import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.inventory.container.PlayerContainer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -8,8 +7,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.client.screen.SolarPanelScreen;
 import org.zeith.solarflux.panels.SolarPanels;
 
 public class SFRClientProxy

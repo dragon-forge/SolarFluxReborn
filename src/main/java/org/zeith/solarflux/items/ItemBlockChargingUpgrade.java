@@ -39,6 +39,7 @@ public class ItemBlockChargingUpgrade
 	}
 
 	@Override
+	@OnlyIn(Dist.CLIENT)
 	public void appendHoverText(ItemStack stack, World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
 	{
 		if(isFoil(stack))
@@ -84,12 +85,6 @@ public class ItemBlockChargingUpgrade
 		BlockPos pos;
 		TileEntity t;
 		return stack.hasTag() && stack.getTag().contains("Pos", NBT.TAG_LONG) && stack.getTag().contains("Face", NBT.TAG_BYTE) && (!stack.getTag().contains("Dim", NBT.TAG_STRING) || tile.getLevel().dimension().getRegistryName().toString().equals(stack.getTag().getString("Dim"))) && tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D && (t = tile.getLevel().getBlockEntity(pos)) != null && t.getCapability(CapabilityEnergy.ENERGY, Direction.values()[stack.getTag().getByte("Face")]).isPresent();
-	}
-
-	@Override
-	public boolean canStayInPanel(SolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
-	{
-		return canInstall(tile, stack, upgradeInv);
 	}
 
 	@Override
