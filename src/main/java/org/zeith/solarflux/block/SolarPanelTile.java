@@ -15,6 +15,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.shapes.VoxelShape;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
 import net.minecraftforge.client.model.data.IModelData;
@@ -370,7 +371,7 @@ public class SolarPanelTile
 	@Override
 	public ITextComponent getDisplayName()
 	{
-		return getBlockState().getBlock().getName();
+		return new TranslationTextComponent(getBlockState().getBlock().getDescriptionId());
 	}
 
 	@Override
