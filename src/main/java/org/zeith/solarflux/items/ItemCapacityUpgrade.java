@@ -1,6 +1,5 @@
 package org.zeith.solarflux.items;
 
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;

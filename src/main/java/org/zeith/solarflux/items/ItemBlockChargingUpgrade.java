@@ -63,7 +63,7 @@ public class ItemBlockChargingUpgrade
 			CompoundNBT nbt = held.getTag();
 			if(nbt == null)
 				held.setTag(nbt = new CompoundNBT());
-			nbt.putString("Dim", context.getLevel().dimension().getRegistryName().toString());
+			nbt.putString("Dim", context.getLevel().dimension().location().toString());
 			nbt.putLong("Pos", context.getClickedPos().asLong());
 			nbt.putByte("Face", (byte) context.getClickedFace().ordinal());
 			estorage = null;
@@ -84,7 +84,7 @@ public class ItemBlockChargingUpgrade
 	{
 		BlockPos pos;
 		TileEntity t;
-		return stack.hasTag() && stack.getTag().contains("Pos", NBT.TAG_LONG) && stack.getTag().contains("Face", NBT.TAG_BYTE) && (!stack.getTag().contains("Dim", NBT.TAG_STRING) || tile.getLevel().dimension().getRegistryName().toString().equals(stack.getTag().getString("Dim"))) && tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D && (t = tile.getLevel().getBlockEntity(pos)) != null && t.getCapability(CapabilityEnergy.ENERGY, Direction.values()[stack.getTag().getByte("Face")]).isPresent();
+		return stack.hasTag() && stack.getTag().contains("Pos", NBT.TAG_LONG) && stack.getTag().contains("Face", NBT.TAG_BYTE) && (!stack.getTag().contains("Dim", NBT.TAG_STRING) || tile.getLevel().dimension().location().toString().equals(stack.getTag().getString("Dim"))) && tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D && (t = tile.getLevel().getBlockEntity(pos)) != null && t.getCapability(CapabilityEnergy.ENERGY, Direction.values()[stack.getTag().getByte("Face")]).isPresent();
 	}
 
 	@Override

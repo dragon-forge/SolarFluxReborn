@@ -19,7 +19,7 @@ mcp_vr=1.16.5
 
 # Misc Info
 java=1.8
-hl_version=16.3.22
+hl_version=16.3.24
 certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
 
 # Project ID on CurseForge
