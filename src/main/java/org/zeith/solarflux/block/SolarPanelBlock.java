@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -44,31 +45,37 @@ public class SolarPanelBlock
 
 	public SolarPanelBlock(SolarPanel panel)
 	{
-		super(Properties.of(Material.METAL).dynamicShape().requiresCorrectToolForDrops().strength(1.5F).noOcclusion().sound(SoundType.METAL));
-		BlockHarvestAdapter.bindToolType(BlockHarvestAdapter.MineableType.PICKAXE, this);
+		super(Properties.of(Material.METAL)
+				.sound(SoundType.METAL)
+				.dynamicShape()
+				.noOcclusion()
+				.strength(1.5F)
+				.requiresCorrectToolForDrops()
+		);
+		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, Tiers.IRON, this);
 		this.panel = panel;
 	}
 
 	@Nullable
 	@Override
-	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level p_153212_, BlockState p_153213_, BlockEntityType<T> p_153214_)
+	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
 		return BlockAPI.ticker();
 	}
 
 	@Override
-	public void setPlacedBy(Level worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
+	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
 	{
 		if(stack.hasTag())
 		{
 			SolarPanelTile spt = null;
-			BlockEntity tile = worldIn.getBlockEntity(pos);
+			BlockEntity tile = level.getBlockEntity(pos);
 			if(tile instanceof SolarPanelTile)
 				spt = (SolarPanelTile) tile;
 			else
 			{
 				spt = (SolarPanelTile) newBlockEntity(pos, state);
-				worldIn.setBlockEntity(spt);
+				level.setBlockEntity(spt);
 			}
 			spt.loadFromItem(stack);
 		}

@@ -99,7 +99,7 @@ public class SolarPanelScreen
 			FXUtils.bindTexture(ELEMENTS);
 			drawTMR(pose, x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 
-			if(menu.carried.isEmpty())
+			if(menu.getCarried().isEmpty())
 				drawMouseOver(I18n.get("info.solarflux.energy.stored2", energy, capacity));
 		}
 
@@ -117,7 +117,7 @@ public class SolarPanelScreen
 			FXUtils.bindTexture(ELEMENTS);
 			drawTMR(pose, x, y, GAUGE_SRC_X + 18, GAUGE_SRC_Y, GAUGE_WIDTH, GAUGE_HEIGHT);
 
-			if(menu.carried.isEmpty())
+			if(menu.getCarried().isEmpty())
 				drawMouseOver(I18n.get("info.solarflux.sun.intensity", Math.round(100 * sunIntensity)));
 		}
 

@@ -12,6 +12,7 @@
 	"info.solarflux.shift": "Shift",
 	"info.solarflux.maximum": "Máximo",
 	"info.solarflux.contentretained": "Conteúdo Retido",
+	"info.solarflux.resetcontent": "Put into crafting to reset contents",
 	"info.solarflux.decreasingReturnsToScale": "Retornos decrescentes de escala",
 	"info.solarflux.constantReturnsToScale": "Retornos constantes de escala",
 	"info.solarflux.increasingReturnsToScale": "Retornos crescentes de escala",

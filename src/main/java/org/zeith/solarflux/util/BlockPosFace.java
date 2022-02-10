@@ -26,11 +26,10 @@ public class BlockPosFace
 	@Override
 	public boolean equals(Object obj)
 	{
-		if(obj instanceof BlockPosFace)
-		{
-			BlockPosFace bpf = (BlockPosFace) obj;
-			return Objects.equals(pos, bpf.pos) && Objects.equals(face, bpf.face) && rate == bpf.rate;
-		}
+		if(obj instanceof BlockPosFace bpf)
+			return Objects.equals(pos, bpf.pos)
+					&& Objects.equals(face, bpf.face)
+					&& rate == bpf.rate;
 		return false;
 	}
 }

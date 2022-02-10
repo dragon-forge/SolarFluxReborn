@@ -9,6 +9,7 @@ import org.zeith.hammerlib.core.init.TagsHL;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.items.ItemsSF;
 import org.zeith.solarflux.panels.SolarPanels;
+import org.zeith.solarflux.recipe.RecipeClearSolarPanel;
 
 public class RecipesSF
 {
@@ -55,6 +56,13 @@ public class RecipesSF
 	{
 		indexRecipes();
 		SolarPanels.refreshRecipes();
+
+		SolarPanels.listPanelBlocks().forEach(panel ->
+		{
+			RecipeClearSolarPanel.builder($)
+					.set(panel)
+					.register();
+		});
 
 		//		helper.addKeyShaped(MIRROR, new ItemStack(ItemsSF.MIRROR, 3), "ggg", " i ", 'g', "blockGlass", 'i', "ingotIron");
 		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_1, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_1), "ggg", "lll", "mmm", 'g', "blockGlass", 'l', "gemLapis", 'm', ItemsSF.MIRROR);

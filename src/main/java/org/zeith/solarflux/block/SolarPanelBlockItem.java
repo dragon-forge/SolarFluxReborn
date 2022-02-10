@@ -47,7 +47,8 @@ public class SolarPanelBlockItem
 			CompoundTag tag = stack.getTag();
 
 			{
-				tooltip.add(new TextComponent(I18n.get("info.solarflux.contentretained")).withStyle(ChatFormatting.ITALIC, ChatFormatting.DARK_GREEN));
+				tooltip.add(new TextComponent(I18n.get("info.solarflux.contentretained")).withStyle(s -> s.withItalic(true).withColor(0x009BB4)));
+				tooltip.add(new TextComponent(I18n.get("info.solarflux.resetcontent")).withStyle(s -> s.withItalic(true).withColor(0x01D7C7)));
 			}
 
 			if(Screen.hasShiftDown())
