@@ -65,7 +65,7 @@ public class SolarFluxResourcePack
 			ResourceLocation reg = blk.getRegistryName();
 
 			ResourceLocation blockstate = new ResourceLocation(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
-			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/" + reg.getPath() + ".json");
+			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 
 			float thicc = si.getPanelData().height * 16F;
@@ -73,7 +73,7 @@ public class SolarFluxResourcePack
 			float reverseThicc = 16 - thicc;
 
 			resourceMap.put(blockstate, ofText("{\"variants\":{\"\":{\"model\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}}}"));
-			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":" + reg.getPath() + "\"}"));
+			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}"));
 
 			// Block Model
 			resourceMap.put(models_block, ofText("{\"parent\":\"block/block\",\"textures\":{\"0\":\"" + reg.getNamespace() + ":blocks/" + reg.getPath() + "_base\",\"1\":\"" + reg.getNamespace() + ":blocks/" + reg.getPath() + "_top\",\"particle\":\"solarflux:blocks/example_base\"},\"elements\":[{\"name\":\"base\",\"from\":[0,0,0],\"to\":[16," + thicc + ",16],\"faces\":{\"north\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"east\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"south\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"west\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"up\":{\"uv\":[0,0,16,16],\"texture\":\"#1\"},\"down\":{\"uv\":[0,0,16,16],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",0],\"to\":[16," + thic2 + ",1],\"faces\":{\"north\":{\"uv\":[0,0,16,0.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,0,16,0.25],\"texture\":\"#0\"},\"west\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,0,16,1],\"texture\":\"#0\"},\"down\":{\"uv\":[0,0,16,1],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",15],\"to\":[16," + thic2 + ",16],\"faces\":{\"north\":{\"uv\":[0,15,16,15.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,15,16,15.25],\"texture\":\"#0\"},\"west\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,15,16,16],\"texture\":\"#0\"},\"down\":{\"uv\":[0,15,16,16],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",1],\"to\":[1," + thic2 + ",15],\"faces\":{\"north\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,0,14,0.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"west\":{\"uv\":[1,0,15,0.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,1,1,15],\"texture\":\"#0\"},\"down\":{\"uv\":[0,1,1,15],\"texture\":\"#0\"}}},{\"from\":[15," + thicc + ",1],\"to\":[16," + thic2 + ",15],\"faces\":{\"north\":{\"uv\":[15,15,16,15.25],\"texture\":\"#0\"},\"east\":{\"uv\":[1,15,15,15.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"west\":{\"uv\":[1,15,15,15.25],\"texture\":\"#0\"},\"up\":{\"uv\":[15,1,16,15],\"texture\":\"#0\"},\"down\":{\"uv\":[15,1,16,15],\"texture\":\"#0\"}}}]}"));
@@ -148,7 +148,7 @@ public class SolarFluxResourcePack
 		if(deserializer.getMetadataSectionName().equals("pack"))
 		{
 			JsonObject obj = new JsonObject();
-			obj.addProperty("pack_format", 6);
+			obj.addProperty("pack_format", 8);
 			obj.addProperty("description", "Generated resources for SolarFlux");
 			return deserializer.fromJson(obj);
 		}
