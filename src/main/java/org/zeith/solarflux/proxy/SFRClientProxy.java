@@ -9,7 +9,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.event.LanguageReloadEvent;
-import org.zeith.solarflux.items.ItemsSF;
+import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.items.JSItem;
 import org.zeith.solarflux.panels.SolarPanels;
 
@@ -46,7 +46,7 @@ public class SFRClientProxy
 
 	public void reloadLangs(LanguageReloadEvent e)
 	{
-		for(JSItem mat : ItemsSF.JS_MATERIALS)
+		for(JSItem mat : SolarFlux.JS_MATERIALS)
 		{
 			e.translate(mat.getDescriptionId(), mat.getLang().getName(e.getLang()));
 		}

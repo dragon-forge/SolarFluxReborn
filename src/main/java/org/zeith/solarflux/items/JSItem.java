@@ -1,6 +1,8 @@
 package org.zeith.solarflux.items;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import org.zeith.solarflux.SolarFlux;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -8,16 +10,12 @@ import java.util.Map;
 public class JSItem
 		extends Item
 {
-	private LanguageData langs;
+	LanguageData langs;
 
-	public JSItem(Properties properties)
+	public JSItem(Properties properties, LanguageData langs)
 	{
 		super(properties);
-	}
-
-	public LanguageData langBuilder()
-	{
-		return new LanguageData(this);
+		this.langs = langs;
 	}
 
 	public boolean hasLang()
@@ -35,9 +33,9 @@ public class JSItem
 		public final Map<String, String> langToName = new HashMap<>();
 		public String def;
 
-		final JSItem material;
+		final FutureJSGenerator material;
 
-		public LanguageData(JSItem material)
+		public LanguageData(FutureJSGenerator material)
 		{
 			this.material = material;
 		}
@@ -56,12 +54,46 @@ public class JSItem
 			return langToName.getOrDefault(lang, def);
 		}
 
-		public JSItem build()
+		public ItemLike build()
 		{
 			if(def == null)
 				throw new RuntimeException("Unable to apply languages: no 'en_us' value found!");
 			material.langs = this;
 			return material;
+		}
+	}
+
+	public static class FutureJSGenerator
+			implements ItemLike
+	{
+		public final String name;
+		private JSItem item;
+
+		private LanguageData langs;
+
+		public FutureJSGenerator(String name)
+		{
+			this.name = name;
+		}
+
+		public LanguageData langBuilder()
+		{
+			return new LanguageData(this);
+		}
+
+		public JSItem create()
+		{
+			if(item != null) return item;
+			JSItem i = new JSItem(new Item.Properties().tab(SolarFlux.ITEM_GROUP), langs);
+			i.setRegistryName(name);
+			item = i;
+			return i;
+		}
+
+		@Override
+		public Item asItem()
+		{
+			return item;
 		}
 	}
 }

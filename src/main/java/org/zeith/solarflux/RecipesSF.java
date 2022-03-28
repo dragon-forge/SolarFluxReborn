@@ -64,15 +64,6 @@ public class RecipesSF
 					.register();
 		});
 
-		//		helper.addKeyShaped(MIRROR, new ItemStack(ItemsSF.MIRROR, 3), "ggg", " i ", 'g', "blockGlass", 'i', "ingotIron");
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_1, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_1), "ggg", "lll", "mmm", 'g', "blockGlass", 'l', "gemLapis", 'm', ItemsSF.MIRROR);
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_2, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_2), "clc", "lcl", "msm", 'c', Items.CLAY_BALL, 'l', "gemLapis", 'm', ItemsSF.MIRROR, 's', ItemsSF.PHOTOVOLTAIC_CELL_1);
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_3, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_3), "ggg", "lll", "oco", 'g', "blockGlass", 'l', "dustGlowstone", 'o', "obsidian", 'c', ItemsSF.PHOTOVOLTAIC_CELL_2);
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_4, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_4), "bbb", "gdg", "qcq", 'b', Items.BLAZE_POWDER, 'g', "dustGlowstone", 'd', "gemDiamond", 'q', "blockQuartz", 'c', ItemsSF.PHOTOVOLTAIC_CELL_3);
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_5, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_5), "bbb", "gdg", "qcq", 'b', Items.BLAZE_ROD, 'g', Blocks.GLOWSTONE, 'd', "blockDiamond", 'q', "blockQuartz", 'c', new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_4));
-		//		helper.addKeyShaped(PHOTOVOLTAIC_CELL_6, new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_6), "bbb", "gdg", "qcq", 'b', "gemEmerald", 'g', Blocks.GLOWSTONE, 'd', "blockDiamond", 'q', "blockQuartz", 'c', new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_5));
-		//		helper.addKeyShaped(BLANK_UPGRADE, new ItemStack(ItemsSF.BLANK_UPGRADE), " c ", "cmc", " c ", 'c', "cobblestone", 'm', ItemsSF.MIRROR);
-
 		$.shaped()
 				.id(MIRROR)
 				.result(ItemsSF.MIRROR, 3)

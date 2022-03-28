@@ -5,8 +5,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.items.ItemsSF;
 import org.zeith.solarflux.panels.SolarPanels;
 
 import java.io.*;
@@ -35,15 +35,19 @@ public class SolarFluxResourcePack
 	{
 		if(packInstance == null)
 			packInstance = new SolarFluxResourcePack();
-		packInstance.init();
 		return packInstance;
 	}
 
+	private boolean hasInit = false;
+
 	public void init()
 	{
+		if(hasInit) return;
+		hasInit = true;
+
 		resourceMap.clear();
 
-		ItemsSF.JS_MATERIALS.forEach(i ->
+		SolarFlux.JS_MATERIALS.forEach(i ->
 		{
 			ResourceLocation reg = i.getRegistryName();
 
@@ -113,6 +117,7 @@ public class SolarFluxResourcePack
 	{
 		try
 		{
+			init();
 			InputStream in = resourceMap.get(location).create();
 			return in;
 		} catch(RuntimeException e)
@@ -132,6 +137,7 @@ public class SolarFluxResourcePack
 	@Override
 	public boolean hasResource(PackType type, ResourceLocation location)
 	{
+		init();
 		IResourceStreamSupplier s;
 		return (s = resourceMap.get(location)) != null && s.exists();
 	}
@@ -139,6 +145,7 @@ public class SolarFluxResourcePack
 	@Override
 	public Set<String> getNamespaces(PackType type)
 	{
+		init();
 		return Collections.singleton("solarflux");
 	}
 

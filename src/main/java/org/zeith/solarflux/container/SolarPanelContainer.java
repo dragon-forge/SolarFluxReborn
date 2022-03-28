@@ -72,7 +72,7 @@ public class SolarPanelContainer
 	@Override
 	public boolean stillValid(Player playerIn)
 	{
-		return panel.getBlockPos().distSqr(playerIn.position(), true) <= 64 && !panel.isRemoved();
+		return panel.getBlockPos().closerToCenterThan(playerIn.position(), 64) && !panel.isRemoved();
 	}
 
 	@Override

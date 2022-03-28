@@ -17,18 +17,18 @@ Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providin
 [[dependencies.solarflux]]
 modId = "forge"
 mandatory = true
-versionRange = "[39,)"
+versionRange = "[40,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.solarflux]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.18,1.19)"
+versionRange = "[1.18.2,1.19)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.solarflux]]
 modId = "hammerlib"
 mandatory = true
-versionRange = "[18.1.9,)"
+versionRange = "[18.2.12,)"
 ordering = "NONE"
 side = "BOTH"

@@ -5,10 +5,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.SolarFlux;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class ItemsSF
 {
@@ -37,20 +34,8 @@ public class ItemsSF
 		return new Item(new Item.Properties().tab(SolarFlux.ITEM_GROUP));
 	}
 
-	private static final List<JSItem> ITEMS2REG = new ArrayList<>();
-	public static final List<JSItem> JS_MATERIALS = Collections.unmodifiableList(ITEMS2REG);
-
-	public static Item newJSItem(String name)
-	{
-		JSItem i = new JSItem(new Item.Properties().tab(SolarFlux.ITEM_GROUP));
-		i.setRegistryName(name);
-		ITEMS2REG.add(i);
-		return i;
-	}
-
 	public static void register(IForgeRegistry<Item> items)
 	{
-		ITEMS2REG.forEach(items::register);
 		Arrays.stream(ItemsSF.class.getDeclaredFields())
 				.filter(f -> Item.class.isAssignableFrom(f.getType()))
 				.forEach(f ->

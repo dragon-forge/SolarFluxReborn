@@ -6,6 +6,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
@@ -31,10 +32,15 @@ import org.zeith.solarflux.block.SolarPanelBlockItem;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
 import org.zeith.solarflux.items.ItemsSF;
+import org.zeith.solarflux.items.JSItem;
 import org.zeith.solarflux.net.SFNetwork;
 import org.zeith.solarflux.panels.SolarPanels;
 import org.zeith.solarflux.proxy.SFRClientProxy;
 import org.zeith.solarflux.proxy.SFRCommonProxy;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 @Mod("solarflux")
 public class SolarFlux
@@ -57,6 +63,17 @@ public class SolarFlux
 		SolarPanels.init();
 
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
+	}
+
+	private static final List<JSItem.FutureJSGenerator> ITEMS2REG = new ArrayList<>();
+	private static final List<JSItem> JS_MATERIALS_INTERNAL = new ArrayList<>();
+	public static final List<JSItem> JS_MATERIALS = Collections.unmodifiableList(JS_MATERIALS_INTERNAL);
+
+	public static ItemLike newJSItem(String name)
+	{
+		var gen = new JSItem.FutureJSGenerator(name);
+		ITEMS2REG.add(gen);
+		return gen;
 	}
 
 	@SubscribeEvent
@@ -133,11 +150,19 @@ public class SolarFlux
 		@SubscribeEvent
 		public static void registerItems(RegistryEvent.Register<Item> e)
 		{
-			ItemsSF.register(e.getRegistry());
+			var r = e.getRegistry();
+
+			ITEMS2REG.forEach(f ->
+			{
+				var jsi = f.create();
+				r.register(jsi);
+				JS_MATERIALS_INTERNAL.add(jsi);
+			});
+			ItemsSF.register(r);
 			SolarPanels.listPanelBlocks().forEach(b ->
 			{
-				SolarPanelBlockItem item = new SolarPanelBlockItem(b, new Item.Properties().tab(ITEM_GROUP));
-				e.getRegistry().register(item);
+				var item = new SolarPanelBlockItem(b, new Item.Properties().tab(ITEM_GROUP));
+				r.register(item);
 			});
 		}
 	}
