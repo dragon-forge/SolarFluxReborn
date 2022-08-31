@@ -1,18 +1,23 @@
-package org.zeith.solarflux.panels;
+package org.zeith.solarflux.init;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
+import org.zeith.hammerlib.annotations.RegistryName;
+import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.cfg.ConfigFile;
 import org.zeith.hammerlib.util.cfg.entries.ConfigEntryCategory;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.panels.SolarPanel;
+import org.zeith.solarflux.panels.SolarScriptEngine;
 
 import javax.script.ScriptException;
 import java.io.File;
@@ -22,52 +27,56 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-public class SolarPanels
+@SimplyRegister
+public class SolarPanelsSF
 {
 	public static final Map<String, SolarPanel> PANELS = new HashMap<>();
+	@RegistryName("solar_panel")
 	public static final BlockEntityType<SolarPanelTile> SOLAR_PANEL_TYPE = new BlockEntityType<SolarPanelTile>(SolarPanelTile::new, new HashSet<>(), null)
 	{
-		{
-			setRegistryName("solarflux", "solar_panel");
-		}
-
 		@Override
 		public boolean isValid(BlockState state)
 		{
 			return state.getBlock() instanceof SolarPanelBlock;
 		}
 	};
-
 	public static double LOOSE_ENERGY;
-
 	public static float RAIN_MULTIPLIER = 0.6F, THUNDER_MULTIPLIER = 0.4F;
-
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
-
 	public static File CONFIG_DIR;
-
+	
 	public static Stream<SolarPanel> listPanels()
 	{
 		return PANELS.values().stream();
 	}
-
+	
 	public static Stream<SolarPanelBlock> listPanelBlocks()
 	{
 		return listPanels().map(SolarPanel::getBlock);
 	}
-
+	
+	@SimplyRegister
+	public static void registerPanels(BiConsumer<ResourceLocation, Block> reg)
+	{
+		listPanelBlocks()
+				.forEach(panel ->
+						reg.accept(panel.getRegistryName(), panel)
+				);
+	}
+	
 	public static final List<ResourceLocation> RECIPE_KEYS = new ArrayList<>();
 	private static final List<ResourceLocation> ENABLED_RECIPES = new ArrayList<>();
-
+	
 	public static void init()
 	{
 		File solarflux = CONFIG_DIR = new File(FMLPaths.CONFIGDIR.get().toFile(), "solarflux");
-
+		
 		if(!solarflux.isDirectory())
 			solarflux.mkdirs();
-
+		
 		int[] generations = new int[]{
 				1,
 				8,
@@ -98,48 +107,48 @@ public class SolarPanels
 				64000000,
 				128000000
 		};
-
+		
 		ConfigFile cfgs = new ConfigFile(new File(solarflux, "main.hlc"));
-
+		
 		cfgs.setComment("Main configuration file for Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
-
+		
 		ConfigEntryCategory spc = cfgs.getCategory("Solar Panels");
-
+		
 		LOOSE_ENERGY = spc.getFloatEntry("Pickup Energy Loss", 5, 0, 100).setDescription("How much energy (percent) will get lost while picking up the solar panel?").getValue();
-
+		
 		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{
 			ConfigEntryCategory spsc = spc.getCategory("Solar Panel " + (i + 1));
-
+			
 			long gen = spsc.getLongEntry("Generation Rate", generations[i], 1, Long.MAX_VALUE).getValue();
 			long transfer = spsc.getLongEntry("Transfer Rate", transfers[i], 1, Long.MAX_VALUE).getValue();
 			long capacity = spsc.getLongEntry("Capacity", capacities[i], 1, Long.MAX_VALUE).getValue();
-
+			
 			CORE_PANELS[i] = SolarPanel.builder().name(Integer.toString(i + 1)).generation(gen).transfer(transfer).capacity(capacity).buildAndRegister();
 		}
-
+		
 		ConfigEntryCategory main = cfgs.getCategory("Main");
-
+		
 		RAIN_MULTIPLIER = main.getFloatEntry("Rain Multiplier", 0.6F, 0F, 1F).setDescription("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.").getValue();
 		THUNDER_MULTIPLIER = main.getFloatEntry("Thunder Multiplier", 0.4F, 0F, 1F).setDescription("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.").getValue();
-
+		
 		if(cfgs.hasChanged())
 			cfgs.save();
-
+		
 		File textures = new File(solarflux, "textures");
 		if(!textures.isDirectory())
 		{
 			textures.mkdirs();
-
+			
 			File blocks = new File(textures, "blocks");
-
+			
 			if(!blocks.isDirectory())
 			{
 				blocks.mkdirs();
-
+				
 				int r;
 				byte[] buf = new byte[768];
-
+				
 				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_base.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/sp_example_base.png"))
 				{
 					while((r = in.read(buf)) > 0)
@@ -148,10 +157,10 @@ public class SolarPanels
 				{
 					throw new RuntimeException(e);
 				}
-
+				
 				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_top.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/sp_example_top.png"))
 				{
-
+					
 					while((r = in.read(buf)) > 0)
 						out.write(buf, 0, r);
 				} catch(IOException e)
@@ -159,16 +168,16 @@ public class SolarPanels
 					throw new RuntimeException(e);
 				}
 			}
-
+			
 			File items = new File(textures, "items");
-
+			
 			if(!items.isDirectory())
 			{
 				items.mkdirs();
-
+				
 				int r;
 				byte[] buf = new byte[768];
-
+				
 				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/items/_example.png"))
 				{
 					while((r = in.read(buf)) > 0)
@@ -181,22 +190,22 @@ public class SolarPanels
 		} else // Migration code
 		{
 			File blocks = new File(textures, "blocks");
-
+			
 			if(!blocks.isDirectory())
 			{
 				blocks.mkdirs();
 				move(textures, blocks);
 			}
-
+			
 			File items = new File(textures, "items");
-
+			
 			if(!items.isDirectory())
 			{
 				items.mkdirs();
-
+				
 				int r;
 				byte[] buf = new byte[768];
-
+				
 				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/items/_example.png"))
 				{
 					while((r = in.read(buf)) > 0)
@@ -207,7 +216,7 @@ public class SolarPanels
 				}
 			}
 		}
-
+		
 		File custom_panels = new File(solarflux, "custom_panels.js");
 		if(!custom_panels.isFile())
 			try(FileOutputStream fos = new FileOutputStream(custom_panels); InputStream in = SolarFlux.class.getResourceAsStream("/__custom_panels.js"))
@@ -220,7 +229,7 @@ public class SolarPanels
 			{
 				throw new RuntimeException(e);
 			}
-
+		
 		try
 		{
 			SolarScriptEngine engine = new SolarScriptEngine(Files.readAllLines(custom_panels.toPath(), StandardCharsets.UTF_8).stream());
@@ -230,7 +239,7 @@ public class SolarPanels
 			throw new RuntimeException(e);
 		}
 	}
-
+	
 	private static void move(File dir, File to)
 	{
 		if(dir.isDirectory() && to.isDirectory() && !dir.getAbsolutePath().startsWith(to.getAbsolutePath()))  // we are not supposed to move a file into itself
@@ -248,11 +257,11 @@ public class SolarPanels
 					}
 				}
 	}
-
+	
 	public static void refreshConfigs()
 	{
 		ConfigFile panels = new ConfigFile(new File(CONFIG_DIR, "panels.hlc"));
-
+		
 		listPanels().forEach(i ->
 		{
 			ConfigEntryCategory cat;
@@ -269,10 +278,10 @@ public class SolarPanels
 				);
 			i.configureBase(cat.getCategory(i.name));
 		});
-
+		
 		if(panels.hasChanged()) panels.save();
 	}
-
+	
 	public static void refreshRecipes()
 	{
 		ConfigFile recipes = new ConfigFile(new File(CONFIG_DIR, "recipes.hlc"));
@@ -284,22 +293,22 @@ public class SolarPanels
 		});
 		recipes.save();
 	}
-
+	
 	public static boolean isRecipeActive(ResourceLocation id)
 	{
 		return ENABLED_RECIPES.contains(id);
 	}
-
+	
 	public static void indexRecipes(ResourceLocation... ids)
 	{
 		RECIPE_KEYS.addAll(Arrays.asList(ids));
 	}
-
+	
 	public static Ingredient getGeneratingSolars(long generation)
 	{
 		return Ingredient.fromValues(listPanels().filter(sp -> sp.delegateData.generation == generation).map(SolarPanel::getBlock).map(ItemStack::new).map(Ingredient.ItemValue::new));
 	}
-
+	
 	public static Ingredient getGeneratingSolars(SolarPanel baseGeneration)
 	{
 		return getGeneratingSolars(baseGeneration.delegateData.generation);

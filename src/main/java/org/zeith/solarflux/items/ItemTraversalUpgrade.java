@@ -18,7 +18,6 @@ public class ItemTraversalUpgrade
 	public ItemTraversalUpgrade()
 	{
 		super(1);
-		setRegistryName("traversal_upgrade");
 	}
 
 	static List<BlockPos> cache = new ArrayList<>();

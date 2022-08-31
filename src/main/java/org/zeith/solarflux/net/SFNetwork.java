@@ -11,9 +11,9 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.event.EventNetworkChannel;
+import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanel.SolarPanelData;
-import org.zeith.solarflux.panels.SolarPanels;
 
 public class SFNetwork
 {
@@ -38,7 +38,7 @@ public class SFNetwork
 				if((int) pb.readShort() == 0x16)
 				{
 					String name = new String(pb.readByteArray());
-					SolarPanel sp = SolarPanels.PANELS.get(name);
+					SolarPanel sp = SolarPanelsSF.PANELS.get(name);
 					if(sp != null)
 						sp.networkData = new SolarPanelData(pb);
 				}
@@ -52,7 +52,7 @@ public class SFNetwork
 				if(pb != null && (int) pb.readShort() == 0x16)
 				{
 					String name = new String(pb.readByteArray());
-					SolarPanel sp = SolarPanels.PANELS.get(name);
+					SolarPanel sp = SolarPanelsSF.PANELS.get(name);
 					if(sp != null)
 						sp.networkData = new SolarPanelData(pb);
 					e.getSource().get().setPacketHandled(true);
@@ -64,14 +64,14 @@ public class SFNetwork
 	public static void sendAllPanels(ServerPlayer mp)
 	{
 		PacketDistributor.PacketTarget pt = PacketDistributor.PLAYER.with(() -> mp);
-		SolarPanels.listPanels().forEach(i ->
+		SolarPanelsSF.listPanels().forEach(i ->
 		{
 			FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
-
+			
 			buf.writeShort(0x16);
 			buf.writeByteArray(i.name.getBytes());
 			i.delegateData.write(buf);
-
+			
 			pt.send(new ClientboundCustomPayloadPacket(CHANNEL_NAME, buf));
 		});
 	}

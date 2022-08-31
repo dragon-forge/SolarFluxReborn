@@ -8,8 +8,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.mixins.AbstractFurnaceBlockEntityAccessor;
 
 import javax.annotation.Nullable;
 
@@ -19,7 +19,6 @@ public class ItemFurnaceUpgrade
 	public ItemFurnaceUpgrade()
 	{
 		super(1);
-		setRegistryName(InfoSF.MOD_ID, "furnace_upgrade");
 	}
 
 	@Override
@@ -27,17 +26,17 @@ public class ItemFurnaceUpgrade
 	{
 		Level lvl = tile.getLevel();
 		BlockPos pos = tile.getBlockPos().below();
-
-		if(lvl.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity tf)
+		
+		if(lvl.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity tf && tf instanceof AbstractFurnaceBlockEntityAccessor a)
 		{
-			AbstractCookingRecipe irecipe = tf.getLevel().getRecipeManager().getRecipeFor(tf.recipeType, tf, tf.getLevel()).orElse(null);
-
+			AbstractCookingRecipe irecipe = tf.getLevel().getRecipeManager().getRecipeFor(a.getRecipeType(), tf, tf.getLevel()).orElse(null);
+			
 			if(tf.litTime <= 1 && irecipe != null && canSmelt(tf, irecipe) && tile.energy >= 1000)
 			{
 				tf.litTime += 200;
 				tf.litDuration = 200;
 				tile.energy -= 1000;
-
+				
 				if(!lvl.getBlockState(pos).getValue(AbstractFurnaceBlock.LIT))
 				{
 					BlockState state = lvl.getBlockState(pos).setValue(AbstractFurnaceBlock.LIT, true);

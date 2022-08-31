@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
 import net.minecraftforge.common.util.INBTSerializable;
 import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.init.SolarPanelsSF;
 
 public class SolarPanelInstance
 		implements INBTSerializable<CompoundTag>
@@ -17,7 +18,7 @@ public class SolarPanelInstance
 	public SolarPanel getDelegate()
 	{
 		if(infoDelegate == null)
-			return infoDelegate = SolarPanels.PANELS.get(this.delegate);
+			return infoDelegate = SolarPanelsSF.PANELS.get(this.delegate);
 		return infoDelegate;
 	}
 

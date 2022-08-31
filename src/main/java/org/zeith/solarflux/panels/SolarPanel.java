@@ -10,8 +10,10 @@ import net.minecraft.world.level.block.Block;
 import org.zeith.hammerlib.core.adapter.recipe.ShapedRecipeBuilder;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.cfg.entries.ConfigEntryCategory;
+import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.init.SolarPanelsSF;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,9 +53,9 @@ public class SolarPanel
 
 	public SolarPanel register()
 	{
-		if(SolarPanels.PANELS.containsKey(name))
+		if(SolarPanelsSF.PANELS.containsKey(name))
 			throw new IllegalArgumentException("Solar panel with id " + name + " already exists.");
-		SolarPanels.PANELS.put(name, this);
+		SolarPanelsSF.PANELS.put(name, this);
 		return this;
 	}
 
@@ -75,7 +77,7 @@ public class SolarPanel
 
 	protected SolarPanelBlock createBlock()
 	{
-		return new SolarPanelBlock(this);
+		return new SolarPanelBlock(this, new ResourceLocation(InfoSF.MOD_ID, "sp_" + name));
 	}
 
 	public SolarPanelBlock getBlock()
@@ -83,7 +85,6 @@ public class SolarPanel
 		if(block == null)
 		{
 			block = createBlock();
-			block.setRegistryName("sp_" + name);
 		}
 		return block;
 	}

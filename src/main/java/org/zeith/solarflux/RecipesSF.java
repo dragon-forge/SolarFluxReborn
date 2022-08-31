@@ -7,8 +7,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import org.zeith.hammerlib.core.init.TagsHL;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
-import org.zeith.solarflux.items.ItemsSF;
-import org.zeith.solarflux.panels.SolarPanels;
+import org.zeith.solarflux.init.ItemsSF;
+import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.recipe.RecipeClearSolarPanel;
 
 public class RecipesSF
@@ -44,50 +44,50 @@ public class RecipesSF
 
 	public static void indexRecipes()
 	{
-		SolarPanels.indexRecipes(MIRROR);
-		SolarPanels.indexRecipes(BLAZING_COATING, EMERALD_GLASS, ENDER_GLASS);
-		SolarPanels.indexRecipes(PHOTOVOLTAIC_CELL_1, PHOTOVOLTAIC_CELL_2, PHOTOVOLTAIC_CELL_3, PHOTOVOLTAIC_CELL_4, PHOTOVOLTAIC_CELL_5, PHOTOVOLTAIC_CELL_6);
-		SolarPanels.indexRecipes(BLANK_UPGRADE);
-		SolarPanels.indexRecipes(SOLAR_PANEL_1, SOLAR_PANEL_2, SOLAR_PANEL_3, SOLAR_PANEL_4, SOLAR_PANEL_5, SOLAR_PANEL_6, SOLAR_PANEL_7, SOLAR_PANEL_8);
-		SolarPanels.indexRecipes(EFFICIENCY_UPGRADE, TRANSFER_RATE_UPGRADE, TRAVERSAL_UPGRADE, DISPERSIVE_UPGRADE, BLOCK_CHARGING_UPGRADE, FURNACE_UPGRADE, CAPACITY_UPGRADE);
+		SolarPanelsSF.indexRecipes(MIRROR);
+		SolarPanelsSF.indexRecipes(BLAZING_COATING, EMERALD_GLASS, ENDER_GLASS);
+		SolarPanelsSF.indexRecipes(PHOTOVOLTAIC_CELL_1, PHOTOVOLTAIC_CELL_2, PHOTOVOLTAIC_CELL_3, PHOTOVOLTAIC_CELL_4, PHOTOVOLTAIC_CELL_5, PHOTOVOLTAIC_CELL_6);
+		SolarPanelsSF.indexRecipes(BLANK_UPGRADE);
+		SolarPanelsSF.indexRecipes(SOLAR_PANEL_1, SOLAR_PANEL_2, SOLAR_PANEL_3, SOLAR_PANEL_4, SOLAR_PANEL_5, SOLAR_PANEL_6, SOLAR_PANEL_7, SOLAR_PANEL_8);
+		SolarPanelsSF.indexRecipes(EFFICIENCY_UPGRADE, TRANSFER_RATE_UPGRADE, TRAVERSAL_UPGRADE, DISPERSIVE_UPGRADE, BLOCK_CHARGING_UPGRADE, FURNACE_UPGRADE, CAPACITY_UPGRADE);
 	}
 
 	public static void addRecipes(RegisterRecipesEvent $)
 	{
 		indexRecipes();
-		SolarPanels.refreshRecipes();
-
-		SolarPanels.listPanelBlocks().forEach(panel ->
+		SolarPanelsSF.refreshRecipes();
+		
+		SolarPanelsSF.listPanelBlocks().forEach(panel ->
 		{
 			RecipeClearSolarPanel.builder($)
 					.set(panel)
 					.register();
 		});
-
+		
 		$.shaped()
 				.id(MIRROR)
 				.result(ItemsSF.MIRROR, 3)
 				.shape("ggg", " i ")
 				.map('g', Tags.Items.GLASS)
 				.map('i', Tags.Items.INGOTS_IRON)
-				.registerIf(SolarPanels::isRecipeActive);
-
+				.registerIf(SolarPanelsSF::isRecipeActive);
+		
 		$.shaped()
 				.id(BLAZING_COATING)
 				.result(ItemsSF.BLAZING_COATING, 2)
 				.shape("m", "b", "m")
 				.map('m', ItemsSF.MIRROR)
 				.map('b', Items.BLAZE_POWDER)
-				.registerIf(SolarPanels::isRecipeActive);
-
+				.registerIf(SolarPanelsSF::isRecipeActive);
+		
 		$.shaped()
 				.id(EMERALD_GLASS)
 				.result(ItemsSF.EMERALD_GLASS, 2)
 				.shape("m", "e", "m")
 				.map('m', ItemsSF.MIRROR)
 				.map('e', Tags.Items.GEMS_EMERALD)
-				.registerIf(SolarPanels::isRecipeActive);
-
+				.registerIf(SolarPanelsSF::isRecipeActive);
+		
 		$.shaped()
 				.id(ENDER_GLASS)
 				.result(ItemsSF.ENDER_GLASS, 3)
@@ -95,7 +95,7 @@ public class RecipesSF
 				.map('p', Tags.Items.ENDER_PEARLS)
 				.map('y', Items.ENDER_EYE)
 				.map('e', ItemsSF.EMERALD_GLASS)
-				.registerIf(SolarPanels::isRecipeActive);
+				.registerIf(SolarPanelsSF::isRecipeActive);
 
 		{
 			$.shaped()
@@ -105,8 +105,8 @@ public class RecipesSF
 					.map('g', Tags.Items.GLASS)
 					.map('l', Tags.Items.GEMS_LAPIS)
 					.map('m', ItemsSF.MIRROR)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_2)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_2)
@@ -115,8 +115,8 @@ public class RecipesSF
 					.map('l', Tags.Items.GEMS_LAPIS)
 					.map('m', ItemsSF.MIRROR)
 					.map('s', ItemsSF.PHOTOVOLTAIC_CELL_1)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_3)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_3)
@@ -125,8 +125,8 @@ public class RecipesSF
 					.map('l', Tags.Items.DUSTS_GLOWSTONE)
 					.map('o', Tags.Items.OBSIDIAN)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_2)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_4)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_4)
@@ -136,8 +136,8 @@ public class RecipesSF
 					.map('d', Tags.Items.GEMS_DIAMOND)
 					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_3)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_5)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_5, 2)
@@ -147,8 +147,8 @@ public class RecipesSF
 					.map('d', Tags.Items.STORAGE_BLOCKS_DIAMOND)
 					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_4)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_6)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_6, 2)
@@ -158,92 +158,92 @@ public class RecipesSF
 					.map('d', Tags.Items.STORAGE_BLOCKS_EMERALD)
 					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_5)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(BLANK_UPGRADE)
 					.result(ItemsSF.BLANK_UPGRADE)
 					.shape(" c ", "cmc", " c ")
 					.map('c', Tags.Items.COBBLESTONE)
 					.map('m', ItemsSF.MIRROR)
-					.registerIf(SolarPanels::isRecipeActive);
+					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
 
 		{
 			$.shaped()
 					.id(SOLAR_PANEL_1)
-					.result(SolarPanels.CORE_PANELS[0].getBlock())
+					.result(SolarPanelsSF.CORE_PANELS[0].getBlock())
 					.shape("mmm", "prp", "ppp")
 					.map('m', ItemsSF.MIRROR)
 					.map('p', ItemTags.PLANKS)
 					.map('r', Tags.Items.DUSTS_REDSTONE)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_2)
-					.result(SolarPanels.CORE_PANELS[1].getBlock())
+					.result(SolarPanelsSF.CORE_PANELS[1].getBlock())
 					.shape("sss", "sps", "sss")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[0]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[0]))
 					.map('p', TagsHL.Items.PISTONS)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_3)
-					.result(SolarPanels.CORE_PANELS[2].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[2].getBlock(), 2)
 					.shape("ppp", "scs", "sbs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[1]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[1]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_1)
 					.map('c', Items.REPEATER)
 					.map('b', Tags.Items.STORAGE_BLOCKS_IRON)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_4)
-					.result(SolarPanels.CORE_PANELS[3].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[3].getBlock(), 2)
 					.shape("ppp", "scs", "sbs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[2]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[2]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_2)
 					.map('c', Items.CLOCK)
 					.map('b', Tags.Items.STORAGE_BLOCKS_IRON)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_5)
-					.result(SolarPanels.CORE_PANELS[4].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[4].getBlock(), 2)
 					.shape("ppp", "scs", "sbs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[3]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[3]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_3)
 					.map('c', TagsHL.Items.STORAGE_BLOCKS_GLOWSTONE)
 					.map('b', Tags.Items.STORAGE_BLOCKS_GOLD)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_6)
-					.result(SolarPanels.CORE_PANELS[5].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[5].getBlock(), 2)
 					.shape("ppp", "scs", "sbs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[4]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[4]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_4)
 					.map('c', Blocks.REDSTONE_LAMP)
 					.map('b', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_7)
-					.result(SolarPanels.CORE_PANELS[6].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[6].getBlock(), 2)
 					.shape("ppp", "scs", "scs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[5]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[5]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_5)
 					.map('c', Items.DRAGON_BREATH)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(SOLAR_PANEL_8)
-					.result(SolarPanels.CORE_PANELS[7].getBlock(), 2)
+					.result(SolarPanelsSF.CORE_PANELS[7].getBlock(), 2)
 					.shape("ppp", "scs", "scs")
-					.map('s', SolarPanels.getGeneratingSolars(SolarPanels.CORE_PANELS[6]))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[6]))
 					.map('p', ItemsSF.PHOTOVOLTAIC_CELL_6)
 					.map('c', Items.DRAGON_EGG)
-					.registerIf(SolarPanels::isRecipeActive);
+					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
 
 		{
@@ -254,8 +254,8 @@ public class RecipesSF
 					.map('m', ItemsSF.MIRROR)
 					.map('u', ItemsSF.BLANK_UPGRADE)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_1)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(TRANSFER_RATE_UPGRADE)
 					.result(ItemsSF.TRANSFER_RATE_UPGRADE)
@@ -263,8 +263,8 @@ public class RecipesSF
 					.map('u', ItemsSF.BLANK_UPGRADE)
 					.map('r', Tags.Items.DUSTS_REDSTONE)
 					.map('g', Tags.Items.INGOTS_GOLD)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(TRAVERSAL_UPGRADE)
 					.result(ItemsSF.TRAVERSAL_UPGRADE)
@@ -273,8 +273,8 @@ public class RecipesSF
 					.map('p', TagsHL.Items.PISTONS)
 					.map('u', ItemsSF.BLANK_UPGRADE)
 					.map('r', Tags.Items.DUSTS_REDSTONE)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(DISPERSIVE_UPGRADE)
 					.result(ItemsSF.DISPERSIVE_UPGRADE)
@@ -282,8 +282,8 @@ public class RecipesSF
 					.map('g', Tags.Items.DUSTS_GLOWSTONE)
 					.map('e', Items.ENDER_EYE)
 					.map('u', ItemsSF.BLANK_UPGRADE)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(BLOCK_CHARGING_UPGRADE)
 					.result(ItemsSF.BLOCK_CHARGING_UPGRADE)
@@ -291,8 +291,8 @@ public class RecipesSF
 					.map('g', Tags.Items.ENDER_PEARLS)
 					.map('e', Tags.Items.STORAGE_BLOCKS_REDSTONE)
 					.map('u', ItemsSF.DISPERSIVE_UPGRADE)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(FURNACE_UPGRADE)
 					.result(ItemsSF.FURNACE_UPGRADE)
@@ -301,8 +301,8 @@ public class RecipesSF
 					.map('c', Items.COAL)
 					.map('f', Blocks.FURNACE)
 					.map('b', ItemsSF.BLAZING_COATING)
-					.registerIf(SolarPanels::isRecipeActive);
-
+					.registerIf(SolarPanelsSF::isRecipeActive);
+			
 			$.shaped()
 					.id(CAPACITY_UPGRADE)
 					.result(ItemsSF.CAPACITY_UPGRADE)
@@ -310,9 +310,9 @@ public class RecipesSF
 					.map('u', ItemsSF.BLANK_UPGRADE)
 					.map('r', Tags.Items.STORAGE_BLOCKS_REDSTONE)
 					.map('c', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-					.registerIf(SolarPanels::isRecipeActive);
+					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
-
-		SolarPanels.listPanels().forEach(sp -> sp.recipes($));
+		
+		SolarPanelsSF.listPanels().forEach(sp -> sp.recipes($));
 	}
 }

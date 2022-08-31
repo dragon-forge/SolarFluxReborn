@@ -12,6 +12,7 @@ buildscript {
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
+        classpath 'org.spongepowered:mixingradle:0.7.+'
     }
 }
 
@@ -19,6 +20,7 @@ apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: "com.matthewprenger.cursegradle"
+apply plugin: 'org.spongepowered.mixin'
 
 ext.configFile = file("build.txt")
 configFile.withReader {
@@ -36,6 +38,14 @@ archivesBaseName = "${config.archive_name}-${config.mc_version}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
+mixin {
+    add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
+    config "mixins.${config.mod_id}.json"
+
+    debug.verbose = true
+    debug.export = true
+}
+
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 minecraft {
     mappings channel: config.mcp_ch, version: config.mcp_vr
@@ -44,6 +54,7 @@ minecraft {
         client {
             workingDirectory project.file('run/client')
             property 'forge.logging.console.level', 'debug'
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
             mods {
                 examplemod {
                     source sourceSets.main
@@ -54,6 +65,7 @@ minecraft {
         server {
             workingDirectory project.file('run/server')
             property 'forge.logging.console.level', 'debug'
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
             mods {
                 examplemod {
                     source sourceSets.main
@@ -68,9 +80,9 @@ repositories {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
     }
-    flatDir {
-        dirs 'runtimeMods'
-    }
+    flatDir { dirs 'libraries/all' }
+    flatDir { dirs 'libraries/classpathOnly' }
+    flatDir { dirs 'libraries/runtimeOnly' }
 }
 
 dependencies {
@@ -78,20 +90,52 @@ dependencies {
 
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
 
-    if (file("runtimeMods").isDirectory()) {
-        file("runtimeMods").eachFile { file ->
+    annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
+
+    def libraries = file("libraries");
+    if (!libraries.isDirectory()) libraries.mkdirs()
+
+    def libDir = new File(libraries, "all");
+    if (libDir.isDirectory()) {
+        libDir.eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
-            def modreference = "lib:$modartifact:$modversion"
-
             dependencies {
-                implementation fg.deobf(project.dependencies.create(modreference) {
+                implementation fg.deobf(project.dependencies.create("_all:$modartifact:$modversion") {
                     transitive = false
                 })
             }
         }
-    } else file("runtimeMods").mkdir();
+    } else libDir.mkdir();
+
+    libDir = new File(libraries, "classpathOnly");
+    if (libDir.isDirectory()) {
+        libDir.eachFile { file ->
+            def splitPos = file.name.lastIndexOf("-")
+            def modartifact = file.name.substring(0, splitPos)
+            def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
+            dependencies {
+                compileClasspath fg.deobf(project.dependencies.create("_classpath:$modartifact:$modversion") {
+                    transitive = false
+                })
+            }
+        }
+    } else libDir.mkdir();
+
+    libDir = new File(libraries, "runtimeOnly");
+    if (libDir.isDirectory()) {
+        libDir.eachFile { file ->
+            def splitPos = file.name.lastIndexOf("-")
+            def modartifact = file.name.substring(0, splitPos)
+            def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
+            dependencies {
+                runtimeClasspath fg.deobf(project.dependencies.create("_runtime:$modartifact:$modversion") {
+                    transitive = false
+                })
+            }
+        }
+    } else libDir.mkdir();
 }
 
 jar {
@@ -194,8 +238,8 @@ publishing {
                 def dependenciesNode = asNode().appendNode('dependencies')
 
                 def dependencyNode = dependenciesNode.appendNode('dependency')
-                dependencyNode.appendNode('groupId', "org.zeith.hammerlib")
-                dependencyNode.appendNode('artifactId', "HammerLib-${config.mc_version}")
+                dependencyNode.appendNode('groupId', "org.zeith.SolarFlux")
+                dependencyNode.appendNode('artifactId', "SolarFluxReborn-${config.mc_version}")
                 dependencyNode.appendNode('version', config.hl_version)
             }
         }

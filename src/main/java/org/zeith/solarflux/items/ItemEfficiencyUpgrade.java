@@ -1,7 +1,6 @@
 package org.zeith.solarflux.items;
 
 import net.minecraft.world.item.ItemStack;
-import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.attribute.AttributeModMultiply;
 import org.zeith.solarflux.block.SolarPanelTile;
 
@@ -13,7 +12,6 @@ public class ItemEfficiencyUpgrade
 	public ItemEfficiencyUpgrade()
 	{
 		super(20);
-		setRegistryName(InfoSF.MOD_ID, "efficiency_upgrade");
 	}
 
 	public static final UUID EFFICIENCY_ATTRIBUTE_UUID = new UUID(2906890122860377677L, -8597508601813181812L);

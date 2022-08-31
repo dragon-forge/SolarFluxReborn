@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8.5",
+  "package": "org.zeith.solarflux.mixins",
+  "refmap": "mixins.solarflux.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "AbstractFurnaceBlockEntityAccessor"
+  ],
+  "client": [
+  ],
+  "server": [
+  ]
+}

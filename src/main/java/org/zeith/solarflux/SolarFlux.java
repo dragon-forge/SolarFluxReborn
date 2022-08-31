@@ -4,17 +4,12 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.Commands;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelBakeEvent;
+import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
@@ -28,19 +23,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
-import org.zeith.solarflux.block.SolarPanelBlockItem;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
-import org.zeith.solarflux.items.ItemsSF;
-import org.zeith.solarflux.items.JSItem;
+import org.zeith.solarflux.init.ItemsSF;
+import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.net.SFNetwork;
-import org.zeith.solarflux.panels.SolarPanels;
 import org.zeith.solarflux.proxy.SFRClientProxy;
 import org.zeith.solarflux.proxy.SFRCommonProxy;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 @Mod("solarflux")
 public class SolarFlux
@@ -55,27 +44,16 @@ public class SolarFlux
 			return new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_3);
 		}
 	};
-
+	
 	public SolarFlux()
 	{
 		MinecraftForge.EVENT_BUS.register(this);
 		HammerLib.EVENT_BUS.addListener(RecipesSF::addRecipes);
-		SolarPanels.init();
-
+		SolarPanelsSF.init();
+		
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
 	}
-
-	private static final List<JSItem.FutureJSGenerator> ITEMS2REG = new ArrayList<>();
-	private static final List<JSItem> JS_MATERIALS_INTERNAL = new ArrayList<>();
-	public static final List<JSItem> JS_MATERIALS = Collections.unmodifiableList(JS_MATERIALS_INTERNAL);
-
-	public static ItemLike newJSItem(String name)
-	{
-		var gen = new JSItem.FutureJSGenerator(name);
-		ITEMS2REG.add(gen);
-		return gen;
-	}
-
+	
 	@SubscribeEvent
 	public void startServer(RegisterCommandsEvent e)
 	{
@@ -84,24 +62,24 @@ public class SolarFlux
 						.then(Commands.literal("reload")
 								.executes(src ->
 								{
-									SolarPanels.refreshConfigs();
+									SolarPanelsSF.refreshConfigs();
 									src.getSource().getServer().getPlayerList().getPlayers().forEach(SFNetwork::sendAllPanels);
 									return 1;
 								})
 						)
 		);
 	}
-
+	
 	@SubscribeEvent
 	public void playerLogin(PlayerEvent.PlayerLoggedInEvent e)
 	{
-		if(e.getPlayer() instanceof ServerPlayer sp)
+		if(e.getEntity() instanceof ServerPlayer sp)
 		{
 			LOG.info("Sending solar panels to " + sp.getGameProfile().getName() + ".");
 			SFNetwork.sendAllPanels(sp);
 		}
 	}
-
+	
 	@EventBusSubscriber(bus = Bus.MOD)
 	public static class ModEvents
 	{
@@ -111,59 +89,28 @@ public class SolarFlux
 			PROXY.commonSetup();
 			SFNetwork.init();
 		}
-
+		
 		@SubscribeEvent
 		public void loadComplete(FMLLoadCompleteEvent e)
 		{
-			SolarPanels.refreshConfigs();
+			SolarPanelsSF.refreshConfigs();
 		}
-
+		
 		@SubscribeEvent
 		@OnlyIn(Dist.CLIENT)
 		public void clientSetup(FMLClientSetupEvent e)
 		{
 			PROXY.clientSetup();
 		}
-
+		
 		@SubscribeEvent
 		@OnlyIn(Dist.CLIENT)
-		public static void modelBake(ModelBakeEvent e)
+		public static void modelBake(ModelEvent.BakingCompleted e)
 		{
-			SolarPanels.listPanelBlocks()
+			SolarPanelsSF.listPanelBlocks()
 					.forEach(spb ->
-							e.getModelRegistry().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb))
+							e.getModels().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb))
 					);
-		}
-
-		@SubscribeEvent
-		public static void registerTiles(RegistryEvent.Register<BlockEntityType<?>> e)
-		{
-			e.getRegistry().register(SolarPanels.SOLAR_PANEL_TYPE);
-		}
-
-		@SubscribeEvent
-		public static void registerBlocks(RegistryEvent.Register<Block> e)
-		{
-			SolarPanels.listPanelBlocks().forEach(e.getRegistry()::register);
-		}
-
-		@SubscribeEvent
-		public static void registerItems(RegistryEvent.Register<Item> e)
-		{
-			var r = e.getRegistry();
-
-			ITEMS2REG.forEach(f ->
-			{
-				var jsi = f.create();
-				r.register(jsi);
-				JS_MATERIALS_INTERNAL.add(jsi);
-			});
-			ItemsSF.register(r);
-			SolarPanels.listPanelBlocks().forEach(b ->
-			{
-				var item = new SolarPanelBlockItem(b, new Item.Properties().tab(ITEM_GROUP));
-				r.register(item);
-			});
 		}
 	}
 }

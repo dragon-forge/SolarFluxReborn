@@ -17,24 +17,23 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.model.data.IModelData;
-import net.minecraftforge.client.model.data.ModelDataMap;
+import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
 import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
 import org.zeith.solarflux.attribute.SimpleAttributeProperty;
 import org.zeith.solarflux.container.SolarPanelContainer;
+import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.items.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
-import org.zeith.solarflux.panels.SolarPanels;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import java.util.ArrayList;
@@ -64,7 +63,7 @@ public class SolarPanelTile
 
 	public SolarPanelTile(BlockPos pos, BlockState state)
 	{
-		super(SolarPanels.SOLAR_PANEL_TYPE, pos, state);
+		super(SolarPanelsSF.SOLAR_PANEL_TYPE, pos, state);
 	}
 
 	public int getUpgrades(Item type)
@@ -96,7 +95,7 @@ public class SolarPanelTile
 			if(blk instanceof SolarPanelBlock)
 				this.delegate = ((SolarPanelBlock) blk).panel;
 			else
-				delegate = SolarPanels.CORE_PANELS[0];
+				delegate = SolarPanelsSF.CORE_PANELS[0];
 		}
 		return delegate;
 	}
@@ -126,7 +125,7 @@ public class SolarPanelTile
 			{
 				if(stack.getItem() instanceof UpgradeItem && ((UpgradeItem) stack.getItem()).canStayInPanel(this, stack, upgradeInventory))
 				{
-					id = stack.getItem().getRegistryName();
+					id = ForgeRegistries.ITEMS.getKey(stack.getItem());
 					if(!tickedUpgrades.contains(id))
 					{
 						UpgradeItem iu = (UpgradeItem) stack.getItem();
@@ -152,7 +151,7 @@ public class SolarPanelTile
 				stack = chargeInventory.getStackInSlot(i);
 				if(!stack.isEmpty())
 				{
-					stack.getCapability(CapabilityEnergy.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
+					stack.getCapability(ForgeCapabilities.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
 					{
 						transfer.setBaseValue(getInstance().transfer);
 						int transfer = this.transfer.getValueI();
@@ -216,8 +215,8 @@ public class SolarPanelTile
 
 				if(tile == null)
 					continue;
-
-				tile.getCapability(CapabilityEnergy.ENERGY, hor.getOpposite()).ifPresent(storage ->
+				
+				tile.getCapability(ForgeCapabilities.ENERGY, hor.getOpposite()).ifPresent(storage ->
 				{
 					if(storage.canReceive())
 						energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
@@ -234,8 +233,8 @@ public class SolarPanelTile
 						break;
 					if(tile == null)
 						continue;
-
-					tile.getCapability(CapabilityEnergy.ENERGY, traverse.face).ifPresent(storage ->
+					
+					tile.getCapability(ForgeCapabilities.ENERGY, traverse.face).ifPresent(storage ->
 					{
 						if(storage.canReceive())
 							energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
@@ -262,12 +261,12 @@ public class SolarPanelTile
 				float raining = level.getRainLevel(1F);
 				raining = raining > 0.2F ? (raining - 0.2F) / 0.8F : 0F;
 				raining = (float) Math.sin(raining * Math.PI / 2F);
-				raining = 1F - raining * (1F - SolarPanels.RAIN_MULTIPLIER);
+				raining = 1F - raining * (1F - SolarPanelsSF.RAIN_MULTIPLIER);
 
 				float thundering = level.getThunderLevel(1F);
 				thundering = thundering > 0.75F ? (thundering - 0.75F) / 0.25F : 0F;
 				thundering = (float) Math.sin(thundering * Math.PI / 2F);
-				thundering = 1F - thundering * (1F - SolarPanels.THUNDER_MULTIPLIER);
+				thundering = 1F - thundering * (1F - SolarPanelsSF.THUNDER_MULTIPLIER);
 
 				eff *= raining * thundering;
 			}
@@ -307,11 +306,11 @@ public class SolarPanelTile
 
 	public static final ModelProperty<Level> WORLD_PROP = new ModelProperty<>();
 	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
-
+	
 	@Override
-	public IModelData getModelData()
+	public ModelData getModelData()
 	{
-		return new ModelDataMap.Builder().withInitial(WORLD_PROP, level).withInitial(POS_PROP, worldPosition).build();
+		return ModelData.builder().with(WORLD_PROP, level).with(POS_PROP, worldPosition).build();
 	}
 
 	@Override
@@ -336,12 +335,12 @@ public class SolarPanelTile
 	@Override
 	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
 	{
-		if(cap == CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+		if(cap == ForgeCapabilities.ITEM_HANDLER)
 		{
 			if(chargeableItems == null)
 				chargeableItems = LazyOptional.of(() -> chargeInventory);
 			return chargeableItems.cast();
-		} else if(cap == CapabilityEnergy.ENERGY)
+		} else if(cap == ForgeCapabilities.ENERGY)
 		{
 			if(energyStorageTile == null)
 				energyStorageTile = LazyOptional.of(() -> SolarPanelTile.this);
@@ -438,7 +437,7 @@ public class SolarPanelTile
 	{
 		ItemStack stack = new ItemStack(item);
 		CompoundTag tag = new CompoundTag();
-		tag.putLong("Energy", energy - Math.round(energy * SolarPanels.LOOSE_ENERGY / 100D));
+		tag.putLong("Energy", energy - Math.round(energy * SolarPanelsSF.LOOSE_ENERGY / 100D));
 		upgradeInventory.writeToNBT(tag, "Upgrades");
 		chargeInventory.writeToNBT(tag, "Chargeable");
 		stack.setTag(tag);

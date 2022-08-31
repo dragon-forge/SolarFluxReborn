@@ -6,7 +6,6 @@ import net.minecraft.world.phys.AABB;
 import org.zeith.hammerlib.util.charging.IChargeHandler;
 import org.zeith.hammerlib.util.charging.ItemChargeHelper;
 import org.zeith.hammerlib.util.charging.fe.FECharge;
-import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.block.SolarPanelTile;
 
 public class ItemDispersiveUpgrade
@@ -15,7 +14,6 @@ public class ItemDispersiveUpgrade
 	public ItemDispersiveUpgrade()
 	{
 		super(1);
-		setRegistryName(InfoSF.MOD_ID, "dispersive_upgrade");
 	}
 
 	@Override

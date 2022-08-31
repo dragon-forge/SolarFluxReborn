@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
@@ -14,10 +13,11 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import javax.annotation.Nullable;
@@ -29,7 +29,6 @@ public class ItemBlockChargingUpgrade
 	public ItemBlockChargingUpgrade()
 	{
 		super(1);
-		setRegistryName("block_charging_upgrade");
 	}
 
 	// We really don't need to make a copy of all values every tick, so this constant is here to save the day.
@@ -42,10 +41,10 @@ public class ItemBlockChargingUpgrade
 		{
 			CompoundTag nbt = stack.getTag();
 			if(nbt.contains("Dim", Tag.TAG_STRING))
-				tooltip.add(new TextComponent("Dimension: " + nbt.getString("Dim")));
-			tooltip.add(new TextComponent("Facing: " + DIRECTIONS[nbt.getByte("Face")]));
+				tooltip.add(Component.literal("Dimension: " + nbt.getString("Dim")));
+			tooltip.add(Component.literal("Facing: " + DIRECTIONS[nbt.getByte("Face")]));
 			BlockPos pos = BlockPos.of(nbt.getLong("Pos"));
-			tooltip.add(new TextComponent("X: " + pos.getX() + ", Y: " + pos.getY() + ", Z: " + pos.getZ()));
+			tooltip.add(Component.literal("X: " + pos.getX() + ", Y: " + pos.getY() + ", Z: " + pos.getZ()));
 		}
 	}
 
@@ -53,7 +52,7 @@ public class ItemBlockChargingUpgrade
 	public InteractionResult useOn(UseOnContext context)
 	{
 		BlockEntity tile = context.getLevel().getBlockEntity(context.getClickedPos());
-		return tile != null ? tile.getCapability(CapabilityEnergy.ENERGY, context.getClickedFace()).filter(IEnergyStorage::canReceive).map(estorage ->
+		return tile != null ? tile.getCapability(ForgeCapabilities.ENERGY, context.getClickedFace()).filter(IEnergyStorage::canReceive).map(estorage ->
 		{
 			ItemStack held = context.getItemInHand();
 			CompoundTag nbt = held.getTag();
@@ -78,7 +77,7 @@ public class ItemBlockChargingUpgrade
 	{
 		BlockPos pos;
 		BlockEntity t;
-		return isFoil(stack) && (!stack.getTag().contains("Dim", Tag.TAG_STRING) || tile.getLevel().dimension().location().toString().equals(stack.getTag().getString("Dim"))) && tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D && (t = tile.getLevel().getBlockEntity(pos)) != null && t.getCapability(CapabilityEnergy.ENERGY, DIRECTIONS[stack.getTag().getByte("Face")]).isPresent();
+		return isFoil(stack) && (!stack.getTag().contains("Dim", Tag.TAG_STRING) || tile.getLevel().dimension().location().toString().equals(stack.getTag().getString("Dim"))) && tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D && (t = tile.getLevel().getBlockEntity(pos)) != null && t.getCapability(ForgeCapabilities.ENERGY, DIRECTIONS[stack.getTag().getByte("Face")]).isPresent();
 	}
 
 	@Override

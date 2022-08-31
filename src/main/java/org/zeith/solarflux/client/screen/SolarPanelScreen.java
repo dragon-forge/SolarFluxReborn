@@ -5,7 +5,6 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Inventory;
@@ -189,8 +188,8 @@ public class SolarPanelScreen
 	{
 		if(line != null)
 			Arrays.stream(line.split("\n"))
-					.map(TextComponent::new)
-					.map(TextComponent::getVisualOrderText)
+					.map(Component::literal)
+					.map(Component::getVisualOrderText)
 					.forEach(tooltip::add);
 	}
 }

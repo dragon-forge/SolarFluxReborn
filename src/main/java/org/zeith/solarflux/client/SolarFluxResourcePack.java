@@ -5,9 +5,10 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
-import org.zeith.solarflux.SolarFlux;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.panels.SolarPanels;
+import org.zeith.solarflux.init.ItemsSF;
+import org.zeith.solarflux.init.SolarPanelsSF;
 
 import java.io.*;
 import java.util.*;
@@ -46,32 +47,32 @@ public class SolarFluxResourcePack
 		hasInit = true;
 
 		resourceMap.clear();
-
-		SolarFlux.JS_MATERIALS.forEach(i ->
+		
+		ItemsSF.JS_MATERIALS.forEach(i ->
 		{
 			ResourceLocation reg = i.getRegistryName();
-
+			
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
-
+			
 			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":items/materials/" + reg.getPath() + "\"}}"));
-
-			File textures = new File(SolarPanels.CONFIG_DIR, "textures");
+			
+			File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 			File items = new File(textures, "items");
 			ResourceLocation textures_items = new ResourceLocation(reg.getNamespace(), "textures/items/materials/" + reg.getPath() + ".png");
 			{
 				resourceMap.put(textures_items, ofFile(new File(items, reg.getPath() + ".png")));
 			}
 		});
-
-		SolarPanels.listPanels().forEach(si ->
+		
+		SolarPanelsSF.listPanels().forEach(si ->
 		{
 			SolarPanelBlock blk = si.getBlock();
-			ResourceLocation reg = blk.getRegistryName();
-
+			ResourceLocation reg = ForgeRegistries.BLOCKS.getKey(blk);
+			
 			ResourceLocation blockstate = new ResourceLocation(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
 			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
-
+			
 			float thicc = si.getPanelData().height * 16F;
 			float thic2 = thicc + 0.25F;
 			float reverseThicc = 16 - thicc;
@@ -84,7 +85,7 @@ public class SolarFluxResourcePack
 
 			if(si.isCustom)
 			{
-				File textures = new File(SolarPanels.CONFIG_DIR, "textures");
+				File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 				File blocks = new File(textures, "blocks");
 				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_base.png");
 				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_top.png");
@@ -127,9 +128,9 @@ public class SolarFluxResourcePack
 			throw e;
 		}
 	}
-
+	
 	@Override
-	public Collection<ResourceLocation> getResources(PackType type, String namespaceIn, String pathIn, int maxDepthIn, Predicate<String> filterIn)
+	public Collection<ResourceLocation> getResources(PackType p_215339_, String p_215340_, String p_215341_, Predicate<ResourceLocation> p_215342_)
 	{
 		return Collections.emptyList();
 	}

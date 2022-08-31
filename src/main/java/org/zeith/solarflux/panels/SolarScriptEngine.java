@@ -9,7 +9,6 @@ import net.minecraftforge.fml.ModList;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
-import org.zeith.solarflux.SolarFlux;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
@@ -84,7 +83,7 @@ public class SolarScriptEngine
 			se.put("panel", se.eval("function(){return Java.type('" + SolarPanel.class.getName() + "').customBuilder();}"));
 			se.put("ingredient", se.eval("function(e){return Java.type('" + RecipeHelper.class.getName() + "').fromComponent(e);}"));
 			se.put("isEmpty", se.eval("function(e){return Java.type('" + SolarScriptEngine.class.getName() + "').isEmpty(e);}"));
-			se.put("newMaterial", se.eval("function(name){return Java.type('" + SolarFlux.class.getName() + "').newJSItem(name);}"));
+			se.put("newMaterial", se.eval("function(name){return Java.type('" + JSHelper.class.getName() + "').newJSItem(name);}"));
 			se.put("item", se.eval("function(mod, id){var js=Java.type('" + JSHelper.class.getName() + "');if(!id){return js.item(mod);}else{return js.item(mod,id);}}"));
 			se.put("tag", se.eval("function(mod, id){var js=Java.type('" + JSHelper.class.getName() + "');if(!id){return js.tag(mod);}else{return js.tag(mod,id);}}"));
 			se.put("isModLoaded", se.eval("function(mod){return Java.type('" + ModList.class.getName() + "').get().isLoaded(mod);}"));
