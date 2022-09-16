@@ -99,7 +99,7 @@ public class ItemBlockChargingUpgrade
 				&& tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D
 				&& (t = tile.getLevel().getBlockEntity(pos)) != null
 				&& (
-				(t instanceof AbstractFurnaceBlockEntity && DIRECTIONS[stack.getTag().getByte("Face")] == Direction.UP)
+				(t instanceof AbstractFurnaceBlockEntity && DIRECTIONS[stack.getTag().getByte("Face")] == Direction.UP && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
 						|| t.getCapability(ForgeCapabilities.ENERGY, DIRECTIONS[stack.getTag().getByte("Face")]).isPresent()
 		);
 	}

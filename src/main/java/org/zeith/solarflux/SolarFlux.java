@@ -24,6 +24,7 @@ import org.apache.logging.log4j.Logger;
 import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.client.adapter.ChatMessageAdapter;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
+import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.core.adapter.ModSourceAdapter;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
@@ -52,6 +53,7 @@ public class SolarFlux
 		MinecraftForge.EVENT_BUS.register(this);
 		HammerLib.EVENT_BUS.addListener(RecipesSF::addRecipes);
 		SolarPanelsSF.init();
+		LanguageAdapter.registerMod("solarflux");
 		
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
 		
