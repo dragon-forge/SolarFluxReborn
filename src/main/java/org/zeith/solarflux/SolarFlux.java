@@ -1,7 +1,9 @@
 package org.zeith.solarflux;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -16,13 +18,13 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zeith.hammerlib.HammerLib;
+import org.zeith.hammerlib.client.adapter.ChatMessageAdapter;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
+import org.zeith.hammerlib.core.adapter.ModSourceAdapter;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
 import org.zeith.solarflux.init.ItemsSF;
@@ -52,6 +54,40 @@ public class SolarFlux
 		SolarPanelsSF.init();
 		
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
+		
+		var illegalSourceNotice = ModSourceAdapter.getModSource(SolarFlux.class)
+				.filter(ModSourceAdapter.ModSource::wasDownloadedIllegally)
+				.orElse(null);
+		
+		if(illegalSourceNotice != null)
+		{
+			LOG.fatal("====================================================");
+			LOG.fatal("WARNING: Solar Flux Reborn was downloaded from " + illegalSourceNotice.referrerDomain() +
+					", which has been marked as illegal site over at stopmodreposts.org.");
+			LOG.fatal("Please download the mod from https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn");
+			LOG.fatal("====================================================");
+			
+			var illegalUri = Component.literal(illegalSourceNotice.referrerDomain())
+					.withStyle(s -> s.withColor(ChatFormatting.RED));
+			var smrUri = Component.literal("stopmodreposts.org")
+					.withStyle(s -> s.withColor(ChatFormatting.BLUE)
+							.withUnderlined(true)
+							.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://stopmodreposts.org/"))
+							.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open webpage."))));
+			var curseforgeUri = Component.literal("curseforge.com")
+					.withStyle(s -> s.withColor(ChatFormatting.BLUE)
+							.withUnderlined(true)
+							.withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, "https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn"))
+							.withHoverEvent(new HoverEvent(HoverEvent.Action.SHOW_TEXT, Component.literal("Click to open webpage."))));
+			ChatMessageAdapter.sendOnFirstWorldLoad(Component.literal("WARNING: Solar Flux Reborn was downloaded from ")
+					.append(illegalUri)
+					.append(", which has been marked as illegal site over at ")
+					.append(smrUri)
+					.append(". Please download the mod from ")
+					.append(curseforgeUri)
+					.append(".")
+			);
+		}
 	}
 	
 	@SubscribeEvent

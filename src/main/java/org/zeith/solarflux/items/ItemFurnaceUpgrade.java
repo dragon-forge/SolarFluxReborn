@@ -1,6 +1,7 @@
 package org.zeith.solarflux.items;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Recipe;
@@ -10,6 +11,7 @@ import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.zeith.solarflux.block.SolarPanelTile;
 import org.zeith.solarflux.mixins.AbstractFurnaceBlockEntityAccessor;
+import org.zeith.solarflux.util.BlockPosFace;
 
 import javax.annotation.Nullable;
 
@@ -20,28 +22,37 @@ public class ItemFurnaceUpgrade
 	{
 		super(1);
 	}
-
+	
 	@Override
 	public void update(SolarPanelTile tile, ItemStack stack, int amount)
 	{
 		Level lvl = tile.getLevel();
 		BlockPos pos = tile.getBlockPos().below();
 		
+		updateFurnaceAt(tile, lvl, pos);
+		
+		for(BlockPosFace face : tile.traversal)
+			if(face.face == Direction.UP)
+				updateFurnaceAt(tile, lvl, face.pos);
+	}
+	
+	public void updateFurnaceAt(SolarPanelTile solar, Level lvl, BlockPos pos)
+	{
 		if(lvl.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity tf && tf instanceof AbstractFurnaceBlockEntityAccessor a)
 		{
 			AbstractCookingRecipe irecipe = tf.getLevel().getRecipeManager().getRecipeFor(a.getRecipeType(), tf, tf.getLevel()).orElse(null);
 			
-			if(tf.litTime <= 1 && irecipe != null && canSmelt(tf, irecipe) && tile.energy >= 1000)
+			if(tf.litTime <= 1 && irecipe != null && canSmelt(tf, irecipe) && solar.energy >= 1000)
 			{
 				tf.litTime += 200;
 				tf.litDuration = 200;
-				tile.energy -= 1000;
+				solar.energy -= 1000;
 				
 				if(!lvl.getBlockState(pos).getValue(AbstractFurnaceBlock.LIT))
 				{
 					BlockState state = lvl.getBlockState(pos).setValue(AbstractFurnaceBlock.LIT, true);
 					lvl.setBlock(pos, state, 3);
-
+					
 					lvl.blockEntityChanged(pos);
 					if(!state.isAir())
 						lvl.updateNeighbourForOutputSignal(pos, state.getBlock());
@@ -49,7 +60,7 @@ public class ItemFurnaceUpgrade
 			}
 		}
 	}
-
+	
 	public static boolean canSmelt(AbstractFurnaceBlockEntity f, @Nullable Recipe<?> recipeIn)
 	{
 		if(!f.getItem(0).isEmpty() && recipeIn != null)
