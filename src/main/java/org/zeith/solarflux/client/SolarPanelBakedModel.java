@@ -5,8 +5,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -59,13 +59,13 @@ public class SolarPanelBakedModel
 				
 				quads.add(COOKER.bakeQuad( //
 						new Vector3f(0, 0, 0), new Vector3f(16, h, 16), //
-						new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+						new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 								0,
 								side.getAxis() == Direction.Axis.Y ? 0 : (16F - h),
 								16,
 								16
 						}, 4)), //
-						side == Direction.UP ? top : base, side, ZERO_SPRITE, null, true, modelName));
+						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				// world/pos not set? no connected textures == no crash!
 				if(world == null || pos == null)
@@ -81,13 +81,13 @@ public class SolarPanelBakedModel
 									0,
 									16,
 									1
-							} : new float[]{
+							} : new float[] {
 									0,
 									0,
 									1,
 									16
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(east = world.getBlockState(pos.east()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -97,86 +97,82 @@ public class SolarPanelBakedModel
 									0,
 									16,
 									1
-							} : new float[]{
+							} : new float[] {
 									15,
 									0,
 									16,
 									16
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(north = world.getBlockState(pos.north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									0,
 									0,
 									16,
 									1
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(south = world.getBlockState(pos.south()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									0,
 									0,
 									16,
 									1
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									0,
 									0,
 									1,
 									1
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									15,
 									0,
 									16,
 									1
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									15,
 									15,
 									16,
 									16
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 				
 				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
 									0,
 									15,
 									1,
 									16
 							}, 4)), //
-							base, side, ZERO_SPRITE, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 			}
 		return quads;
 	}
-	
-	public static final ModelState ZERO_SPRITE = new ModelState()
-	{
-	};
 	
 	@Override
 	public ItemTransforms getTransforms()

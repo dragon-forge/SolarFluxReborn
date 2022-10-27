@@ -6,6 +6,7 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.zeith.hammerlib.util.shaded.json.JSONObject;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -19,33 +20,33 @@ public class SolarFluxResourcePack
 		implements PackResources
 {
 	public final Map<ResourceLocation, IResourceStreamSupplier> resourceMap = new HashMap<>();
-
+	
 	private static IResourceStreamSupplier ofText(String text)
 	{
 		return IResourceStreamSupplier.create(() -> true, () -> new ByteArrayInputStream(text.getBytes()));
 	}
-
+	
 	private static IResourceStreamSupplier ofFile(File file)
 	{
 		return IResourceStreamSupplier.create(file::isFile, () -> new FileInputStream(file));
 	}
-
+	
 	static SolarFluxResourcePack packInstance;
-
+	
 	public static SolarFluxResourcePack getPackInstance()
 	{
 		if(packInstance == null)
 			packInstance = new SolarFluxResourcePack();
 		return packInstance;
 	}
-
+	
 	private boolean hasInit = false;
-
+	
 	public void init()
 	{
 		if(hasInit) return;
 		hasInit = true;
-
+		
 		resourceMap.clear();
 		
 		ItemsSF.JS_MATERIALS.forEach(i ->
@@ -76,13 +77,16 @@ public class SolarFluxResourcePack
 			float thicc = si.getPanelData().height * 16F;
 			float thic2 = thicc + 0.25F;
 			float reverseThicc = 16 - thicc;
-
+			
 			resourceMap.put(blockstate, ofText("{\"variants\":{\"\":{\"model\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}}}"));
 			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}"));
-
+			
 			// Block Model
-			resourceMap.put(models_block, ofText("{\"parent\":\"block/block\",\"textures\":{\"0\":\"" + reg.getNamespace() + ":blocks/" + reg.getPath() + "_base\",\"1\":\"" + reg.getNamespace() + ":blocks/" + reg.getPath() + "_top\",\"particle\":\"solarflux:blocks/example_base\"},\"elements\":[{\"name\":\"base\",\"from\":[0,0,0],\"to\":[16," + thicc + ",16],\"faces\":{\"north\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"east\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"south\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"west\":{\"uv\":[0," + reverseThicc + ",16,16],\"texture\":\"#0\"},\"up\":{\"uv\":[0,0,16,16],\"texture\":\"#1\"},\"down\":{\"uv\":[0,0,16,16],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",0],\"to\":[16," + thic2 + ",1],\"faces\":{\"north\":{\"uv\":[0,0,16,0.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,0,16,0.25],\"texture\":\"#0\"},\"west\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,0,16,1],\"texture\":\"#0\"},\"down\":{\"uv\":[0,0,16,1],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",15],\"to\":[16," + thic2 + ",16],\"faces\":{\"north\":{\"uv\":[0,15,16,15.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,15,16,15.25],\"texture\":\"#0\"},\"west\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,15,16,16],\"texture\":\"#0\"},\"down\":{\"uv\":[0,15,16,16],\"texture\":\"#0\"}}},{\"from\":[0," + thicc + ",1],\"to\":[1," + thic2 + ",15],\"faces\":{\"north\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"east\":{\"uv\":[0,0,14,0.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,0,1,0.25],\"texture\":\"#0\"},\"west\":{\"uv\":[1,0,15,0.25],\"texture\":\"#0\"},\"up\":{\"uv\":[0,1,1,15],\"texture\":\"#0\"},\"down\":{\"uv\":[0,1,1,15],\"texture\":\"#0\"}}},{\"from\":[15," + thicc + ",1],\"to\":[16," + thic2 + ",15],\"faces\":{\"north\":{\"uv\":[15,15,16,15.25],\"texture\":\"#0\"},\"east\":{\"uv\":[1,15,15,15.25],\"texture\":\"#0\"},\"south\":{\"uv\":[0,15,1,15.25],\"texture\":\"#0\"},\"west\":{\"uv\":[1,15,15,15.25],\"texture\":\"#0\"},\"up\":{\"uv\":[15,1,16,15],\"texture\":\"#0\"},\"down\":{\"uv\":[15,1,16,15],\"texture\":\"#0\"}}}]}"));
-
+			var blockModel = new JSONObject();
+			blockModel.put("loader", "solarflux:solar_panel");
+			blockModel.put("panel", reg.toString());
+			resourceMap.put(models_block, ofText(blockModel.toString()));
+			
 			if(si.isCustom)
 			{
 				File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
@@ -101,18 +105,18 @@ public class SolarFluxResourcePack
 			}
 		});
 	}
-
+	
 	@Override
 	public void close()
 	{
 	}
-
+	
 	@Override
 	public InputStream getRootResource(String fileName) throws IOException
 	{
 		throw new FileNotFoundException(fileName);
 	}
-
+	
 	@Override
 	public InputStream getResource(PackType type, ResourceLocation location) throws IOException
 	{
@@ -134,7 +138,7 @@ public class SolarFluxResourcePack
 	{
 		return Collections.emptyList();
 	}
-
+	
 	@Override
 	public boolean hasResource(PackType type, ResourceLocation location)
 	{
@@ -142,14 +146,14 @@ public class SolarFluxResourcePack
 		IResourceStreamSupplier s;
 		return (s = resourceMap.get(location)) != null && s.exists();
 	}
-
+	
 	@Override
 	public Set<String> getNamespaces(PackType type)
 	{
 		init();
 		return Collections.singleton("solarflux");
 	}
-
+	
 	@Override
 	public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) throws IOException
 	{
@@ -162,13 +166,13 @@ public class SolarFluxResourcePack
 		}
 		return null;
 	}
-
+	
 	@Override
 	public String getName()
 	{
 		return "Solar Flux Generated Resources";
 	}
-
+	
 	public interface IResourceStreamSupplier
 	{
 		static IResourceStreamSupplier create(BooleanSupplier exists, IIOSupplier<InputStream> streamable)
@@ -180,7 +184,7 @@ public class SolarFluxResourcePack
 				{
 					return exists.getAsBoolean();
 				}
-
+				
 				@Override
 				public InputStream create() throws IOException
 				{
@@ -188,12 +192,12 @@ public class SolarFluxResourcePack
 				}
 			};
 		}
-
+		
 		boolean exists();
-
+		
 		InputStream create() throws IOException;
 	}
-
+	
 	@FunctionalInterface
 	public interface IIOSupplier<T>
 	{

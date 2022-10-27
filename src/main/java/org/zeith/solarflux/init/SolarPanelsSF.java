@@ -11,8 +11,10 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
-import org.zeith.hammerlib.util.cfg.ConfigFile;
-import org.zeith.hammerlib.util.cfg.entries.ConfigEntryCategory;
+import org.zeith.hammerlib.util.configured.ConfiguredLib;
+import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
+import org.zeith.hammerlib.util.configured.data.IntValueRange;
+import org.zeith.hammerlib.util.configured.types.ConfigCategory;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.block.SolarPanelTile;
@@ -20,10 +22,7 @@ import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarScriptEngine;
 
 import javax.script.ScriptException;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
@@ -77,7 +76,7 @@ public class SolarPanelsSF
 		if(!solarflux.isDirectory())
 			solarflux.mkdirs();
 		
-		int[] generations = new int[]{
+		int[] generations = new int[] {
 				1,
 				8,
 				32,
@@ -87,7 +86,7 @@ public class SolarPanelsSF
 				8192,
 				32768
 		};
-		int[] transfers = new int[]{
+		int[] transfers = new int[] {
 				8,
 				64,
 				256,
@@ -97,7 +96,7 @@ public class SolarPanelsSF
 				65536,
 				262144
 		};
-		int[] capacities = new int[]{
+		int[] capacities = new int[] {
 				25000,
 				125000,
 				425000,
@@ -108,29 +107,67 @@ public class SolarPanelsSF
 				128000000
 		};
 		
-		ConfigFile cfgs = new ConfigFile(new File(solarflux, "main.hlc"));
+		var cfgs = ConfiguredLib.create(new File(solarflux, "main.cfg"), true);
 		
-		cfgs.setComment("Main configuration file for Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
+		cfgs.withComment("Main configuration file for Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
 		
-		ConfigEntryCategory spc = cfgs.getCategory("Solar Panels");
+		var spc = cfgs.setupCategory("Solar Panels");
 		
-		LOOSE_ENERGY = spc.getFloatEntry("Pickup Energy Loss", 5, 0, 100).setDescription("How much energy (percent) will get lost while picking up the solar panel?").getValue();
+		LOOSE_ENERGY = spc.getElement(ConfiguredLib.DECIMAL, "Pickup Energy Loss")
+				.withRange(DecimalValueRange.rangeClosed(0, 100))
+				.withDefault(5)
+				.withComment("How much energy (percent) will get lost while picking up the solar panel?")
+				.getValue()
+				.floatValue();
 		
 		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{
-			ConfigEntryCategory spsc = spc.getCategory("Solar Panel " + (i + 1));
+			var spsc = spc.setupSubCategory("Solar Panel " + (i + 1));
 			
-			long gen = spsc.getLongEntry("Generation Rate", generations[i], 1, Long.MAX_VALUE).getValue();
-			long transfer = spsc.getLongEntry("Transfer Rate", transfers[i], 1, Long.MAX_VALUE).getValue();
-			long capacity = spsc.getLongEntry("Capacity", capacities[i], 1, Long.MAX_VALUE).getValue();
+			var generation = spsc.getElement(ConfiguredLib.INT, "Generation Rate")
+					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
+					.withDefault(generations[i])
+					.withComment("How much FE does this solar panel produce per tick?")
+					.getValue()
+					.longValue();
 			
-			CORE_PANELS[i] = SolarPanel.builder().name(Integer.toString(i + 1)).generation(gen).transfer(transfer).capacity(capacity).buildAndRegister();
+			var transfer = spsc.getElement(ConfiguredLib.INT, "Transfer Rate")
+					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
+					.withDefault(transfers[i])
+					.withComment("How much FE does this solar panel emit to other blocks, per tick?")
+					.getValue()
+					.longValue();
+			
+			var capacity = spsc.getElement(ConfiguredLib.INT, "Capacity")
+					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
+					.withDefault(capacities[i])
+					.withComment("How much FE does this solar panel store?")
+					.getValue()
+					.longValue();
+			
+			CORE_PANELS[i] = SolarPanel.builder()
+					.name(Integer.toString(i + 1))
+					.generation(generation)
+					.transfer(transfer)
+					.capacity(capacity)
+					.buildAndRegister();
 		}
 		
-		ConfigEntryCategory main = cfgs.getCategory("Main");
+		var main = cfgs.setupCategory("Main");
 		
-		RAIN_MULTIPLIER = main.getFloatEntry("Rain Multiplier", 0.6F, 0F, 1F).setDescription("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.").getValue();
-		THUNDER_MULTIPLIER = main.getFloatEntry("Thunder Multiplier", 0.4F, 0F, 1F).setDescription("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.").getValue();
+		RAIN_MULTIPLIER = spc.getElement(ConfiguredLib.DECIMAL, "Rain Multiplier")
+				.withRange(DecimalValueRange.rangeClosed(0, 1))
+				.withDefault(0.6F)
+				.withComment("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.")
+				.getValue()
+				.floatValue();
+		
+		THUNDER_MULTIPLIER = spc.getElement(ConfiguredLib.DECIMAL, "Thunder Multiplier")
+				.withRange(DecimalValueRange.rangeClosed(0, 1))
+				.withDefault(0.4F)
+				.withComment("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.")
+				.getValue()
+				.floatValue();
 		
 		if(cfgs.hasChanged())
 			cfgs.save();
@@ -260,15 +297,15 @@ public class SolarPanelsSF
 	
 	public static void refreshConfigs()
 	{
-		ConfigFile panels = new ConfigFile(new File(CONFIG_DIR, "panels.hlc"));
+		var panels = ConfiguredLib.create(new File(CONFIG_DIR, "panels.cfg"), true);
 		
 		listPanels().forEach(i ->
 		{
-			ConfigEntryCategory cat;
-			if(i.isCustom) cat = panels.getCategory("Solar Flux: Custom");
-			else if(i.getCompatMod() == null) cat = panels.getCategory("Solar Flux");
+			ConfigCategory cat;
+			if(i.isCustom) cat = panels.setupCategory("Solar Flux: Custom");
+			else if(i.getCompatMod() == null) cat = panels.setupCategory("Solar Flux");
 			else
-				cat = panels.getCategory(
+				cat = panels.setupCategory(
 						ModList.get().getMods()
 								.stream()
 								.filter(m -> m.getModId().equals(i.getCompatMod()))
@@ -276,22 +313,32 @@ public class SolarPanelsSF
 								.map(IModInfo::getDisplayName)
 								.orElse("Unknown")
 				);
-			i.configureBase(cat.getCategory(i.name));
+			i.configureBase(cat.setupSubCategory(i.name));
 		});
 		
 		if(panels.hasChanged()) panels.save();
+		
+		refreshRecipes();
 	}
 	
 	public static void refreshRecipes()
 	{
-		ConfigFile recipes = new ConfigFile(new File(CONFIG_DIR, "recipes.hlc"));
-		ConfigEntryCategory cat = recipes.getCategory("recipes");
+		ENABLED_RECIPES.clear();
+		
+		var recipes = ConfiguredLib.create(new File(CONFIG_DIR, "recipes.cfg"), true);
+		var cat = recipes.setupCategory("recipes");
 		RECIPE_KEYS.forEach(recipe ->
 		{
-			boolean enabled = cat.getBooleanEntry(recipe.toString(), true).setDescription("Enable this recipe?").getValue();
-			if(enabled) ENABLED_RECIPES.add(recipe);
+			boolean enabled = cat.getElement(ConfiguredLib.BOOLEAN, recipe.toString())
+					.withDefault(true)
+					.withComment("Enable this recipe?")
+					.getValue();
+			
+			if(enabled)
+				ENABLED_RECIPES.add(recipe);
 		});
-		recipes.save();
+		if(recipes.hasChanged())
+			recipes.save();
 	}
 	
 	public static boolean isRecipeActive(ResourceLocation id)

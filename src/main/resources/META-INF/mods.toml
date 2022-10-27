@@ -29,6 +29,6 @@ side = "BOTH"
 [[dependencies.solarflux]]
 modId = "hammerlib"
 mandatory = true
-versionRange = "[19.1.10,)"
+versionRange = "[19.2.35,)"
 ordering = "NONE"
 side = "BOTH"

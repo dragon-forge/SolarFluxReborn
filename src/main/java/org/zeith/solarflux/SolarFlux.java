@@ -30,7 +30,7 @@ import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
-import org.zeith.solarflux.net.SFNetwork;
+import org.zeith.solarflux.net.PacketSyncPanelData;
 import org.zeith.solarflux.proxy.SFRClientProxy;
 import org.zeith.solarflux.proxy.SFRCommonProxy;
 
@@ -101,7 +101,7 @@ public class SolarFlux
 								.executes(src ->
 								{
 									SolarPanelsSF.refreshConfigs();
-									src.getSource().getServer().getPlayerList().getPlayers().forEach(SFNetwork::sendAllPanels);
+									src.getSource().getServer().getPlayerList().getPlayers().forEach(PacketSyncPanelData::sendAllPanels);
 									return 1;
 								})
 						)
@@ -114,7 +114,7 @@ public class SolarFlux
 		if(e.getEntity() instanceof ServerPlayer sp)
 		{
 			LOG.info("Sending solar panels to " + sp.getGameProfile().getName() + ".");
-			SFNetwork.sendAllPanels(sp);
+			PacketSyncPanelData.sendAllPanels(sp);
 		}
 	}
 	
@@ -125,7 +125,6 @@ public class SolarFlux
 		public void commonSetup(FMLCommonSetupEvent e)
 		{
 			PROXY.commonSetup();
-			SFNetwork.init();
 		}
 		
 		@SubscribeEvent
