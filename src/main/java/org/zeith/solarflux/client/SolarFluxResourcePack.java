@@ -118,6 +118,12 @@ public class SolarFluxResourcePack
 	}
 	
 	@Override
+	public boolean isHidden()
+	{
+		return true;
+	}
+	
+	@Override
 	public InputStream getResource(PackType type, ResourceLocation location) throws IOException
 	{
 		try

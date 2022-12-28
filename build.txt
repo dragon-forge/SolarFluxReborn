@@ -2,15 +2,16 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=19.2.4
+mod_version=19.3.5
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=19.2.35
+hl_version=19.3.44
 
 # MC Info
 mc_version=1.19.2
-forge_version=43.1.43
+forge_version=43.2.0
+mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
 # MCP Info
 mcp_ch=official

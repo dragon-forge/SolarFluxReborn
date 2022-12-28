@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -19,24 +20,29 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.client.adapter.ChatMessageAdapter;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
+import org.zeith.hammerlib.compat.base.CompatList;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.core.adapter.ModSourceAdapter;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
+import org.zeith.solarflux.compat._base.SFCompatList;
+import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.net.PacketSyncPanelData;
 import org.zeith.solarflux.proxy.SFRClientProxy;
 import org.zeith.solarflux.proxy.SFRCommonProxy;
 
-@Mod("solarflux")
+@Mod(SolarFlux.MOD_ID)
 public class SolarFlux
 {
+	public static final String MOD_ID = "solarflux";
 	public static final Logger LOG = LogManager.getLogger();
 	public static final SFRCommonProxy PROXY = DistExecutor.unsafeRunForDist(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
 	public static final CreativeModeTab ITEM_GROUP = new CreativeModeTab(InfoSF.MOD_ID)
@@ -48,12 +54,18 @@ public class SolarFlux
 		}
 	};
 	
+	public static final SFCompatList SF_COMPAT = CompatList.gather(SolarFluxCompat.class, SFCompatList::new);
+	
 	public SolarFlux()
 	{
+		var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+		
 		MinecraftForge.EVENT_BUS.register(this);
 		HammerLib.EVENT_BUS.addListener(RecipesSF::addRecipes);
+		
 		SolarPanelsSF.init();
-		LanguageAdapter.registerMod("solarflux");
+		SF_COMPAT.setupSolarPanels();
+		LanguageAdapter.registerMod(MOD_ID);
 		
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
 		
@@ -92,11 +104,16 @@ public class SolarFlux
 		}
 	}
 	
+	public static ResourceLocation id(String s)
+	{
+		return new ResourceLocation(MOD_ID, s);
+	}
+	
 	@SubscribeEvent
 	public void startServer(RegisterCommandsEvent e)
 	{
 		e.getDispatcher().register(
-				Commands.literal("solarflux")
+				Commands.literal(MOD_ID)
 						.then(Commands.literal("reload")
 								.executes(src ->
 								{

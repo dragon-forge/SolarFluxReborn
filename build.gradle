@@ -54,7 +54,7 @@ minecraft {
         client {
             workingDirectory project.file('run/client')
             property 'forge.logging.console.level', 'debug'
-            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json --username ${config.mc_user.split(',')[0]} --uuid ${config.mc_user.split(',')[1]}".split(' ')))
             mods {
                 examplemod {
                     source sourceSets.main
@@ -83,12 +83,23 @@ repositories {
     flatDir { dirs 'libraries/all' }
     flatDir { dirs 'libraries/classpathOnly' }
     flatDir { dirs 'libraries/runtimeOnly' }
+
+    maven {
+        name "Modmaven"
+        url "https://modmaven.dev/"
+        // For Gradle 5.1 and above, limit it to just AE2
+        content {
+            includeGroup 'appeng'
+        }
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    implementation fg.deobf("appeng:appliedenergistics2-forge:12.9.1")
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 

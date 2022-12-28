@@ -5,8 +5,11 @@
   "refmap": "mixins.solarflux.refmap.json",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "org.zeith.solarflux.mixins.SFMixinConfig",
   "mixins": [
-    "AbstractFurnaceBlockEntityAccessor"
+    "AbstractFurnaceBlockEntityAccessor",
+    "BlockMixin",
+    "compat.ae2.SolarPanelTileMixin"
   ],
   "client": [
   ],

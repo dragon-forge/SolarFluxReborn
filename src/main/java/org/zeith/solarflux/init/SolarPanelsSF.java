@@ -4,20 +4,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
-import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.configured.ConfiguredLib;
 import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
-import org.zeith.hammerlib.util.configured.data.IntValueRange;
 import org.zeith.hammerlib.util.configured.types.ConfigCategory;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.block.SolarPanelTile;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarScriptEngine;
 
@@ -33,15 +28,7 @@ import java.util.stream.Stream;
 public class SolarPanelsSF
 {
 	public static final Map<String, SolarPanel> PANELS = new HashMap<>();
-	@RegistryName("solar_panel")
-	public static final BlockEntityType<SolarPanelTile> SOLAR_PANEL_TYPE = new BlockEntityType<SolarPanelTile>(SolarPanelTile::new, new HashSet<>(), null)
-	{
-		@Override
-		public boolean isValid(BlockState state)
-		{
-			return state.getBlock() instanceof SolarPanelBlock;
-		}
-	};
+	
 	public static double LOOSE_ENERGY;
 	public static float RAIN_MULTIPLIER = 0.6F, THUNDER_MULTIPLIER = 0.4F;
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
@@ -111,39 +98,11 @@ public class SolarPanelsSF
 		
 		cfgs.withComment("Main configuration file for Solar Flux Reborn!\nTo implement custom panels, look for the custom_panels.js file!");
 		
-		var spc = cfgs.setupCategory("Solar Panels");
-		
-		LOOSE_ENERGY = spc.getElement(ConfiguredLib.DECIMAL, "Pickup Energy Loss")
-				.withRange(DecimalValueRange.rangeClosed(0, 100))
-				.withDefault(5)
-				.withComment("How much energy (percent) will get lost while picking up the solar panel?")
-				.getValue()
-				.floatValue();
-		
 		for(int i = 0; i < CORE_PANELS.length; ++i)
 		{
-			var spsc = spc.setupSubCategory("Solar Panel " + (i + 1));
-			
-			var generation = spsc.getElement(ConfiguredLib.INT, "Generation Rate")
-					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
-					.withDefault(generations[i])
-					.withComment("How much FE does this solar panel produce per tick?")
-					.getValue()
-					.longValue();
-			
-			var transfer = spsc.getElement(ConfiguredLib.INT, "Transfer Rate")
-					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
-					.withDefault(transfers[i])
-					.withComment("How much FE does this solar panel emit to other blocks, per tick?")
-					.getValue()
-					.longValue();
-			
-			var capacity = spsc.getElement(ConfiguredLib.INT, "Capacity")
-					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
-					.withDefault(capacities[i])
-					.withComment("How much FE does this solar panel store?")
-					.getValue()
-					.longValue();
+			var generation = generations[i];
+			var transfer = transfers[i];
+			var capacity = capacities[i];
 			
 			CORE_PANELS[i] = SolarPanel.builder()
 					.name(Integer.toString(i + 1))
@@ -155,14 +114,21 @@ public class SolarPanelsSF
 		
 		var main = cfgs.setupCategory("Main");
 		
-		RAIN_MULTIPLIER = spc.getElement(ConfiguredLib.DECIMAL, "Rain Multiplier")
+		LOOSE_ENERGY = main.getElement(ConfiguredLib.DECIMAL, "Pickup Energy Loss")
+				.withRange(DecimalValueRange.rangeClosed(0, 100))
+				.withDefault(5)
+				.withComment("How much energy (percent) will get lost while picking up the solar panel?")
+				.getValue()
+				.floatValue();
+		
+		RAIN_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Rain Multiplier")
 				.withRange(DecimalValueRange.rangeClosed(0, 1))
 				.withDefault(0.6F)
 				.withComment("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.")
 				.getValue()
 				.floatValue();
 		
-		THUNDER_MULTIPLIER = spc.getElement(ConfiguredLib.DECIMAL, "Thunder Multiplier")
+		THUNDER_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Thunder Multiplier")
 				.withRange(DecimalValueRange.rangeClosed(0, 1))
 				.withDefault(0.4F)
 				.withComment("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.")
@@ -311,7 +277,7 @@ public class SolarPanelsSF
 								.filter(m -> m.getModId().equals(i.getCompatMod()))
 								.findFirst()
 								.map(IModInfo::getDisplayName)
-								.orElse("Unknown")
+								.orElse(i.getCompatMod())
 				);
 			i.configureBase(cat.setupSubCategory(i.name));
 		});

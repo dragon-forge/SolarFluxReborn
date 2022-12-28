@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
-import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.util.BlockPosFace;
 
@@ -89,15 +89,15 @@ public class ItemBlockChargingUpgrade
 	}
 	
 	@Override
-	public boolean canInstall(SolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
+	public boolean canInstall(ISolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
 	{
 		BlockPos pos;
 		BlockEntity t;
 		return isFoil(stack) &&
 				(!stack.getTag().contains("Dim", Tag.TAG_STRING)
-						|| tile.getLevel().dimension().location().toString().equals(stack.getTag().getString("Dim")))
-				&& tile.getBlockPos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D
-				&& (t = tile.getLevel().getBlockEntity(pos)) != null
+						|| tile.level().dimension().location().toString().equals(stack.getTag().getString("Dim")))
+				&& tile.pos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D
+				&& (t = tile.level().getBlockEntity(pos)) != null
 				&& (
 				(t instanceof AbstractFurnaceBlockEntity && DIRECTIONS[stack.getTag().getByte("Face")] == Direction.UP && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
 						|| t.getCapability(ForgeCapabilities.ENERGY, DIRECTIONS[stack.getTag().getByte("Face")]).isPresent()
@@ -105,31 +105,31 @@ public class ItemBlockChargingUpgrade
 	}
 	
 	@Override
-	public boolean canStayInPanel(SolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
+	public boolean canStayInPanel(ISolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
 	{
 		return canInstall(tile, stack, upgradeInv);
 	}
 	
 	@Override
-	public void update(SolarPanelTile tile, ItemStack stack, int amount)
+	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
 	{
 		CompoundTag nbt = stack.getTag();
-		if(tile.getLevel().getDayTime() % 20L == 0L)
+		if(tile.level().getDayTime() % 20L == 0L)
 		{
 			BlockPos pos = BlockPos.of(nbt.getLong("Pos"));
 			
 			double d;
-			if((d = tile.getBlockPos().distSqr(pos)) <= 256D)
+			if((d = tile.pos().distSqr(pos)) <= 256D)
 			{
 				d /= 256;
-				tile.traversal.clear();
+				tile.traversal().clear();
 				if(tile.getUpgrades(ItemsSF.TRAVERSAL_UPGRADE) > 0)
 				{
 					ItemTraversalUpgrade.cache.clear();
 					ItemTraversalUpgrade.cache.add(pos);
-					ItemTraversalUpgrade.findMachines(tile, ItemTraversalUpgrade.cache, tile.traversal);
+					ItemTraversalUpgrade.findMachines(tile, ItemTraversalUpgrade.cache, tile.traversal());
 				}
-				tile.traversal.add(new BlockPosFace(pos, Direction.values()[nbt.getByte("Face")], (float) (1 - d)));
+				tile.traversal().add(new BlockPosFace(pos, Direction.values()[nbt.getByte("Face")], (float) (1 - d)));
 			}
 		}
 	}

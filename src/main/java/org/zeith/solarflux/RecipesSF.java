@@ -50,6 +50,7 @@ public class RecipesSF
 		SolarPanelsSF.indexRecipes(BLANK_UPGRADE);
 		SolarPanelsSF.indexRecipes(SOLAR_PANEL_1, SOLAR_PANEL_2, SOLAR_PANEL_3, SOLAR_PANEL_4, SOLAR_PANEL_5, SOLAR_PANEL_6, SOLAR_PANEL_7, SOLAR_PANEL_8);
 		SolarPanelsSF.indexRecipes(EFFICIENCY_UPGRADE, TRANSFER_RATE_UPGRADE, TRAVERSAL_UPGRADE, DISPERSIVE_UPGRADE, BLOCK_CHARGING_UPGRADE, FURNACE_UPGRADE, CAPACITY_UPGRADE);
+		SolarFlux.SF_COMPAT.indexRecipes(SolarPanelsSF::indexRecipes);
 	}
 
 	public static void addRecipes(RegisterRecipesEvent $)
@@ -312,6 +313,8 @@ public class RecipesSF
 					.map('c', Tags.Items.STORAGE_BLOCKS_DIAMOND)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
+		
+		SolarFlux.SF_COMPAT.registerRecipes($);
 		
 		SolarPanelsSF.listPanels().forEach(sp -> sp.recipes($));
 	}

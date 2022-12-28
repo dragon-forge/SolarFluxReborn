@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.zeith.solarflux.block.SolarPanelTile;
+import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.mixins.AbstractFurnaceBlockEntityAccessor;
 import org.zeith.solarflux.util.BlockPosFace;
 
@@ -24,29 +24,29 @@ public class ItemFurnaceUpgrade
 	}
 	
 	@Override
-	public void update(SolarPanelTile tile, ItemStack stack, int amount)
+	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
 	{
-		Level lvl = tile.getLevel();
-		BlockPos pos = tile.getBlockPos().below();
+		Level lvl = tile.level();
+		BlockPos pos = tile.pos().below();
 		
 		updateFurnaceAt(tile, lvl, pos);
 		
-		for(BlockPosFace face : tile.traversal)
+		for(BlockPosFace face : tile.traversal())
 			if(face.face == Direction.UP)
 				updateFurnaceAt(tile, lvl, face.pos);
 	}
 	
-	public void updateFurnaceAt(SolarPanelTile solar, Level lvl, BlockPos pos)
+	public void updateFurnaceAt(ISolarPanelTile solar, Level lvl, BlockPos pos)
 	{
 		if(lvl.getBlockEntity(pos) instanceof AbstractFurnaceBlockEntity tf && tf instanceof AbstractFurnaceBlockEntityAccessor a)
 		{
 			AbstractCookingRecipe irecipe = tf.getLevel().getRecipeManager().getRecipeFor(a.getRecipeType(), tf, tf.getLevel()).orElse(null);
 			
-			if(tf.litTime <= 1 && irecipe != null && canSmelt(tf, irecipe) && solar.energy >= 1000)
+			if(tf.litTime <= 1 && irecipe != null && canSmelt(tf, irecipe) && solar.energy() >= 1000)
 			{
 				tf.litTime += 200;
 				tf.litDuration = 200;
-				solar.energy -= 1000;
+				solar.energy(solar.energy() - 1000L);
 				
 				if(!lvl.getBlockState(pos).getValue(AbstractFurnaceBlock.LIT))
 				{

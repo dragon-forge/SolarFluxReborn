@@ -6,8 +6,8 @@ license = "All rights reserved"
 modId = "solarflux"
 version = "${file.jarVersion}"
 displayName = "Solar Flux Reborn"
-updateJSONURL = "https://dccg.herokuapp.com/api/fmluc/246974"
-displayURL = "https://www.curseforge.com/project/246974"
+updateJSONURL = "https://h.zeith.org/api/fmluc/246974"
+displayURL = "https://h.zeith.org/api/fmlhp/246974"
 # logoFile="assets/solarflux/textures/logo.png"
 credits = "Nauktis for original Solar Flux for 1.7"
 authors = "Zeitheron"
@@ -17,7 +17,7 @@ Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providin
 [[dependencies.solarflux]]
 modId = "forge"
 mandatory = true
-versionRange = "[43.1,)"
+versionRange = "[43.2,)"
 ordering = "NONE"
 side = "BOTH"
 [[dependencies.solarflux]]
@@ -29,6 +29,6 @@ side = "BOTH"
 [[dependencies.solarflux]]
 modId = "hammerlib"
 mandatory = true
-versionRange = "[19.2.35,)"
+versionRange = "[19.3.44,)"
 ordering = "NONE"
 side = "BOTH"

@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,9 +28,11 @@ import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
+import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.attribute.SimpleAttributeProperty;
 import org.zeith.solarflux.container.SolarPanelContainer;
 import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.init.TilesSF;
 import org.zeith.solarflux.items.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
@@ -39,7 +42,7 @@ import java.util.*;
 
 public class SolarPanelTile
 		extends TileSyncableTickable
-		implements IEnergyStorage, IContainerTile
+		implements IEnergyStorage, IContainerTile, ISolarPanelTile
 {
 	public long energy;
 	
@@ -60,9 +63,60 @@ public class SolarPanelTile
 	
 	public SolarPanelTile(BlockPos pos, BlockState state)
 	{
-		super(SolarPanelsSF.SOLAR_PANEL_TYPE, pos, state);
+		super(TilesSF.SOLAR_PANEL, pos, state);
+		onConstructed();
 	}
 	
+	/**
+	 * Mostly for mixin injection.
+	 */
+	protected void onConstructed()
+	{
+	}
+	
+	@Override
+	public void setRemoved()
+	{
+		super.setRemoved();
+		setRemovedSFR();
+	}
+	
+	/**
+	 * Mostly for mixin injection.
+	 */
+	public void setRemovedSFR()
+	{
+	}
+	
+	@Override
+	public void onChunkUnloaded()
+	{
+		super.onChunkUnloaded();
+		onChunkUnloadedSFR();
+	}
+	
+	/**
+	 * Mostly for mixin injection.
+	 */
+	public void onChunkUnloadedSFR()
+	{
+	}
+	
+	@Override
+	public void clearRemoved()
+	{
+		super.clearRemoved();
+		clearRemovedSFR();
+	}
+	
+	/**
+	 * Mostly for mixin injection.
+	 */
+	public void clearRemovedSFR()
+	{
+	}
+	
+	@Override
 	public int getUpgrades(Item type)
 	{
 		int c = 0;
@@ -84,6 +138,7 @@ public class SolarPanelTile
 		return Objects.equals(other.getDelegate(), getDelegate());
 	}
 	
+	@Override
 	public SolarPanel getDelegate()
 	{
 		if(delegate == null)
@@ -97,6 +152,7 @@ public class SolarPanelTile
 		return delegate;
 	}
 	
+	@Override
 	public SolarPanelInstance getInstance()
 	{
 		if(instance == null || instance.getDelegate() != getDelegate())
@@ -247,6 +303,7 @@ public class SolarPanelTile
 	int effCacheTime;
 	float effCache;
 	
+	@Override
 	public int getGeneration()
 	{
 		float eff = effCache;
@@ -288,6 +345,7 @@ public class SolarPanelTile
 	public boolean cache$seeSky;
 	public byte cache$seeSkyTimer;
 	
+	@Override
 	public boolean doesSeeSky()
 	{
 		if(cache$seeSkyTimer < 1)
@@ -298,6 +356,54 @@ public class SolarPanelTile
 					level.canSeeSky(worldPosition.above());
 		}
 		return cache$seeSky;
+	}
+	
+	@Override
+	public Level level()
+	{
+		return level;
+	}
+	
+	@Override
+	public BlockPos pos()
+	{
+		return worldPosition;
+	}
+	
+	@Override
+	public List<BlockPosFace> traversal()
+	{
+		return traversal;
+	}
+	
+	@Override
+	public long energy()
+	{
+		return energy;
+	}
+	
+	@Override
+	public void energy(long newEnergy)
+	{
+		energy = Mth.clamp(newEnergy, 0L, capacity.getValueL());
+	}
+	
+	@Override
+	public SimpleAttributeProperty generation()
+	{
+		return generation;
+	}
+	
+	@Override
+	public SimpleAttributeProperty transfer()
+	{
+		return transfer;
+	}
+	
+	@Override
+	public SimpleAttributeProperty capacity()
+	{
+		return capacity;
 	}
 	
 	public static final ModelProperty<Level> WORLD_PROP = new ModelProperty<>();

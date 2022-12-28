@@ -1,0 +1,73 @@
+itemGroup.solarflux=Solar Flux [Reborn]
+
+block.solarflux.sp_1=Сонячна панель I
+block.solarflux.sp_2=Сонячна панель II
+block.solarflux.sp_3=Сонячна панель III
+block.solarflux.sp_4=Сонячна панель IV
+block.solarflux.sp_5=Сонячна панель V
+block.solarflux.sp_6=Сонячна панель VI
+block.solarflux.sp_7=Сонячна панель VII
+block.solarflux.sp_8=Сонячна панель VIII
+
+item.solarflux.mirror=Зеркало
+item.solarflux.blazing_coating=Палаюче покриття
+item.solarflux.emerald_glass=Смарагдове скло
+item.solarflux.ender_glass=Ендер-скло
+item.solarflux.photovoltaic_cell_1=Фотоелектричний осередок I
+item.solarflux.photovoltaic_cell_2=Фотоелектричний осередок II
+item.solarflux.photovoltaic_cell_3=Фотоелектричний осередок III
+item.solarflux.photovoltaic_cell_4=Фотоелектричний осередок IV
+item.solarflux.photovoltaic_cell_5=Фотоелектричний осередок V
+item.solarflux.photovoltaic_cell_6=Фотоелектричний осередок VI
+item.solarflux.blank_upgrade=Шаблон покращення
+item.solarflux.efficiency_upgrade=Покращення: Ефективність
+item.solarflux.low_light_upgrade=Покращення: Слабке освітлення
+item.solarflux.traversal_upgrade=Покращення: Розподіл по машинах
+item.solarflux.transfer_rate_upgrade=Покращення: Швидкість передачі
+item.solarflux.capacity_upgrade=Покращення: Ємність
+item.solarflux.furnace_upgrade=Покращення: Піч
+item.solarflux.dispersive_upgrade=Покращення: Розсіювання
+item.solarflux.block_charging_upgrade=Покращення: Заряджання блоку
+
+info.solarflux.energy.stored1=Зберігається: %,d FE
+info.solarflux.energy.stored2=Зберігається: %,d/%,d FE
+info.solarflux.energy.generation=Генерація: %,d FE/тик
+info.solarflux.energy.transfer=Передача: %,d FE/тик
+info.solarflux.energy.capacity=Ємність: %,d FE
+info.solarflux.energy.efficiency=Ефективність: %,d%%
+info.solarflux.sun.intensity=Рівень освітленості: %d%%
+info.solarflux.upgrades.installed=Покращення
+info.solarflux.hold.for.info=Утримуйте %s для перегляду деталей
+info.solarflux.shift=Shift
+info.solarflux.maximum=Максимум
+info.solarflux.contentretained=Контент збережено
+info.solarflux.decreasingReturnsToScale=Decreasing returns to scale
+info.solarflux.constantReturnsToScale=Constant returns to scale
+info.solarflux.increasingReturnsToScale=Increasing returns to scale
+info.solarflux.solar.panel.upgrade=Покращення для сонячної панелі
+info.solarflux.upgrade.efficiency=Збільшує кількість FE, яку виробляє %.2f%%.
+info.solarflux.upgrade.low.light=Генерує більше FE при слабкому освітленні, але менше – при максимальному.
+info.solarflux.upgrade.traversal=Розподіляє енергію в %d додаткову(і) приєднану(і) машину(-и).
+info.solarflux.upgrade.transfer=Збільшують швидкість передачі на %.2f%%.
+info.solarflux.upgrade.capacity=Збільшують внутрішню ємність на %.2f%%.
+info.solarflux.upgrade.furnace=Накопичує енергію для нагрівання ванільних печей.
+info.solarflux.craftitem=Інгредієнт у рецептах.
+
+## AVARITIA COMPATIBILITY ##
+block.solarflux.sp_avaritia.neutronium=Нейтрониевая солнечная панель
+block.solarflux.sp_avaritia.infinity=Солнечная панель Бесконечности
+
+## DRACONIC EVOLUTION ##
+block.solarflux.sp_de.wyvern=Сонячна панель Віверни
+block.solarflux.sp_de.draconic=Сонячна панель Дракона
+block.solarflux.sp_de.chaotic=Сонячна панель Хаоса
+
+## TWILIGHT FOREST ##
+block.solarflux.sp_tf.carminite=Carminite Solar Panel
+block.solarflux.sp_tf.fiery=Fiery Solar Panel
+
+item.solarflux.twilightforest.twilight_cell_1=Twilight Cell I
+item.solarflux.twilightforest.twilight_cell_2=Twilight Cell II
+
+## APPLIED ENERGISTICS ##
+item.solarflux.ae2.energy_upgrade=AEU Energy Upgrade

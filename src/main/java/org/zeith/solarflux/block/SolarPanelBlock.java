@@ -10,27 +10,17 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.BaseEntityBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.RenderShape;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
-import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Material;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
 import org.zeith.hammerlib.api.forge.BlockAPI;
@@ -100,11 +90,9 @@ public class SolarPanelBlock
 		NonNullList<ItemStack> stacks = NonNullList.create();
 		
 		BlockEntity tileentity = builder.getParameter(LootContextParams.BLOCK_ENTITY);
-		if(tileentity instanceof SolarPanelTile)
-		{
-			SolarPanelTile te = (SolarPanelTile) tileentity;
+		if(tileentity instanceof SolarPanelTile te)
 			stacks.add(te.generateItem(panel));
-		} else
+		else
 			stacks.add(new ItemStack(panel));
 		
 		return stacks;
@@ -127,9 +115,7 @@ public class SolarPanelBlock
 	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)
 	{
 		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
-		BlockEntity tile = worldIn.getBlockEntity(pos);
-		SolarPanelTile spt = tile instanceof SolarPanelTile ? (SolarPanelTile) tile : null;
-		if(spt != null)
+		if(worldIn.getBlockEntity(pos) instanceof SolarPanelTile spt)
 			spt.resetVoxelShape();
 	}
 	
@@ -175,36 +161,36 @@ public class SolarPanelBlock
 		if(player instanceof ServerPlayer && worldIn.getBlockEntity(pos) instanceof SolarPanelTile tbs)
 		{
 			ItemStack held = player.getItemInHand(handIn);
-			if(!held.isEmpty() && held.getItem() instanceof UpgradeItem)
+			if(!held.isEmpty() && held.getItem() instanceof UpgradeItem iu)
 			{
-				int amt = tbs.getUpgrades(held.getItem());
-				UpgradeItem iu = (UpgradeItem) held.getItem();
-				if(amt < held.getMaxStackSize() && iu.canInstall(tbs, held, tbs.upgradeInventory))
+				int amt = tbs.getUpgrades(iu);
+				if(amt < iu.getMaxUpgradesInstalled(tbs) && iu.canInstall(tbs, held, tbs.upgradeInventory))
 				{
-					boolean installed = false;
+					int installed = 0;
 					for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
 					{
 						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
 						if(stack.sameItem(held) && ItemStack.tagMatches(stack, held))
 						{
-							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), Math.min(iu.getMaxStackSize(stack) - stack.getCount(), held.getCount()));
+							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), Math.min(iu.getMaxStackSize(stack) - stack.getCount(), held.getCount()));
 							stack.grow(allow);
 							held.shrink(allow);
-							installed = true;
+							installed += allow;
 							break;
 						} else if(stack.isEmpty())
 						{
-							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), held.getCount());
+							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), held.getCount());
 							ItemStack copy = held.copy();
 							held.shrink(allow);
 							copy.setCount(allow);
 							tbs.upgradeInventory.setStackInSlot(i, copy);
-							installed = true;
+							installed += allow;
 							break;
 						}
 					}
-					if(installed)
+					if(installed > 0)
 					{
+						iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
 						worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, .1F, 1F);
 						return InteractionResult.SUCCESS;
 					}
