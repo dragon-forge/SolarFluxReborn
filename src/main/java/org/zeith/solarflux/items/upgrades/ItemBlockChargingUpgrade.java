@@ -1,4 +1,4 @@
-package org.zeith.solarflux.items;
+package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -19,10 +19,13 @@ import net.minecraftforge.energy.IEnergyStorage;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.init.ItemsSF;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import static org.zeith.solarflux.init.SolarPanelsSF.BLOCK_CHARGING_UPGRADE_RANGE;
 
 public class ItemBlockChargingUpgrade
 		extends UpgradeItem
@@ -38,6 +41,8 @@ public class ItemBlockChargingUpgrade
 	@Override
 	public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
 	{
+		super.appendHoverText(stack, worldIn, tooltip, flagIn);
+		
 		if(isFoil(stack))
 		{
 			CompoundTag nbt = stack.getTag();
@@ -96,7 +101,7 @@ public class ItemBlockChargingUpgrade
 		return isFoil(stack) &&
 				(!stack.getTag().contains("Dim", Tag.TAG_STRING)
 						|| tile.level().dimension().location().toString().equals(stack.getTag().getString("Dim")))
-				&& tile.pos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= 256D
+				&& tile.pos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= BLOCK_CHARGING_UPGRADE_RANGE
 				&& (t = tile.level().getBlockEntity(pos)) != null
 				&& (
 				(t instanceof AbstractFurnaceBlockEntity && DIRECTIONS[stack.getTag().getByte("Face")] == Direction.UP && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
@@ -119,9 +124,9 @@ public class ItemBlockChargingUpgrade
 			BlockPos pos = BlockPos.of(nbt.getLong("Pos"));
 			
 			double d;
-			if((d = tile.pos().distSqr(pos)) <= 256D)
+			if((d = tile.pos().distSqr(pos)) <= BLOCK_CHARGING_UPGRADE_RANGE)
 			{
-				d /= 256;
+				d /= BLOCK_CHARGING_UPGRADE_RANGE;
 				tile.traversal().clear();
 				if(tile.getUpgrades(ItemsSF.TRAVERSAL_UPGRADE) > 0)
 				{
@@ -132,5 +137,11 @@ public class ItemBlockChargingUpgrade
 				tile.traversal().add(new BlockPosFace(pos, Direction.values()[nbt.getByte("Face")], (float) (1 - d)));
 			}
 		}
+	}
+	
+	@Override
+	protected Object[] hoverTextData(ItemStack stack)
+	{
+		return new Object[] { Math.round((float) Math.sqrt(BLOCK_CHARGING_UPGRADE_RANGE)) };
 	}
 }

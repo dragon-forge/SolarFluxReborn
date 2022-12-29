@@ -1,4 +1,4 @@
-package org.zeith.solarflux.items;
+package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -7,6 +7,7 @@ import org.zeith.hammerlib.util.charging.IChargeHandler;
 import org.zeith.hammerlib.util.charging.ItemChargeHelper;
 import org.zeith.hammerlib.util.charging.fe.FECharge;
 import org.zeith.solarflux.api.ISolarPanelTile;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 
 public class ItemDispersiveUpgrade
 		extends UpgradeItem
@@ -28,5 +29,11 @@ public class ItemDispersiveUpgrade
 			int fe = sent - ItemChargeHelper.chargePlayer(mp, new FECharge(sent), IChargeHandler.ChargeAction.EXECUTE).FE;
 			tile.energy(tile.energy() - fe);
 		}
+	}
+	
+	@Override
+	protected Object[] hoverTextData(ItemStack stack)
+	{
+		return new Object[] { 16 };
 	}
 }

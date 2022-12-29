@@ -1,11 +1,16 @@
 package org.zeith.solarflux.init;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
+import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.items.*;
+import org.zeith.solarflux.items.JSItem;
+import org.zeith.solarflux.items.upgrades.*;
 import org.zeith.solarflux.panels.JSHelper;
 
 import java.util.List;
@@ -70,7 +75,14 @@ public interface ItemsSF
 	
 	static Item newItem()
 	{
-		return new Item(new Item.Properties().tab(SolarFlux.ITEM_GROUP));
+		return new Item(new Item.Properties().tab(SolarFlux.ITEM_GROUP))
+		{
+			@Override
+			public void appendHoverText(ItemStack p_41421_, @Nullable Level p_41422_, List<Component> p_41423_, TooltipFlag p_41424_)
+			{
+				p_41423_.add(Component.translatable("info." + SolarFlux.MOD_ID + ".craftitem").setStyle(Style.EMPTY.withColor(0x666666)));
+			}
+		};
 	}
 	
 	@SimplyRegister

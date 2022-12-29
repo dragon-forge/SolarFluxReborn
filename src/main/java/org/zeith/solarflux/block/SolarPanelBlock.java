@@ -27,7 +27,7 @@ import org.zeith.hammerlib.api.forge.BlockAPI;
 import org.zeith.hammerlib.api.forge.ContainerAPI;
 import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.items.UpgradeItem;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
 import java.util.List;

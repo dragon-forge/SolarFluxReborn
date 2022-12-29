@@ -1,10 +1,13 @@
-package org.zeith.solarflux.items;
+package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.world.item.ItemStack;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.attribute.AttributeModMultiply;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 
 import java.util.UUID;
+
+import static org.zeith.solarflux.init.SolarPanelsSF.CAPACITY_UPGRADE_INCREASE;
 
 public class ItemCapacityUpgrade
 		extends UpgradeItem
@@ -20,6 +23,12 @@ public class ItemCapacityUpgrade
 	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
 	{
 		amount = Math.min(amount, 10);
-		tile.capacity().applyModifier(new AttributeModMultiply(1F + (amount * .1F)), CAPACITY_ATTRIBUTE_UUID);
+		tile.capacity().applyModifier(new AttributeModMultiply(1F + (amount * CAPACITY_UPGRADE_INCREASE)), CAPACITY_ATTRIBUTE_UUID);
+	}
+	
+	@Override
+	protected Object[] hoverTextData(ItemStack stack)
+	{
+		return new Object[] { CAPACITY_UPGRADE_INCREASE * 100F };
 	}
 }

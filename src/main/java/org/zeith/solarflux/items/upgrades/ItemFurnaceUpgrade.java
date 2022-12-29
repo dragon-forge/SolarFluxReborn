@@ -1,4 +1,4 @@
-package org.zeith.solarflux.items;
+package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.zeith.solarflux.api.ISolarPanelTile;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.mixins.AbstractFurnaceBlockEntityAccessor;
 import org.zeith.solarflux.util.BlockPosFace;
 

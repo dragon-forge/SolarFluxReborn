@@ -4,7 +4,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.compat.ae2.tile.IAE2SolarPanelTile;
-import org.zeith.solarflux.items.UpgradeItem;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 
 public class ItemAE2EnergyUpgrade
 		extends UpgradeItem

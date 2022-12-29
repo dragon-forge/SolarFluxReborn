@@ -10,6 +10,7 @@ import net.minecraftforge.forgespi.language.IModInfo;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.configured.ConfiguredLib;
 import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
+import org.zeith.hammerlib.util.configured.data.IntValueRange;
 import org.zeith.hammerlib.util.configured.types.ConfigCategory;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
@@ -31,6 +32,12 @@ public class SolarPanelsSF
 	
 	public static double LOOSE_ENERGY;
 	public static float RAIN_MULTIPLIER = 0.6F, THUNDER_MULTIPLIER = 0.4F;
+	public static float CAPACITY_UPGRADE_INCREASE = 0.1F;
+	public static float EFFICIENCY_UPGRADE_INCREASE = 0.05F;
+	public static float TRANSFER_RATE_UPGRADE_INCREASE = 0.15F;
+	public static float BLOCK_CHARGING_UPGRADE_RANGE = 16;
+	public static int TRAVERSAL_UPGRADE_RANGE = 5;
+	
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
 	public static File CONFIG_DIR;
 	
@@ -113,27 +120,60 @@ public class SolarPanelsSF
 		}
 		
 		var main = cfgs.setupCategory("Main");
+		{
+			LOOSE_ENERGY = main.getElement(ConfiguredLib.DECIMAL, "Pickup Energy Loss")
+					.withRange(DecimalValueRange.rangeClosed(0, 100))
+					.withDefault(5)
+					.withComment("How much energy (percent) will get lost while picking up the solar panel?")
+					.getValueF();
+			
+			RAIN_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Rain Multiplier")
+					.withRange(DecimalValueRange.rangeClosed(0, 1))
+					.withDefault(0.6F)
+					.withComment("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.")
+					.getValueF();
+			
+			THUNDER_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Thunder Multiplier")
+					.withRange(DecimalValueRange.rangeClosed(0, 1))
+					.withDefault(0.4F)
+					.withComment("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.")
+					.getValueF();
+		}
 		
-		LOOSE_ENERGY = main.getElement(ConfiguredLib.DECIMAL, "Pickup Energy Loss")
-				.withRange(DecimalValueRange.rangeClosed(0, 100))
-				.withDefault(5)
-				.withComment("How much energy (percent) will get lost while picking up the solar panel?")
-				.getValue()
-				.floatValue();
-		
-		RAIN_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Rain Multiplier")
-				.withRange(DecimalValueRange.rangeClosed(0, 1))
-				.withDefault(0.6F)
-				.withComment("How much energy should be generated when it is raining? 0 - nothing, 1 - full power.")
-				.getValue()
-				.floatValue();
-		
-		THUNDER_MULTIPLIER = main.getElement(ConfiguredLib.DECIMAL, "Thunder Multiplier")
-				.withRange(DecimalValueRange.rangeClosed(0, 1))
-				.withDefault(0.4F)
-				.withComment("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.")
-				.getValue()
-				.floatValue();
+		var upgrades = cfgs.setupCategory("Upgrades");
+		{
+			BLOCK_CHARGING_UPGRADE_RANGE = upgrades.getElement(ConfiguredLib.DECIMAL, "Block Charging Upgrade Range")
+					.withRange(DecimalValueRange.min(0))
+					.withDefault(16)
+					.withComment("How far should the Block Charging Upgrade reach?")
+					.getValueF();
+			BLOCK_CHARGING_UPGRADE_RANGE = BLOCK_CHARGING_UPGRADE_RANGE * BLOCK_CHARGING_UPGRADE_RANGE;
+			
+			TRAVERSAL_UPGRADE_RANGE = upgrades.getElement(ConfiguredLib.INT, "Traversal Upgrade Range")
+					.withRange(IntValueRange.range(0, 16))
+					.withDefault(5)
+					.withComment("How far should the Traversal Upgrade reach?")
+					.getValue().intValue();
+			TRAVERSAL_UPGRADE_RANGE = TRAVERSAL_UPGRADE_RANGE * TRAVERSAL_UPGRADE_RANGE;
+			
+			CAPACITY_UPGRADE_INCREASE = upgrades.getElement(ConfiguredLib.DECIMAL, "Capacity Upgrade Bonus")
+					.withRange(DecimalValueRange.rangeClosed(0F, 100F))
+					.withDefault(10F)
+					.withComment("How much should each capacity upgrade add, in percent?")
+					.getValueF() / 100F;
+			
+			EFFICIENCY_UPGRADE_INCREASE = upgrades.getElement(ConfiguredLib.DECIMAL, "Efficiency Upgrade Bonus")
+					.withRange(DecimalValueRange.rangeClosed(0F, 100F))
+					.withDefault(5F)
+					.withComment("How much should each efficiency upgrade add, in percent?")
+					.getValueF() / 100F;
+			
+			TRANSFER_RATE_UPGRADE_INCREASE = upgrades.getElement(ConfiguredLib.DECIMAL, "Transfer Rate Upgrade Bonus")
+					.withRange(DecimalValueRange.rangeClosed(0F, 100F))
+					.withDefault(15F)
+					.withComment("How much should each transfer rate upgrade add, in percent?")
+					.getValueF() / 100F;
+		}
 		
 		if(cfgs.hasChanged())
 			cfgs.save();
@@ -282,7 +322,8 @@ public class SolarPanelsSF
 			i.configureBase(cat.setupSubCategory(i.name));
 		});
 		
-		if(panels.hasChanged()) panels.save();
+		if(panels.hasChanged())
+			panels.save();
 		
 		refreshRecipes();
 	}

@@ -2,6 +2,7 @@ package org.zeith.solarflux.compat.twilightforest;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.hammerlib.compat.base.BaseCompat;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
@@ -25,6 +26,7 @@ public class TwilightForestCompat
 	
 	public final ResourceLocation twiCell1Recipe = SolarFlux.id("twilightforest/twilight_cell_1");
 	public final ResourceLocation twiCell2Recipe = SolarFlux.id("twilightforest/twilight_cell_2");
+	public final ResourceLocation twiLightUpgradeRecipe = SolarFlux.id("twilightforest/twilight_upgrade");
 	
 	private SolarPanel fiery, carminite;
 	
@@ -53,6 +55,7 @@ public class TwilightForestCompat
 		recipes.accept(carminiteRecipe);
 		recipes.accept(twiCell1Recipe);
 		recipes.accept(twiCell2Recipe);
+		recipes.accept(twiLightUpgradeRecipe);
 	}
 	
 	@Override
@@ -61,9 +64,21 @@ public class TwilightForestCompat
 		var fieryBlock = ItemTags.create(new ResourceLocation("forge", "storage_blocks/fiery"));
 		var carminiteItem = ItemTags.create(new ResourceLocation("forge", "gems/carminite"));
 		var ironwoodBlock = ItemTags.create(new ResourceLocation("forge", "storage_blocks/ironwood"));
+		var ironwoodIngot = ItemTags.create(new ResourceLocation("forge", "ingots/ironwood"));
 		var fieryIngot = ItemTags.create(new ResourceLocation("forge", "ingots/fiery"));
 		var knightmetal = ItemTags.create(new ResourceLocation("forge", "ingots/knightmetal"));
 		var steeleaf = ItemTags.create(new ResourceLocation("forge", "ingots/steeleaf"));
+		var torchberries = ForgeRegistries.ITEMS.getValue(new ResourceLocation("twilightforest", "torchberries"));
+		
+		e.shaped()
+				.id(twiLightUpgradeRecipe)
+				.result(ContentsSFTF.TWI_LIGHT_UPGRADE)
+				.shape("ici", "tbt", "iti")
+				.map('i', ironwoodIngot)
+				.map('c', Items.CLOCK)
+				.map('t', torchberries)
+				.map('b', ItemsSF.BLANK_UPGRADE)
+				.registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
 				.id(twiCell1Recipe)
@@ -93,7 +108,7 @@ public class TwilightForestCompat
 				.shape("ppp", "scs", "sbs")
 				.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[4]))
 				.map('p', ContentsSFTF.TWILIGHT_CELL_1)
-				.map('c', ForgeRegistries.ITEMS.getValue(new ResourceLocation("twilightforest", "torchberries")))
+				.map('c', torchberries)
 				.map('b', fieryBlock)
 				.registerIf(SolarPanelsSF::isRecipeActive);
 		

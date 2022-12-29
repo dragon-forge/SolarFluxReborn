@@ -28,17 +28,22 @@ import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
+import org.zeith.hammerlib.util.java.tuples.Tuple2;
+import org.zeith.hammerlib.util.java.tuples.Tuples;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.attribute.SimpleAttributeProperty;
+import org.zeith.solarflux.compat._abilities.SFAbilities;
 import org.zeith.solarflux.container.SolarPanelContainer;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.init.TilesSF;
-import org.zeith.solarflux.items.UpgradeItem;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
+import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 public class SolarPanelTile
 		extends TileSyncableTickable
@@ -127,6 +132,14 @@ public class SolarPanelTile
 				c += stack.getCount();
 		}
 		return c;
+	}
+	
+	@Override
+	public Stream<Tuple2<UpgradeItem, ItemStack>> getUpgrades()
+	{
+		return upgradeInventory.stream()
+				.map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
+				.filter(Objects::nonNull);
 	}
 	
 	public boolean isSameLevel(SolarPanelTile other)
@@ -307,25 +320,28 @@ public class SolarPanelTile
 	public int getGeneration()
 	{
 		float eff = effCache;
+		
 		if(effCacheTime <= 0)
 		{
 			eff = getInstance().computeSunIntensity(this);
+			for(var mod : UpgradeSystem.findAbilitiesIn(this, SFAbilities.ITEM_UPGRADE_SUN_INTENSITY_MUL))
+				eff = mod.applySunIntensityModifier(this, eff);
+			
 			{
 				float raining = level.getRainLevel(1F);
 				raining = raining > 0.2F ? (raining - 0.2F) / 0.8F : 0F;
 				raining = (float) Math.sin(raining * Math.PI / 2F);
-				raining = 1F - raining * (1F - SolarPanelsSF.RAIN_MULTIPLIER);
+				eff *= 1F - raining * (1F - SolarPanelsSF.RAIN_MULTIPLIER);
 				
 				float thundering = level.getThunderLevel(1F);
 				thundering = thundering > 0.75F ? (thundering - 0.75F) / 0.25F : 0F;
 				thundering = (float) Math.sin(thundering * Math.PI / 2F);
-				thundering = 1F - thundering * (1F - SolarPanelsSF.THUNDER_MULTIPLIER);
-				
-				eff *= raining * thundering;
+				eff *= 1F - thundering * (1F - SolarPanelsSF.THUNDER_MULTIPLIER);
 			}
 			effCache = eff;
-			effCacheTime = 2;
+			effCacheTime = 5;
 		}
+		
 		if(!level.isClientSide) sunIntensity = eff;
 		float gen = getInstance().gen * eff;
 		generation.setBaseValue(gen);

@@ -47,12 +47,14 @@ info.solarflux.decreasingReturnsToScale=Decreasing returns to scale
 info.solarflux.constantReturnsToScale=Constant returns to scale
 info.solarflux.increasingReturnsToScale=Increasing returns to scale
 info.solarflux.solar.panel.upgrade=Улучшение для солнечной панели
-info.solarflux.upgrade.efficiency=Увеличивает количество FE, которое вырабатывает %.2f%%.
+info.solarflux.efficiency_upgrade=Увеличивает количество FE, которое вырабатывает %.2f%%.
 info.solarflux.upgrade.low.light=Генерирует больше FE при слабом освещении, но меньше - при максимальном.
-info.solarflux.upgrade.traversal=Распределяет энергию в %d дополнительную(-ые) присоединённую(-ые) машину(-ы).
-info.solarflux.upgrade.transfer=Увеличивают скорость передачи на %.2f%%.
-info.solarflux.upgrade.capacity=Увеличивают внутреннюю ёмкость на %.2f%%.
-info.solarflux.upgrade.furnace=Накапливает энергию для нагрева ванильных печей.
+info.solarflux.traversal_upgrade=Распределяет энергию подключенным машинам в радиусе %d блоков.
+info.solarflux.transfer_rate_upgrade=Увеличивают скорость передачи на %.2f%%.
+info.solarflux.capacity_upgrade=Увеличивают внутреннюю ёмкость на %.2f%%.
+info.solarflux.furnace_upgrade=Накапливает энергию для нагрева ванильных печей.
+info.solarflux.dispersive_upgrade=Disperses energy to nearby players in the %d block range.
+info.solarflux.block_charging_upgrade=Wirelessly transmits energy to a specified block in the %d range.
 info.solarflux.craftitem=Ингредиент в рецептах.
 
 ## AVARITIA COMPATIBILITY ##
@@ -70,6 +72,11 @@ block.solarflux.sp_tf.fiery=Fiery Solar Panel
 
 item.solarflux.twilightforest.twilight_cell_1=Twilight Cell I
 item.solarflux.twilightforest.twilight_cell_2=Twilight Cell II
+item.solarflux.twilightforest.twilight_upgrade=Twi-Light Upgrade
+
+info.solarflux.twilightforest.twilight_upgrade=Slightly increases light gathered by Solar Panel in The Twilight Forest.
 
 ## APPLIED ENERGISTICS ##
 item.solarflux.ae2.energy_upgrade=AEU Energy Upgrade
+
+info.solarflux.ae2.energy_upgrade=Allows connecting Solar Panel directly into ME Grid.

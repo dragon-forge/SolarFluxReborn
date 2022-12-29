@@ -139,20 +139,20 @@ public class SolarFlux
 	public static class ModEvents
 	{
 		@SubscribeEvent
-		public void commonSetup(FMLCommonSetupEvent e)
+		public static void commonSetup(FMLCommonSetupEvent e)
 		{
 			PROXY.commonSetup();
 		}
 		
 		@SubscribeEvent
-		public void loadComplete(FMLLoadCompleteEvent e)
+		public static void loadComplete(FMLLoadCompleteEvent e)
 		{
 			SolarPanelsSF.refreshConfigs();
 		}
 		
 		@SubscribeEvent
 		@OnlyIn(Dist.CLIENT)
-		public void clientSetup(FMLClientSetupEvent e)
+		public static void clientSetup(FMLClientSetupEvent e)
 		{
 			PROXY.clientSetup();
 		}

@@ -1,4 +1,4 @@
-package org.zeith.solarflux.items;
+package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -7,10 +7,13 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import org.zeith.solarflux.api.ISolarPanelTile;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.zeith.solarflux.init.SolarPanelsSF.TRAVERSAL_UPGRADE_RANGE;
 
 public class ItemTraversalUpgrade
 		extends UpgradeItem
@@ -45,7 +48,7 @@ public class ItemTraversalUpgrade
 			for(var face : DIRECTIONS)
 			{
 				var p = pos.relative(face);
-				if(p.distSqr(cache.get(0)) > 25D)
+				if(p.distSqr(cache.get(0)) > TRAVERSAL_UPGRADE_RANGE)
 					continue;
 				BlockEntity t = tile.level().getBlockEntity(p);
 				if(t != null)
@@ -62,5 +65,11 @@ public class ItemTraversalUpgrade
 							});
 			}
 		}
+	}
+	
+	@Override
+	protected Object[] hoverTextData(ItemStack stack)
+	{
+		return new Object[] { Math.round((float) Math.sqrt(TRAVERSAL_UPGRADE_RANGE)) };
 	}
 }
