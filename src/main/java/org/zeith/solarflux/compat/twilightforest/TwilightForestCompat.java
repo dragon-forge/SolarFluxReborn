@@ -77,7 +77,7 @@ public class TwilightForestCompat
 				.map('i', ironwoodIngot)
 				.map('c', Items.CLOCK)
 				.map('t', torchberries)
-				.map('b', ItemsSF.BLANK_UPGRADE)
+				.map('b', ItemsSF.EFFICIENCY_UPGRADE)
 				.registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
