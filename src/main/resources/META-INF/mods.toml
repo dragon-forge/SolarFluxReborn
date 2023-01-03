@@ -1,5 +1,5 @@
 modLoader = "javafml"
-loaderVersion = "[43,)"
+loaderVersion = "[44,)"
 issueTrackerURL = "https://github.com/dragon-forge/SolarFluxReborn/issues"
 license = "All rights reserved"
 
@@ -20,20 +20,20 @@ Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providin
 [[dependencies.solarflux]]
 modId = "forge"
 mandatory = true
-versionRange = "[43.2,)"
+versionRange = "[44.1,)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.solarflux]]
 modId = "minecraft"
 mandatory = true
-versionRange = "[1.19.2,1.20)"
+versionRange = "[1.19.3,1.20)"
 ordering = "NONE"
 side = "BOTH"
 
 [[dependencies.solarflux]]
 modId = "hammerlib"
 mandatory = true
-versionRange = "[19.3.45,)"
+versionRange = "[19.4.46,)"
 ordering = "NONE"
 side = "BOTH"

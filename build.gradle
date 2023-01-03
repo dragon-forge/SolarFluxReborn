@@ -102,8 +102,8 @@ dependencies {
 
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
 
-    implementation fg.deobf("appeng:appliedenergistics2-forge:12.9.1")
-    implementation fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.0.297")
+    compileClasspath fg.deobf("appeng:appliedenergistics2-forge:12.9.1")
+    compileClasspath fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.0.297")
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
