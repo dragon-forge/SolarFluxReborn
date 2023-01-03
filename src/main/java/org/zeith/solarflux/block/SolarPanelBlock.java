@@ -50,8 +50,13 @@ public class SolarPanelBlock
 				.requiresCorrectToolForDrops()
 		);
 		this.registryName = registryName;
-		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, Tiers.IRON, this);
+		bindTool();
 		this.panel = panel;
+	}
+	
+	protected void bindTool()
+	{
+		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, Tiers.IRON, this);
 	}
 	
 	public ResourceLocation getRegistryName()

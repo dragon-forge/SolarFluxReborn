@@ -24,7 +24,7 @@ public class RecipesSF
 	public static final ResourceLocation PHOTOVOLTAIC_CELL_5 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_5");
 	public static final ResourceLocation PHOTOVOLTAIC_CELL_6 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_6");
 	public static final ResourceLocation BLANK_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "blank_upgrade");
-
+	
 	public static final ResourceLocation SOLAR_PANEL_1 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_1");
 	public static final ResourceLocation SOLAR_PANEL_2 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_2");
 	public static final ResourceLocation SOLAR_PANEL_3 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_3");
@@ -33,7 +33,7 @@ public class RecipesSF
 	public static final ResourceLocation SOLAR_PANEL_6 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_6");
 	public static final ResourceLocation SOLAR_PANEL_7 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_7");
 	public static final ResourceLocation SOLAR_PANEL_8 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_8");
-
+	
 	public static final ResourceLocation EFFICIENCY_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "efficiency_upgrade");
 	public static final ResourceLocation TRANSFER_RATE_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "transfer_rate_upgrade");
 	public static final ResourceLocation TRAVERSAL_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "traversal_upgrade");
@@ -41,7 +41,7 @@ public class RecipesSF
 	public static final ResourceLocation BLOCK_CHARGING_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "block_charging_upgrade");
 	public static final ResourceLocation FURNACE_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "furnace_upgrade");
 	public static final ResourceLocation CAPACITY_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "capacity_upgrade");
-
+	
 	public static void indexRecipes()
 	{
 		SolarPanelsSF.indexRecipes(MIRROR);
@@ -52,7 +52,7 @@ public class RecipesSF
 		SolarPanelsSF.indexRecipes(EFFICIENCY_UPGRADE, TRANSFER_RATE_UPGRADE, TRAVERSAL_UPGRADE, DISPERSIVE_UPGRADE, BLOCK_CHARGING_UPGRADE, FURNACE_UPGRADE, CAPACITY_UPGRADE);
 		SolarFlux.SF_COMPAT.indexRecipes(SolarPanelsSF::indexRecipes);
 	}
-
+	
 	public static void addRecipes(RegisterRecipesEvent $)
 	{
 		indexRecipes();
@@ -97,7 +97,7 @@ public class RecipesSF
 				.map('y', Items.ENDER_EYE)
 				.map('e', ItemsSF.EMERALD_GLASS)
 				.registerIf(SolarPanelsSF::isRecipeActive);
-
+		
 		{
 			$.shaped()
 					.id(PHOTOVOLTAIC_CELL_1)
@@ -169,7 +169,7 @@ public class RecipesSF
 					.map('m', ItemsSF.MIRROR)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
-
+		
 		{
 			$.shaped()
 					.id(SOLAR_PANEL_1)
@@ -246,7 +246,7 @@ public class RecipesSF
 					.map('c', Items.DRAGON_EGG)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
-
+		
 		{
 			$.shaped()
 					.id(EFFICIENCY_UPGRADE)

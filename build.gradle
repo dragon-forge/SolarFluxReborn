@@ -83,7 +83,10 @@ repositories {
     flatDir { dirs 'libraries/all' }
     flatDir { dirs 'libraries/classpathOnly' }
     flatDir { dirs 'libraries/runtimeOnly' }
-
+    maven {
+        name = "jei"
+        url = "https://dvs1.progwml6.com/files/maven"
+    }
     maven {
         name "Modmaven"
         url "https://modmaven.dev/"
@@ -100,6 +103,7 @@ dependencies {
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
 
     implementation fg.deobf("appeng:appliedenergistics2-forge:12.9.1")
+    implementation fg.deobf("mezz.jei:jei-1.19.2-forge:11.5.0.297")
 
     annotationProcessor("org.spongepowered:mixin:0.8.5:processor")
 
@@ -220,6 +224,18 @@ task signJar(type: SignJar, dependsOn: jar) {
     outputFile = jar.archiveFile
 }
 
+task signDeobfJar(type: SignJar, dependsOn: deobfJar) {
+    onlyIf {
+        System.env.MC_KS_PASS != null
+    }
+    keyStore = System.env.MC_KS_PATH
+    alias = System.env.MC_KS_ALIAS
+    storePass = System.env.MC_KS_PASS
+    keyPass = System.env.MC_KS_PASS
+    inputFile = deobfJar.archiveFile
+    outputFile = deobfJar.archiveFile
+}
+
 def reobfFile = jar.archiveFile.get().asFile
 def reobfArtifact = artifacts.add('default', reobfFile) {
     type 'jar'
@@ -230,6 +246,7 @@ jar.finalizedBy('reobfJar')
 publish.dependsOn('reobfJar')
 
 build.dependsOn signJar
+build.dependsOn signDeobfJar
 
 afterEvaluate {
     tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
