@@ -91,9 +91,8 @@ public class JSItem
 		public JSItem create()
 		{
 			if(item != null) return item;
-			var i = new JSItem(new ResourceLocation(InfoSF.MOD_ID, name), new Item.Properties().tab(SolarFlux.ITEM_GROUP), langs);
-			item = i;
-			return i;
+			item = SolarFlux.ITEM_GROUP.add(new JSItem(new ResourceLocation(InfoSF.MOD_ID, name), new Item.Properties(), langs));
+			return item;
 		}
 		
 		@Override

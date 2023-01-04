@@ -1,6 +1,6 @@
 {
 	"parent": "item/generated",
 	"textures": {
-		"layer0": "solarflux:items/ender_glass"
+		"layer0": "solarflux:item/ender_glass"
 	}
 }

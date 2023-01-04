@@ -1,7 +1,7 @@
 package org.zeith.solarflux.mixins;
 
-import net.minecraft.core.Registry;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.registries.ForgeRegistries;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -19,6 +19,6 @@ public class BlockMixin
 	)
 	public void toStringSFR(CallbackInfoReturnable<String> cir)
 	{
-		cir.setReturnValue(getClass().getName() + "{" + Registry.BLOCK.getKey(Cast.cast(this)) + "}");
+		cir.setReturnValue(getClass().getName() + "{" + ForgeRegistries.BLOCKS.getKey(Cast.cast(this)) + "}");
 	}
 }

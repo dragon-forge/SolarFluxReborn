@@ -1,16 +1,14 @@
 package org.zeith.solarflux.panels;
 
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.solarflux.items.JSItem;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.function.Supplier;
 
@@ -49,11 +47,11 @@ public class JSHelper
 	
 	public static Supplier<TagKey<Item>> tag(String id)
 	{
-		return () -> TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(id));
+		return () -> ItemTags.create(new ResourceLocation(id));
 	}
 	
 	public static Supplier<TagKey<Item>> tag(String mod, String id)
 	{
-		return () -> TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(mod, id));
+		return () -> ItemTags.create(new ResourceLocation(mod, id));
 	}
 }

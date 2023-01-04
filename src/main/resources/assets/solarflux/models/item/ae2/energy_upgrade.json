@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "solarflux:items/ae2/energy_upgrade"
+    "layer0": "solarflux:item/ae2/energy_upgrade"
   }
 }

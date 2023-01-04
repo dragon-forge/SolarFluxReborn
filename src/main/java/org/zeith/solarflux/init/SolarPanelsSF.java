@@ -183,7 +183,7 @@ public class SolarPanelsSF
 		{
 			textures.mkdirs();
 			
-			File blocks = new File(textures, "blocks");
+			File blocks = new File(textures, "block");
 			
 			if(!blocks.isDirectory())
 			{
@@ -192,7 +192,7 @@ public class SolarPanelsSF
 				int r;
 				byte[] buf = new byte[768];
 				
-				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_base.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/sp_example_base.png"))
+				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_base.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/block/sp_example_base.png"))
 				{
 					while((r = in.read(buf)) > 0)
 						out.write(buf, 0, r);
@@ -201,7 +201,7 @@ public class SolarPanelsSF
 					throw new RuntimeException(e);
 				}
 				
-				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_top.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/blocks/sp_example_top.png"))
+				try(FileOutputStream out = new FileOutputStream(new File(blocks, "example_top.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/block/sp_example_top.png"))
 				{
 					
 					while((r = in.read(buf)) > 0)
@@ -212,7 +212,7 @@ public class SolarPanelsSF
 				}
 			}
 			
-			File items = new File(textures, "items");
+			File items = new File(textures, "item");
 			
 			if(!items.isDirectory())
 			{
@@ -221,7 +221,7 @@ public class SolarPanelsSF
 				int r;
 				byte[] buf = new byte[768];
 				
-				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/items/_example.png"))
+				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/item/_example.png"))
 				{
 					while((r = in.read(buf)) > 0)
 						out.write(buf, 0, r);
@@ -232,7 +232,7 @@ public class SolarPanelsSF
 			}
 		} else // Migration code
 		{
-			File blocks = new File(textures, "blocks");
+			File blocks = new File(textures, "block");
 			
 			if(!blocks.isDirectory())
 			{
@@ -240,7 +240,7 @@ public class SolarPanelsSF
 				move(textures, blocks);
 			}
 			
-			File items = new File(textures, "items");
+			File items = new File(textures, "item");
 			
 			if(!items.isDirectory())
 			{
@@ -249,7 +249,7 @@ public class SolarPanelsSF
 				int r;
 				byte[] buf = new byte[768];
 				
-				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/items/_example.png"))
+				try(FileOutputStream out = new FileOutputStream(new File(items, "example.png")); InputStream in = SolarFlux.class.getResourceAsStream("/assets/solarflux/textures/item/_example.png"))
 				{
 					while((r = in.read(buf)) > 0)
 						out.write(buf, 0, r);

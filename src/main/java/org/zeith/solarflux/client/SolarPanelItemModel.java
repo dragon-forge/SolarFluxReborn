@@ -1,8 +1,6 @@
 package org.zeith.solarflux.client;
 
 import com.google.gson.*;
-import com.mojang.datafixers.util.Pair;
-import com.mojang.math.Vector3f;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -19,12 +17,14 @@ import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.zeith.hammerlib.client.model.IBakedModel;
 import org.zeith.hammerlib.client.model.LoadUnbakedGeometry;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.solarflux.block.SolarPanelBlock;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Function;
 
 @LoadUnbakedGeometry(path = "solar_panel")
@@ -41,20 +41,14 @@ public class SolarPanelItemModel
 		
 		var registryName = ForgeRegistries.BLOCKS.getKey(block);
 		
-		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "blocks/" + registryName.getPath() + "_base"));
-		topTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "blocks/" + registryName.getPath() + "_top"));
+		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_base"));
+		topTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_top"));
 	}
 	
 	@Override
-	public BakedModel bake(IGeometryBakingContext context, ModelBakery bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation)
+	public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation)
 	{
 		return new Baked(block, spriteGetter.apply(topTx), spriteGetter.apply(baseTx), modelLocation);
-	}
-	
-	@Override
-	public Collection<Material> getMaterials(IGeometryBakingContext context, Function<ResourceLocation, UnbakedModel> modelGetter, Set<Pair<String, String>> missingTextureErrors)
-	{
-		return List.of(topTx, baseTx);
 	}
 	
 	private static class Baked

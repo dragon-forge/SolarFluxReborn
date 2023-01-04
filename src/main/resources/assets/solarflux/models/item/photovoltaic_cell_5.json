@@ -1,6 +1,6 @@
 {
 	"parent": "item/generated",
 	"textures": {
-		"layer0": "solarflux:items/photovoltaic_cell_5"
+		"layer0": "solarflux:item/photovoltaic_cell_5"
 	}
 }

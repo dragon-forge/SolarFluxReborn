@@ -1,6 +1,5 @@
 package org.zeith.solarflux.client;
 
-import com.mojang.math.Vector3f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
@@ -19,6 +18,7 @@ import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.block.SolarPanelTile;
@@ -34,7 +34,7 @@ public class SolarPanelBakedModel
 	public static final FaceBakery COOKER = new FaceBakery();
 	public final SolarPanelBlock block;
 	public final ResourceLocation registryName;
-	final ResourceLocation modelName = new ModelResourceLocation(InfoSF.MOD_ID, "solar_panel");
+	final ResourceLocation modelName = new ModelResourceLocation(InfoSF.MOD_ID, "solar_panel", "");
 	
 	public SolarPanelBakedModel(SolarPanelBlock spb)
 	{
@@ -46,7 +46,7 @@ public class SolarPanelBakedModel
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction sideIn, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType)
 	{
 		List<BakedQuad> quads = new ArrayList<>();
-		Direction[] sides = sideIn == null ? Direction.values() : new Direction[]{sideIn};
+		Direction[] sides = sideIn == null ? Direction.values() : new Direction[] { sideIn };
 		for(Direction side : sides)
 			if(side != null)
 			{
@@ -76,7 +76,7 @@ public class SolarPanelBakedModel
 				if(west = world.getBlockState(pos.west()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
 									0,
 									0,
 									16,
@@ -92,7 +92,7 @@ public class SolarPanelBakedModel
 				if(east = world.getBlockState(pos.east()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[]{
+							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
 									0,
 									0,
 									16,
@@ -219,14 +219,14 @@ public class SolarPanelBakedModel
 	public TextureAtlasSprite t_base()
 	{
 		if(baseTx == null)
-			baseTx = new ResourceLocation(registryName.getNamespace(), "blocks/" + registryName.getPath() + "_base");
+			baseTx = new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_base");
 		return spriteGetter.apply(baseTx);
 	}
 	
 	public TextureAtlasSprite t_top()
 	{
 		if(topTx == null)
-			topTx = new ResourceLocation(registryName.getNamespace(), "blocks/" + registryName.getPath() + "_top");
+			topTx = new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_top");
 		return spriteGetter.apply(topTx);
 	}
 	

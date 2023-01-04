@@ -1,6 +1,6 @@
 {
 	"parent": "item/generated",
 	"textures": {
-		"layer0": "solarflux:items/furnace_upgrade"
+		"layer0": "solarflux:item/furnace_upgrade"
 	}
 }

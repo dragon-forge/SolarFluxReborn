@@ -199,7 +199,7 @@ public class SolarPanelTile
 					}
 				} else
 				{
-					// Why non-upgrade items would end up in this inventory?
+					// Why non-upgrade item would end up in this inventory?
 					// idk, let's drop them!
 					ItemStack s = upgradeInventory.getStackInSlot(i);
 					s.copy();

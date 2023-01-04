@@ -1,11 +1,14 @@
 package org.zeith.solarflux.client;
 
 import com.google.gson.JsonObject;
+import net.minecraft.SharedConstants;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.ItemsSF;
@@ -14,7 +17,6 @@ import org.zeith.solarflux.init.SolarPanelsSF;
 import java.io.*;
 import java.util.*;
 import java.util.function.BooleanSupplier;
-import java.util.function.Predicate;
 
 public class SolarFluxResourcePack
 		implements PackResources
@@ -55,11 +57,11 @@ public class SolarFluxResourcePack
 			
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
-			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":items/materials/" + reg.getPath() + "\"}}"));
+			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":item/materials/" + reg.getPath() + "\"}}"));
 			
 			File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
-			File items = new File(textures, "items");
-			ResourceLocation textures_items = new ResourceLocation(reg.getNamespace(), "textures/items/materials/" + reg.getPath() + ".png");
+			File items = new File(textures, "item");
+			ResourceLocation textures_items = new ResourceLocation(reg.getNamespace(), "textures/item/materials/" + reg.getPath() + ".png");
 			{
 				resourceMap.put(textures_items, ofFile(new File(items, reg.getPath() + ".png")));
 			}
@@ -74,10 +76,6 @@ public class SolarFluxResourcePack
 			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
 			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
-			float thicc = si.getPanelData().height * 16F;
-			float thic2 = thicc + 0.25F;
-			float reverseThicc = 16 - thicc;
-			
 			resourceMap.put(blockstate, ofText("{\"variants\":{\"\":{\"model\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}}}"));
 			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}"));
 			
@@ -91,12 +89,14 @@ public class SolarFluxResourcePack
 			{
 				File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 				File blocks = new File(textures, "blocks");
-				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_base.png");
-				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_top.png");
-				ResourceLocation textures_blocks_base_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_base_" + reg.getPath() + "_base.png.mcmeta");
-				ResourceLocation textures_blocks_top_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_top_" + reg.getPath() + "_top.png.mcmeta");
+				
+				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png");
+				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png");
+				ResourceLocation textures_blocks_base_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/block/solar_base_" + reg.getPath() + "_base.png.mcmeta");
+				ResourceLocation textures_blocks_top_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/block/solar_top_" + reg.getPath() + "_top.png.mcmeta");
 				{
 					String n = reg.getPath().startsWith("sp_custom_") ? reg.getPath().substring(10) : reg.getPath().substring(3);
+					
 					resourceMap.put(textures_blocks_base, ofFile(new File(blocks, n + "_base.png")));
 					resourceMap.put(textures_blocks_base_mcmeta, ofFile(new File(blocks, n + "_base.mcmeta")));
 					resourceMap.put(textures_blocks_top, ofFile(new File(blocks, n + "_top.png")));
@@ -112,45 +112,54 @@ public class SolarFluxResourcePack
 	}
 	
 	@Override
-	public InputStream getRootResource(String fileName) throws IOException
-	{
-		throw new FileNotFoundException(fileName);
-	}
-	
-	@Override
 	public boolean isHidden()
 	{
 		return true;
 	}
 	
+	@Nullable
 	@Override
-	public InputStream getResource(PackType type, ResourceLocation location) throws IOException
+	public IoSupplier<InputStream> getRootResource(String... p_252049_)
 	{
-		try
+		return null;
+	}
+	
+	@Override
+	public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location)
+	{
+		var res = resourceMap.get(location);
+		if(res == null) return null;
+		
+		return () ->
+		{
+			try
+			{
+				init();
+				return res.create();
+			} catch(RuntimeException e)
+			{
+				if(e.getCause() instanceof IOException)
+					throw (IOException) e.getCause();
+				throw e;
+			}
+		};
+	}
+	
+	@Override
+	public void listResources(PackType type, String namespace, String dir, ResourceOutput out)
+	{
+		if(namespace.equals("solarflux"))
 		{
 			init();
-			InputStream in = resourceMap.get(location).create();
-			return in;
-		} catch(RuntimeException e)
-		{
-			if(e.getCause() instanceof IOException)
-				throw (IOException) e.getCause();
-			throw e;
+			
+			for(var e : resourceMap.entrySet())
+			{
+				if(e.getKey().getPath().startsWith(dir))
+				{
+					out.accept(e.getKey(), e.getValue()::create);
+				}
+			}
 		}
-	}
-	
-	@Override
-	public Collection<ResourceLocation> getResources(PackType p_215339_, String p_215340_, String p_215341_, Predicate<ResourceLocation> p_215342_)
-	{
-		return Collections.emptyList();
-	}
-	
-	@Override
-	public boolean hasResource(PackType type, ResourceLocation location)
-	{
-		init();
-		IResourceStreamSupplier s;
-		return (s = resourceMap.get(location)) != null && s.exists();
 	}
 	
 	@Override
@@ -166,7 +175,7 @@ public class SolarFluxResourcePack
 		if(deserializer.getMetadataSectionName().equals("pack"))
 		{
 			JsonObject obj = new JsonObject();
-			obj.addProperty("pack_format", 8);
+			obj.addProperty("pack_format", PackType.CLIENT_RESOURCES.getVersion(SharedConstants.getCurrentVersion()));
 			obj.addProperty("description", "Generated resources for SolarFlux");
 			return deserializer.fromJson(obj);
 		}
@@ -174,9 +183,9 @@ public class SolarFluxResourcePack
 	}
 	
 	@Override
-	public String getName()
+	public String packId()
 	{
-		return "Solar Flux Generated Resources";
+		return "SolarFlux";
 	}
 	
 	public interface IResourceStreamSupplier

@@ -2,10 +2,9 @@ package org.zeith.solarflux;
 
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.ModelEvent;
@@ -22,6 +21,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.zeith.hammerlib.HammerLib;
+import org.zeith.hammerlib.api.items.CreativeTab;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
 import org.zeith.hammerlib.compat.base.CompatList;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
@@ -43,14 +43,11 @@ public class SolarFlux
 	public static final String MOD_ID = "solarflux";
 	public static final Logger LOG = LogManager.getLogger();
 	public static final SFRCommonProxy PROXY = DistExecutor.unsafeRunForDist(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
-	public static final CreativeModeTab ITEM_GROUP = new CreativeModeTab(InfoSF.MOD_ID)
-	{
-		@Override
-		public ItemStack makeIcon()
-		{
-			return new ItemStack(ItemsSF.PHOTOVOLTAIC_CELL_3);
-		}
-	};
+	
+	@CreativeTab.RegisterTab
+	public static final CreativeTab ITEM_GROUP = new CreativeTab(new ResourceLocation(InfoSF.MOD_ID, "root"),
+			b -> b.icon(ItemsSF.PHOTOVOLTAIC_CELL_3::getDefaultInstance).title(Component.translatable("itemGroup." + MOD_ID))
+	);
 	
 	public static final SFCompatList SF_COMPAT = CompatList.gather(SolarFluxCompat.class, SFCompatList::new);
 	
@@ -133,7 +130,7 @@ public class SolarFlux
 		
 		@SubscribeEvent
 		@OnlyIn(Dist.CLIENT)
-		public static void modelBake(ModelEvent.BakingCompleted e)
+		public static void modelBake(ModelEvent.ModifyBakingResult e)
 		{
 			SolarPanelsSF.listPanelBlocks()
 					.forEach(spb ->

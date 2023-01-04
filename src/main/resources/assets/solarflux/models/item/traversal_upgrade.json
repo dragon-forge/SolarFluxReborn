@@ -1,6 +1,6 @@
 {
 	"parent": "item/generated",
 	"textures": {
-		"layer0": "solarflux:items/traversal_upgrade"
+		"layer0": "solarflux:item/traversal_upgrade"
 	}
 }

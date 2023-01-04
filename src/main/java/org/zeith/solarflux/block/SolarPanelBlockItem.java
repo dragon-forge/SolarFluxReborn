@@ -7,19 +7,20 @@ import net.minecraft.client.resources.language.I18n;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
+import org.zeith.hammerlib.api.items.ITabItem;
+import org.zeith.solarflux.SolarFlux;
 
 import java.util.List;
 
 public class SolarPanelBlockItem
 		extends BlockItem
+		implements ITabItem
 {
 	public final SolarPanelBlock panelBlock;
 	
@@ -76,5 +77,11 @@ public class SolarPanelBlockItem
 			} else
 				tooltip.add(Component.literal(I18n.get("info.solarflux.hold.for.info", ChatFormatting.YELLOW + I18n.get("info.solarflux.shift") + ChatFormatting.DARK_GRAY)).withStyle(ChatFormatting.DARK_GRAY));
 		}
+	}
+	
+	@Override
+	public CreativeModeTab getItemCategory()
+	{
+		return SolarFlux.ITEM_GROUP.tab();
 	}
 }

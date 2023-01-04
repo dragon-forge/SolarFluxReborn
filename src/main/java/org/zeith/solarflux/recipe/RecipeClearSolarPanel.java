@@ -13,7 +13,7 @@ public class RecipeClearSolarPanel
 {
 	public RecipeClearSolarPanel(ResourceLocation id, String group, ItemStack result, NonNullList<Ingredient> input)
 	{
-		super(id, group, result, input);
+		super(id, group, CraftingBookCategory.MISC, result, input);
 	}
 	
 	@Override

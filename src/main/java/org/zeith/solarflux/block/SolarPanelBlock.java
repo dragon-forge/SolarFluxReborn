@@ -26,7 +26,6 @@ import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
 import org.zeith.hammerlib.api.forge.BlockAPI;
 import org.zeith.hammerlib.api.forge.ContainerAPI;
 import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
-import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
@@ -279,6 +278,6 @@ public class SolarPanelBlock
 	@Override
 	public BlockItem createBlockItem()
 	{
-		return new SolarPanelBlockItem(this, new Item.Properties().tab(SolarFlux.ITEM_GROUP));
+		return new SolarPanelBlockItem(this, new Item.Properties());
 	}
 }

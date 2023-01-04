@@ -724,7 +724,7 @@ public class SolarPanel
 		public final long capacity;
 		
 		/**
-		 * The rate at which the solar panel transfers energy to other blocks, in units of FE per tick
+		 * The rate at which the solar panel transfers energy to other block, in units of FE per tick
 		 */
 		public final long transfer;
 		
@@ -791,7 +791,7 @@ public class SolarPanel
 			this.transfer = cat.getElement(ConfiguredLib.INT, "Transfer Rate")
 					.withRange(IntValueRange.rangeClosed(1, Long.MAX_VALUE))
 					.withDefault(base.delegateDataBase.transfer)
-					.withComment("How much FE does this solar panel emit to other blocks, per tick?")
+					.withComment("How much FE does this solar panel emit to other block, per tick?")
 					.getValue()
 					.longValue();
 			

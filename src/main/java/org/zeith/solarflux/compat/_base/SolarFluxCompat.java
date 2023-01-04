@@ -48,7 +48,7 @@ import java.util.function.*;
  * </pre>
  *
  * <p>You can also override the {@link #indexRecipes(Consumer)} and {@link #registerRecipes(RegisterRecipesEvent)}
- * methods to add custom recipes for the solar panels or other items in the mod.
+ * methods to add custom recipes for the solar panels or other item in the mod.
  */
 public class SolarFluxCompat
 		extends BaseCompat<SolarFluxCompat>

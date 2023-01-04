@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "solarflux:items/twilightforest/twilight_cell_1"
+    "layer0": "solarflux:item/twilightforest/twilight_cell_1"
   }
 }
