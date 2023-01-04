@@ -13,10 +13,6 @@ mc_version=1.19.2
 forge_version=43.2.0
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
-# MCP Info
-mcp_ch=official
-mcp_vr=1.19.2
-
 # Misc Info
 java=17
 
