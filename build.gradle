@@ -206,6 +206,11 @@ curseforge {
         }
         relations {
             requiredDependency 'Hammer-Lib'
+
+            optionalDependency 'Draconic-Evolution'
+            optionalDependency 'Applied-Energistics-2'
+            optionalDependency 'The-Twilight-Forest'
+            optionalDependency 'Avaritia-1-10'
         }
     }
 }
