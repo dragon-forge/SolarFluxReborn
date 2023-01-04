@@ -13,10 +13,6 @@ mc_version=1.19.3
 forge_version=44.1.0
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
-# MCP Info
-mcp_ch=official
-mcp_vr=1.19.3
-
 # Misc Info
 java=17
 
