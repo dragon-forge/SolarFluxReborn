@@ -1,0 +1,82 @@
+
+itemGroup.solarflux=Solar Flux [Reborn]
+
+block.solarflux.sp_1=Painel Solar I
+block.solarflux.sp_2=Painel Solar II
+block.solarflux.sp_3=Painel Solar III
+block.solarflux.sp_4=Painel Solar IV
+block.solarflux.sp_5=Painel Solar V
+block.solarflux.sp_6=Painel Solar VI
+block.solarflux.sp_7=Painel Solar VII
+block.solarflux.sp_8=Painel Solar VIII
+
+item.solarflux.mirror=Epelho
+item.solarflux.blazing_coating=Blazing Coating
+item.solarflux.emerald_glass=Emerald Glass
+item.solarflux.ender_glass=Ender Glass
+item.solarflux.photovoltaic_cell_1=Célula Fotovoltaica I
+item.solarflux.photovoltaic_cell_2=Célula Fotovoltaica II
+item.solarflux.photovoltaic_cell_3=Célula Fotovoltaica III
+item.solarflux.photovoltaic_cell_4=Célula Fotovoltaica IV
+item.solarflux.photovoltaic_cell_5=Célula Fotovoltaica V
+item.solarflux.photovoltaic_cell_6=Célula Fotovoltaica VI
+item.solarflux.blank_upgrade=Upgrade: Vazio
+item.solarflux.efficiency_upgrade=Upgrade: Eficiência
+item.solarflux.low_light_upgrade=Upgrade: Luz Baixa
+item.solarflux.traversal_upgrade=Upgrade: Máquina Transversal
+item.solarflux.transfer_rate_upgrade=Upgrade: Taxa de Transferência
+item.solarflux.capacity_upgrade=Upgrade: Capacidade
+item.solarflux.furnace_upgrade=Upgrade: Fornalha
+item.solarflux.dispersive_upgrade=Upgrade: Dispersivo
+item.solarflux.block_charging_upgrade=Upgrade: Carregamento de Bloco
+
+info.solarflux.energy.stored1=Carga: %,d FE
+info.solarflux.energy.stored2=Carga: %,d/%,d FE
+info.solarflux.energy.generation=Geração: %,d FE/tick
+info.solarflux.energy.transfer=Transferência: %,d FE/tick
+info.solarflux.energy.capacity=Capacidade: %,d FE
+info.solarflux.energy.efficiency=Eficiência: %,d%%
+info.solarflux.sun.intensity=Nível de Luz: %,d%%
+info.solarflux.upgrades.installed=Upgrades
+info.solarflux.hold.for.info=Segure %s para detalhes
+info.solarflux.shift=Shift
+info.solarflux.maximum=Máximo
+info.solarflux.contentretained=Conteúdo Retido
+info.solarflux.resetcontent=Put into crafting to reset contents
+info.solarflux.decreasingReturnsToScale=Retornos decrescentes de escala
+info.solarflux.constantReturnsToScale=Retornos constantes de escala
+info.solarflux.increasingReturnsToScale=Retornos crescentes de escala
+info.solarflux.solar.panel.upgrade=Upgrade para painel solar
+info.solarflux.efficiency_upgrade=Aumenta a quantidade de FE gerada em %.2f%%.
+info.solarflux.upgrade.low.light=Gera mais FE em ambientes de pouca luz, mas gera menos no brilho total.
+info.solarflux.traversal_upgrade=Distribui energia para máquina(s) conectada(s) no raio de %d blocos.
+info.solarflux.transfer_rate_upgrade=Aumenta a taxa de transferência em %.2f%%.
+info.solarflux.capacity_upgrade=Aumenta a capacidade interna em %.2f%%.
+info.solarflux.furnace_upgrade=Acumula energia para aquecer fornalhas vanilla.
+info.solarflux.dispersive_upgrade=Disperses energy to nearby players in the %d block range.
+info.solarflux.block_charging_upgrade=Wirelessly transmits energy to a specified block in the %d range.
+info.solarflux.craftitem=Ingrediente de fabricação.
+
+## AVARITIA COMPATIBILITY ##
+block.solarflux.sp_avaritia.neutronium=Neutronium Solar Panel
+block.solarflux.sp_avaritia.infinity=Solar Panel of Infinity
+
+## DRACONIC EVOLUTION ##
+block.solarflux.sp_de.wyvern=Wyvern Solar Panel
+block.solarflux.sp_de.draconic=Draconic Solar Panel
+block.solarflux.sp_de.chaotic=Chaotic Solar Panel
+
+## TWILIGHT FOREST ##
+block.solarflux.sp_tf.carminite=Carminite Solar Panel
+block.solarflux.sp_tf.fiery=Fiery Solar Panel
+
+item.solarflux.twilightforest.twilight_cell_1=Twilight Cell I
+item.solarflux.twilightforest.twilight_cell_2=Twilight Cell II
+item.solarflux.twilightforest.twilight_upgrade=Twi-Light Upgrade
+
+info.solarflux.twilightforest.twilight_upgrade=Slightly increases light gathered by Solar Panel in The Twilight Forest.
+
+## APPLIED ENERGISTICS ##
+item.solarflux.ae2.energy_upgrade=AEU Energy Upgrade
+
+info.solarflux.ae2.energy_upgrade=Allows connecting Solar Panel directly into ME Grid.

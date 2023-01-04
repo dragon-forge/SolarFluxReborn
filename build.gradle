@@ -4,16 +4,22 @@ buildscript {
 		maven { url "https://plugins.gradle.org/m2/" }
         jcenter()
         mavenCentral()
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
 		classpath "gradle.plugin.com.matthewprenger:CurseGradle:1.4.0"
+        classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
 apply plugin: "com.matthewprenger.cursegradle"
+apply plugin: 'org.spongepowered.mixin'
 
 ext.configFile = file("build.txt")
 configFile.withReader {
@@ -33,6 +39,10 @@ sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = co
 
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
+mixin {
+    add sourceSets.main, "mixins.${config.mod_id}.refmap.json"
+}
+
 minecraft {
     mappings channel: config.mcp_ch, version: config.mcp_vr
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -41,6 +51,7 @@ minecraft {
         client {
             workingDirectory project.file('run')
             property 'forge.logging.console.level', 'debug'
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
             mods {
                 examplemod {
                     source sourceSets.main
@@ -74,7 +85,7 @@ minecraft {
 repositories {
     maven {
         name = "DragonForge"
-        url = "https://zeith.org/maven"
+        url = "https://maven.zeith.org"
     }
     flatDir {
         dirs 'runtimeMods'
@@ -85,6 +96,11 @@ dependencies {
     minecraft "net.minecraftforge:forge:${config.mc_version}-${config.forge_version}"
 
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}:deobf"
+
+    if(!gradle.startParameter.taskNames.isEmpty()) {
+        print "Including MIXIN annotation processor."
+        annotationProcessor("org.spongepowered:mixin:0.8.2:processor")
+    }
 
     if (file("runtimeMods").isDirectory()) {
         file("runtimeMods").eachFile { file ->
@@ -111,7 +127,8 @@ jar {
             "Implementation-Title": project.name,
             "Implementation-Version": archiveVersion,
             "Implementation-Vendor" :"Zeitheron",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "MixinConfigs"            : "mixins.${config.mod_id}.json"
         ])
     }
 }
@@ -126,7 +143,8 @@ task deobfJar(type: Jar) {
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : archiveVersion,
                     "Implementation-Vendor"   : "Zeitheron",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                    "MixinConfigs"            : "mixins.${config.mod_id}.json"
         ])
     }
 }
@@ -145,12 +163,18 @@ curseforge {
 		}
         relations {
             requiredDependency 'Hammer-Lib'
+
             optionalDependency 'Draconic-Evolution'
+            optionalDependency 'Applied-Energistics-2'
+            optionalDependency 'The-Twilight-Forest'
         }
 	}
 }
 
 import net.minecraftforge.gradle.common.task.SignJar
+
+import java.nio.file.Files
+import java.nio.file.StandardOpenOption
 
 task signJar(type: SignJar, dependsOn: jar) {
     onlyIf {

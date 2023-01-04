@@ -5,18 +5,14 @@ import net.minecraft.block.material.Material;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.loot.LootContext;
 import net.minecraft.loot.LootParameters;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.shapes.ISelectionContext;
-import net.minecraft.util.math.shapes.VoxelShape;
-import net.minecraft.util.math.shapes.VoxelShapes;
+import net.minecraft.util.math.shapes.*;
 import net.minecraft.world.IBlockReader;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
@@ -25,7 +21,7 @@ import net.minecraftforge.common.ToolType;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
 import org.zeith.hammerlib.api.forge.ContainerAPI;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.items.UpgradeItem;
+import org.zeith.solarflux.items._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
 import java.util.ArrayList;
@@ -36,13 +32,13 @@ public class SolarPanelBlock
 		implements ICustomBlockItem
 {
 	public final SolarPanel panel;
-
+	
 	public SolarPanelBlock(SolarPanel panel)
 	{
 		super(Properties.of(Material.METAL).noOcclusion().harvestLevel(1).harvestTool(ToolType.PICKAXE).strength(1.5F).sound(SoundType.METAL));
 		this.panel = panel;
 	}
-
+	
 	@Override
 	public void setPlacedBy(World worldIn, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
 	{
@@ -60,12 +56,12 @@ public class SolarPanelBlock
 			spt.loadFromItem(stack);
 		}
 	}
-
+	
 	@Override
 	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
 	{
 		NonNullList<ItemStack> stacks = NonNullList.create();
-
+		
 		TileEntity tileentity = builder.getParameter(LootParameters.BLOCK_ENTITY);
 		if(tileentity instanceof SolarPanelTile)
 		{
@@ -73,16 +69,16 @@ public class SolarPanelBlock
 			stacks.add(te.generateItem(panel));
 		} else
 			stacks.add(new ItemStack(panel));
-
+		
 		return stacks;
 	}
-
+	
 	@Override
 	public BlockRenderType getRenderShape(BlockState p_149645_1_)
 	{
 		return BlockRenderType.MODEL;
 	}
-
+	
 	@Override
 	public VoxelShape getShape(BlockState state, IBlockReader world, BlockPos pos, ISelectionContext context)
 	{
@@ -92,7 +88,7 @@ public class SolarPanelBlock
 			return spt.getShape(this);
 		return VoxelShapes.box(0, 0, 0, 1, panel.networkData.height, 1);
 	}
-
+	
 	@Override
 	public void neighborChanged(BlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)
 	{
@@ -102,43 +98,43 @@ public class SolarPanelBlock
 		if(spt != null)
 			spt.resetVoxelShape();
 	}
-
+	
 	public VoxelShape recalcShape(IBlockReader world, BlockPos pos)
 	{
 		VoxelShape baseShape = VoxelShapes.box(0, 0, 0, 1, panel.networkData.height, 1);
 		List<VoxelShape> shapes = new ArrayList<>(8);
-
+		
 		boolean west = false, east = false, north = false, south = false;
-
+		
 		float h = panel.getPanelData().height, h2 = h + 0.25F / 16F;
-
+		
 		if(west = world.getBlockState(pos.west()).getBlock() != this)
 			shapes.add(VoxelShapes.box(0, h, 1 / 16F, 1 / 16F, h2, 15 / 16F));
-
+		
 		if(east = world.getBlockState(pos.east()).getBlock() != this)
 			shapes.add(VoxelShapes.box(15 / 16F, h, 1 / 16F, 1, h2, 15 / 16F));
-
+		
 		if(north = world.getBlockState(pos.north()).getBlock() != this)
 			shapes.add(VoxelShapes.box(1 / 16F, h, 0, 15 / 16F, h2, 1 / 16F));
-
+		
 		if(south = world.getBlockState(pos.south()).getBlock() != this)
 			shapes.add(VoxelShapes.box(1 / 16F, h, 15 / 16F, 15 / 16F, h2, 1));
-
+		
 		if(west || north || world.getBlockState(pos.west().north()).getBlock() != this)
 			shapes.add(VoxelShapes.box(0, h, 0, 1 / 16F, h2, 1 / 16F));
-
+		
 		if(east || north || world.getBlockState(pos.east().north()).getBlock() != this)
 			shapes.add(VoxelShapes.box(15 / 16F, h, 0, 1, h2, 1 / 16F));
-
+		
 		if(south || east || world.getBlockState(pos.south().east()).getBlock() != this)
 			shapes.add(VoxelShapes.box(15 / 16F, h, 15 / 16F, 1, h2, 1));
-
+		
 		if(west || south || world.getBlockState(pos.west().south()).getBlock() != this)
 			shapes.add(VoxelShapes.box(0, h, 15 / 16F, 1 / 16F, h2, 1));
-
+		
 		return VoxelShapes.or(baseShape, shapes.toArray(new VoxelShape[0]));
 	}
-
+	
 	@Override
 	public ActionResultType use(BlockState state, World worldIn, BlockPos pos, PlayerEntity player, Hand handIn, BlockRayTraceResult hit)
 	{
@@ -151,32 +147,33 @@ public class SolarPanelBlock
 			{
 				int amt = tbs.getUpgrades(held.getItem());
 				UpgradeItem iu = (UpgradeItem) held.getItem();
-				if(amt < held.getMaxStackSize() && iu.canInstall(tbs, held, tbs.upgradeInventory))
+				if(amt < iu.getMaxUpgradesInstalled(tbs) && iu.canInstall(tbs, held, tbs.upgradeInventory))
 				{
-					boolean installed = false;
+					int installed = 0;
 					for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
 					{
 						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
 						if(stack.sameItem(held) && ItemStack.tagMatches(stack, held))
 						{
-							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
+							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), Math.min(iu.getItemStackLimit(stack) - stack.getCount(), held.getCount()));
 							stack.grow(allow);
 							held.shrink(allow);
-							installed = true;
+							installed += allow;
 							break;
 						} else if(stack.isEmpty())
 						{
-							int allow = Math.min(held.getMaxStackSize() - tbs.getUpgrades(iu), held.getCount());
+							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), held.getCount());
 							ItemStack copy = held.copy();
 							held.shrink(allow);
 							copy.setCount(allow);
 							tbs.upgradeInventory.setStackInSlot(i, copy);
-							installed = true;
+							installed += allow;
 							break;
 						}
 					}
-					if(installed)
+					if(installed > 0)
 					{
+						iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
 						worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundCategory.BLOCKS, .1F, 1F);
 						return ActionResultType.SUCCESS;
 					}
@@ -186,20 +183,20 @@ public class SolarPanelBlock
 		}
 		return ActionResultType.SUCCESS;
 	}
-
+	
 	@Override
 	@OnlyIn(Dist.CLIENT)
 	public boolean skipRendering(BlockState state, BlockState adjacentBlockState, Direction side)
 	{
 		return adjacentBlockState.getBlock() == state.getBlock() && side != Direction.UP;
 	}
-
+	
 	@Override
 	public boolean hasAnalogOutputSignal(BlockState state)
 	{
 		return true;
 	}
-
+	
 	@Override
 	public int getAnalogOutputSignal(BlockState blockState, World worldIn, BlockPos pos)
 	{
@@ -212,7 +209,7 @@ public class SolarPanelBlock
 		}
 		return 0;
 	}
-
+	
 	@Override
 	public TileEntity newBlockEntity(IBlockReader worldIn)
 	{
@@ -250,13 +247,13 @@ public class SolarPanelBlock
 //	{
 //		builder.add(WATERLOGGED);
 //	}
-
+	
 	@Override
 	public boolean propagatesSkylightDown(BlockState state, IBlockReader reader, BlockPos pos)
 	{
 		return true;
 	}
-
+	
 	@Override
 	public BlockItem createBlockItem()
 	{

@@ -52,7 +52,7 @@ public class ItemsSF
 	@RegistryName("ender_glass")
 	public static final Item ENDER_GLASS = newItem();
 
-	private static Item newItem()
+	public static Item newItem()
 	{
 		return new Item(new Item.Properties().tab(SolarFlux.ITEM_GROUP));
 	}

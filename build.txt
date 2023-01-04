@@ -2,12 +2,13 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=16.3.9
-build_candidate=false
+mod_version=16.4.9
+build_candidate=true
 
 # Maven Info
 maven_group=org.zeith.solarflux
-build_candidate=false
+build_candidate=true
+hl_version=16.4.31
 
 # MC Info
 mc_version=1.16.5
@@ -19,7 +20,6 @@ mcp_vr=1.16.5
 
 # Misc Info
 java=1.8
-hl_version=16.3.24
 certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
 
 # Project ID on CurseForge

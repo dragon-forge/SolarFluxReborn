@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8.2",
+  "package": "org.zeith.solarflux.mixins",
+  "refmap": "mixins.solarflux.refmap.json",
+  "target": "@env(DEFAULT)",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "compat.ae2.SolarPanelTileMixin"
+  ],
+  "client": [
+  ],
+  "server": [
+  ]
+}
