@@ -6,7 +6,7 @@ mod_version=19.3.7
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=19.3.45
+hl_version=19.3.49
 
 # MC Info
 mc_version=1.19.2

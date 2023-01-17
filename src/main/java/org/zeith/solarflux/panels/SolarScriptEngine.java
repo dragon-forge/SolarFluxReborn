@@ -10,9 +10,7 @@ import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -30,7 +28,7 @@ public class SolarScriptEngine
 		lines.forEach(ln ->
 		{
 			AtomicReference<String> tmp = new AtomicReference<>(ln);
-			defines.forEach((src, dst) -> tmp.set(tmp.get().replaceAll(src, dst)));
+			defines.forEach((src, dst) -> tmp.set(tmp.get().replace(src, dst)));
 			ln = tmp.get();
 
 			if(ln.startsWith("define "))
