@@ -74,7 +74,7 @@ public class SolarFluxCompat
 		if(reg == null)
 			reg = RegistryMapping.getRegistryByType(RegistryMapping.getSuperType(event.getRegistryKey()));
 		for(var cls : simplyRegisterClasses)
-			RegistryAdapter.register(reg, cls, SolarFlux.MOD_ID, getCompatModID() + "/");
+			RegistryAdapter.register(event, reg, cls, SolarFlux.MOD_ID, getCompatModID() + "/");
 	}
 	
 	/**

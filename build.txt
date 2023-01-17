@@ -2,11 +2,11 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=19.4.7
+mod_version=19.5.8
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=19.4.47
+hl_version=19.5.49
 
 # MC Info
 mc_version=1.19.3
