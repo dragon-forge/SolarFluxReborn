@@ -65,7 +65,7 @@ public class AvaritiaCompat
 					.map('g', AvaritiaModContent.NEUTRON_NUGGET.get())
 					.map('p', AvaritiaModContent.NEUTRON_PILE.get())
 					.map('i', AvaritiaModContent.INFINITY_CATALYST.get())
-					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[7].delegateData.generation))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[7]))
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
 			extremeShaped(e)
@@ -76,7 +76,7 @@ public class AvaritiaCompat
 					.map('c', AvaritiaModContent.CRYSTAL_MATRIX_INGOT.get())
 					.map('g', AvaritiaModContent.NEUTRON_NUGGET.get())
 					.map('p', AvaritiaModContent.NEUTRON_PILE.get())
-					.map('F', new ItemStack(neutronium.getBlock()))
+					.map('F', SolarPanelsSF.getGeneratingSolars(neutronium))
 					.map('i', AvaritiaModContent.INFINITY_INGOT.get())
 					.map('s', new ItemStack(AvaritiaModContent.NEUTRONIUM_STORAGE_BLOCK.get()))
 					.registerIf(SolarPanelsSF::isRecipeActive);

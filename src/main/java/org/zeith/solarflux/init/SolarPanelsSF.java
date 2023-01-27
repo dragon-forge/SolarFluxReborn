@@ -360,11 +360,11 @@ public class SolarPanelsSF
 	
 	public static Ingredient getGeneratingSolars(long generation)
 	{
-		return Ingredient.fromValues(listPanels().filter(sp -> sp.delegateData.generation == generation).map(SolarPanel::getBlock).map(ItemStack::new).map(Ingredient.ItemValue::new));
+		return Ingredient.fromValues(listPanels().filter(sp -> sp.getDelegateData().generation == generation).map(SolarPanel::getBlock).map(ItemStack::new).map(Ingredient.ItemValue::new));
 	}
 	
-	public static Ingredient getGeneratingSolars(SolarPanel baseGeneration)
+	public static Ingredient getGeneratingSolars(SolarPanel as)
 	{
-		return getGeneratingSolars(baseGeneration.delegateData.generation);
+		return getGeneratingSolars(as.getDelegateData().generation);
 	}
 }
