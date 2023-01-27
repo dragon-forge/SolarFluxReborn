@@ -84,7 +84,7 @@ public class DraconicEvolutionCompat
 					.id(wyvernRecipe)
 					.result(wyvern, 2)
 					.shape("sps", "pcp", "sps")
-					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[7].delegateData.generation))
+					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[7]))
 					.map('p', new ItemStack(wyvernEnergyCore))
 					.map('c', new ItemStack(wyvernCore))
 					.registerIf(SolarPanelsSF::isRecipeActive);
@@ -93,7 +93,7 @@ public class DraconicEvolutionCompat
 					.id(draconicRecipe)
 					.result(draconic, 2)
 					.shape("sps", "pcp", "sps")
-					.map('s', SolarPanelsSF.getGeneratingSolars(wyvern.delegateData.generation))
+					.map('s', SolarPanelsSF.getGeneratingSolars(wyvern))
 					.map('p', new ItemStack(draconicEnergyCore))
 					.map('c', new ItemStack(awakenedCore))
 					.registerIf(SolarPanelsSF::isRecipeActive);
@@ -101,11 +101,11 @@ public class DraconicEvolutionCompat
 			if(SolarPanelsSF.isRecipeActive(chaoticRecipe))
 				FusionRecipeAPI.register(chaoticRecipe, FusionRecipeAPI.create(chaoticRecipe, new ItemStack(chaotic.getBlock(), 4), Ingredient.of(chaoticCore), 256L * MEGA, TechLevel.CHAOTIC, List.of(
 						ingr(new ItemStack(awakenedCore)),
-						ingr(new ItemStack(draconic.getBlock())),
+						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
 						ingr(new ItemStack(awakenedCore)),
-						ingr(new ItemStack(draconic.getBlock())),
+						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
 						ingr(new ItemStack(awakenedCore)),
-						ingr(new ItemStack(draconic.getBlock())),
+						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
 						ingr(new ItemStack(awakenedCore))
 				)), e);
 		} catch(LinkageError | ReflectiveOperationException error)

@@ -30,6 +30,7 @@ import org.zeith.hammerlib.api.tiles.IContainerTile;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
 import org.zeith.hammerlib.util.java.tuples.Tuple2;
 import org.zeith.hammerlib.util.java.tuples.Tuples;
+import org.zeith.hammerlib.util.mcf.NormalizedTicker;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.attribute.SimpleAttributeProperty;
 import org.zeith.solarflux.compat._abilities.SFAbilities;
@@ -142,15 +143,6 @@ public class SolarPanelTile
 				.filter(Objects::nonNull);
 	}
 	
-	public boolean isSameLevel(SolarPanelTile other)
-	{
-		if(other == null)
-			return false;
-		if(other.getDelegate() == null || getDelegate() == null)
-			return false;
-		return Objects.equals(other.getDelegate(), getDelegate());
-	}
-	
 	@Override
 	public SolarPanel getDelegate()
 	{
@@ -216,7 +208,7 @@ public class SolarPanelTile
 				stack = chargeInventory.getStackInSlot(i);
 				if(!stack.isEmpty())
 				{
-					stack.getCapability(ForgeCapabilities.ENERGY, null).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
+					stack.getCapability(ForgeCapabilities.ENERGY).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
 					{
 						transfer.setBaseValue(getInstance().transfer);
 						int transfer = this.transfer.getValueI();
@@ -229,16 +221,31 @@ public class SolarPanelTile
 	}
 	
 	// We really don't need to make a copy of all values every tick, so this constant is here to save the day.
-	private static final Direction[] DIRECTIONS = Direction.values();
+	private static final Direction[] DIRECTIONS_NO_UP = Direction.stream().filter(f -> f != Direction.UP).toArray(Direction[]::new);
+	private static final Direction[] DIRECTIONS_HORIZONTAL = Direction.stream().filter(f -> f.getAxis() != Direction.Axis.Y).toArray(Direction[]::new);
+	
+	protected final NormalizedTicker ticker = NormalizedTicker.create(this::normTick);
 	
 	@Override
 	public void update()
 	{
+		ticker.tick(level);
+	}
+	
+	@Override
+	public boolean atTickRate(int rate)
+	{
+		return ticker.atTickRate(rate);
+	}
+	
+	public void normTick(int suppressed)
+	{
 		if(voxelTimer > 0)
 			--voxelTimer;
+		
 		Block blk = getBlockState().getBlock();
-		if(blk instanceof SolarPanelBlock)
-			this.delegate = ((SolarPanelBlock) blk).panel;
+		if(blk instanceof SolarPanelBlock spb)
+			this.delegate = spb.panel;
 		else
 			return;
 		
@@ -253,58 +260,49 @@ public class SolarPanelTile
 		
 		tickUpgrades();
 		
-		int gen = getGeneration();
+		transfer.setBaseValue(getInstance().transfer);
+		int transfer = this.transfer.getValueI() * suppressed;
+		
+		long gen = getGeneration();
 		capacity.setBaseValue(getInstance().cap);
-		energy += Math.min(capacity.getValueL() - energy, gen);
+		energy += Math.min(capacity.getValueL() - energy, gen * suppressed);
 		currentGeneration = gen;
 		
-		energy = Math.min(Math.max(energy, 0), capacity.getValueL());
+		energy = Mth.clamp(energy, 0L, capacity.getValueL());
+		
+		for(Direction hor : DIRECTIONS_HORIZONTAL)
 		{
-			for(Direction hor : DIRECTIONS)
-				if(hor.getAxis() != Direction.Axis.Y)
-				{
-					BlockEntity tile = level.getBlockEntity(worldPosition.relative(hor));
-					if(tile instanceof SolarPanelTile)
-						autoBalanceEnergy((SolarPanelTile) tile);
-				}
+			BlockEntity tile = level.getBlockEntity(worldPosition.relative(hor));
+			if(tile instanceof SolarPanelTile spt)
+				autoBalanceEnergy(spt);
+		}
+		
+		for(Direction hor : DIRECTIONS_NO_UP)
+		{
+			BlockEntity tile = level.getBlockEntity(worldPosition.relative(hor));
+			if(tile == null) continue;
 			
-			transfer.setBaseValue(getInstance().transfer);
-			int transfer = this.transfer.getValueI();
-			
-			for(Direction hor : DIRECTIONS)
+			tile.getCapability(ForgeCapabilities.ENERGY, hor.getOpposite()).ifPresent(storage ->
 			{
-				if(hor == Direction.UP)
-					continue;
+				if(storage.canReceive())
+					energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
+			});
+		}
+		
+		if(!traversal.isEmpty() && energy > 0L)
+		{
+			for(BlockPosFace traverse : traversal)
+			{
+				BlockEntity tile = level.getBlockEntity(traverse.pos);
+				if(tile == null) continue;
 				
-				BlockEntity tile = level.getBlockEntity(worldPosition.relative(hor));
-				
-				if(tile == null)
-					continue;
-				
-				tile.getCapability(ForgeCapabilities.ENERGY, hor.getOpposite()).ifPresent(storage ->
+				tile.getCapability(ForgeCapabilities.ENERGY, traverse.face).ifPresent(storage ->
 				{
 					if(storage.canReceive())
-						energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
+						energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
 				});
-			}
-			
-			if(!traversal.isEmpty())
-			{
-				for(BlockPosFace traverse : traversal)
-				{
-					BlockEntity tile = level.getBlockEntity(traverse.pos);
-					
-					if(energy < 1L)
-						break;
-					if(tile == null)
-						continue;
-					
-					tile.getCapability(ForgeCapabilities.ENERGY, traverse.face).ifPresent(storage ->
-					{
-						if(storage.canReceive())
-							energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
-					});
-				}
+				
+				if(energy < 1L) break;
 			}
 		}
 		
@@ -428,7 +426,10 @@ public class SolarPanelTile
 	@Override
 	public ModelData getModelData()
 	{
-		return ModelData.builder().with(WORLD_PROP, level).with(POS_PROP, worldPosition).build();
+		return ModelData.builder()
+				.with(WORLD_PROP, level)
+				.with(POS_PROP, worldPosition)
+				.build();
 	}
 	
 	@Override

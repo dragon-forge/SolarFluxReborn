@@ -37,18 +37,23 @@ public class PacketSyncPanelData
 		data = new SolarPanel.SolarPanelData(buf);
 	}
 	
+	public SolarPanel.SolarPanelData getData()
+	{
+		return data;
+	}
+	
 	@Override
 	public void clientExecute(PacketContext ctx)
 	{
 		SolarPanel sp = SolarPanelsSF.PANELS.get(name);
-		if(sp != null) sp.networkData = data;
+		if(sp != null) sp.handle(this);
 	}
 	
 	public static void sendAllPanels(ServerPlayer mp)
 	{
 		SolarPanelsSF.listPanels().forEach(i ->
 		{
-			Network.sendTo(new PacketSyncPanelData(i.name, i.delegateData), mp);
+			Network.sendTo(new PacketSyncPanelData(i.name, i.getDelegateData()), mp);
 		});
 	}
 }

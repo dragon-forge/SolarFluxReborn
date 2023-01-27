@@ -113,7 +113,7 @@ public class SolarPanelBlock
 	public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context)
 	{
 		if(world.getBlockEntity(pos) instanceof SolarPanelTile spt) return spt.getShape(this);
-		return Shapes.create(0, 0, 0, 1, panel.networkData.height, 1);
+		return Shapes.create(0, 0, 0, 1, panel.getPanelData().height, 1);
 	}
 	
 	@Override
@@ -126,12 +126,15 @@ public class SolarPanelBlock
 	
 	public VoxelShape recalcShape(BlockGetter world, BlockPos pos)
 	{
-		VoxelShape baseShape = Shapes.create(0, 0, 0, 1, panel.networkData.height, 1);
+		var pd = panel.getPanelData();
+		var ph = pd.height;
+		
+		VoxelShape baseShape = Shapes.create(0, 0, 0, 1, ph, 1);
 		Stream.Builder<VoxelShape> shapes = Stream.builder();
 		
 		boolean west = false, east = false, north = false, south = false;
 		
-		float h = panel.getPanelData().height, h2 = h + 0.25F / 16F;
+		float h = ph, h2 = h + 0.25F / 16F;
 		
 		if(west = world.getBlockState(pos.west()).getBlock() != this)
 			shapes.add(Shapes.create(0, h, 1 / 16F, 1 / 16F, h2, 15 / 16F));

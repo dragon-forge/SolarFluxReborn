@@ -62,6 +62,7 @@ minecraft {
             mods {
                 examplemod {
                     source sourceSets.main
+                    resource sourceSets.main.resources
                 }
             }
         }
@@ -69,10 +70,11 @@ minecraft {
         server {
             workingDirectory project.file('run/server')
             property 'forge.logging.console.level', 'debug'
-            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json -Dmixin.env.disableRefMap=true".split(' ')))
+            setArgs(Arrays.asList("--mixin mixins.${config.mod_id}.json".split(' ')))
             mods {
                 examplemod {
                     source sourceSets.main
+                    resource sourceSets.main.resources
                 }
             }
         }

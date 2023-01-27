@@ -19,6 +19,7 @@ import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.net.PacketSyncPanelData;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -45,12 +46,12 @@ public class SolarPanel
 	/**
 	 * The data of the solar panel.
 	 */
-	public SolarPanelData delegateData;
+	private SolarPanelData delegateData;
 	
 	/**
 	 * The network data of the solar panel.
 	 */
-	public SolarPanelData networkData;
+	private SolarPanelData networkData;
 	
 	/**
 	 * The mod ID of a compat that has created this {@link SolarPanel} instance.
@@ -89,7 +90,7 @@ public class SolarPanel
 	 */
 	protected SolarPanel(String name, SolarPanelData data, boolean isCustom)
 	{
-		this.delegateData = this.delegateDataBase = networkData = data;
+		this.delegateData = this.delegateDataBase = data;
 		this.name = (isCustom ? "custom_" : "") + name;
 		this.isCustom = isCustom;
 	}
@@ -102,6 +103,14 @@ public class SolarPanel
 	public SolarPanelData getPanelData()
 	{
 		return networkData != null ? networkData : delegateData;
+	}
+	
+	/**
+	 * Gets the current solar panel information (it's generation, transfer and capacity) AFTER configs have been applied.
+	 */
+	public SolarPanelData getDelegateData()
+	{
+		return delegateData;
 	}
 	
 	/**
@@ -312,6 +321,14 @@ public class SolarPanel
 		t.cap = data.capacity;
 		t.transfer = data.transfer;
 		t.delegate = name;
+	}
+	
+	/**
+	 * Applies panel data for this panel. Used to obtain custom values from server and display them correctly.
+	 */
+	public void handle(PacketSyncPanelData packet)
+	{
+		this.networkData = packet.getData();
 	}
 	
 	/**

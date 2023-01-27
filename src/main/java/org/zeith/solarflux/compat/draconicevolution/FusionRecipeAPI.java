@@ -97,4 +97,41 @@ public class FusionRecipeAPI
 		ctor.setAccessible(true);
 		return ctor.newInstance(Ingredient.of(stack), consume);
 	}
+	
+	/**
+	 * Creates a new Fusion Ingredient with the specified ItemStack and default "consume" value of true.
+	 *
+	 * @param ingredient
+	 * 		the ItemStack
+	 *
+	 * @return the new Fusion Ingredient
+	 *
+	 * @throws ReflectiveOperationException
+	 * 		if there is an error creating the Fusion Ingredient
+	 */
+	public static FusionRecipe.FusionIngredient ingr(Ingredient ingredient) throws ReflectiveOperationException
+	{
+		return ingr(ingredient, true);
+	}
+	
+	/**
+	 * Creates a new Fusion Ingredient with the specified ItemStack and "consume" value.
+	 *
+	 * @param ingredient
+	 * 		the ItemStack
+	 * @param consume
+	 * 		whether the ItemStack should be consumed
+	 *
+	 * @return the new Fusion Ingredient
+	 *
+	 * @throws ReflectiveOperationException
+	 * 		if there is an error creating the Fusion Ingredient
+	 */
+	public static FusionRecipe.FusionIngredient ingr(Ingredient ingredient, boolean consume) throws ReflectiveOperationException
+	{
+		@SuppressWarnings("JavaReflectionMemberAccess") // We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
+		var ctor = FusionRecipe.FusionIngredient.class.getDeclaredConstructor(Ingredient.class, boolean.class);
+		ctor.setAccessible(true);
+		return ctor.newInstance(ingredient, consume);
+	}
 }
