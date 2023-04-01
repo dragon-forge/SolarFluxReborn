@@ -2,7 +2,7 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=16.4.9
+mod_version=16.4.10
 build_candidate=true
 
 # Maven Info
