@@ -31,6 +31,14 @@ public class SolarFluxResourcePack
 		return IResourceStreamSupplier.create(file::isFile, () -> new FileInputStream(file));
 	}
 	
+	private static IResourceStreamSupplier oneOfFiles(File... file)
+	{
+		return IResourceStreamSupplier.create(
+				() -> Arrays.stream(file).anyMatch(File::isFile),
+				() -> new FileInputStream(Arrays.stream(file).filter(File::isFile).findFirst().orElseThrow(FileNotFoundException::new))
+		);
+	}
+	
 	static SolarFluxResourcePack packInstance;
 	
 	public static SolarFluxResourcePack getPackInstance()
@@ -93,14 +101,14 @@ public class SolarFluxResourcePack
 				File blocks = new File(textures, "blocks");
 				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_base.png");
 				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_top.png");
-				ResourceLocation textures_blocks_base_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_base_" + reg.getPath() + "_base.png.mcmeta");
-				ResourceLocation textures_blocks_top_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/solar_top_" + reg.getPath() + "_top.png.mcmeta");
+				ResourceLocation textures_blocks_base_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_base.png.mcmeta");
+				ResourceLocation textures_blocks_top_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/blocks/" + reg.getPath() + "_top.png.mcmeta");
 				{
 					String n = reg.getPath().startsWith("sp_custom_") ? reg.getPath().substring(10) : reg.getPath().substring(3);
 					resourceMap.put(textures_blocks_base, ofFile(new File(blocks, n + "_base.png")));
-					resourceMap.put(textures_blocks_base_mcmeta, ofFile(new File(blocks, n + "_base.mcmeta")));
+					resourceMap.put(textures_blocks_base_mcmeta, oneOfFiles(new File(blocks, n + "_base.mcmeta"), new File(blocks, n + "_base.png.mcmeta")));
 					resourceMap.put(textures_blocks_top, ofFile(new File(blocks, n + "_top.png")));
-					resourceMap.put(textures_blocks_top_mcmeta, ofFile(new File(blocks, n + "_top.mcmeta")));
+					resourceMap.put(textures_blocks_top_mcmeta, oneOfFiles(new File(blocks, n + "_top.mcmeta"), new File(blocks, n + "_top.png.mcmeta")));
 				}
 			}
 		});
