@@ -11,6 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.IDynamicBakedModel;
@@ -178,14 +179,14 @@ public class SolarPanelBakedModel
 	public ItemTransforms getTransforms()
 	{
 		return new ItemTransforms(
-				getTransform(ItemTransforms.TransformType.THIRD_PERSON_LEFT_HAND),
-				getTransform(ItemTransforms.TransformType.THIRD_PERSON_RIGHT_HAND),
-				getTransform(ItemTransforms.TransformType.FIRST_PERSON_LEFT_HAND),
-				getTransform(ItemTransforms.TransformType.FIRST_PERSON_RIGHT_HAND),
-				getTransform(ItemTransforms.TransformType.HEAD),
-				getTransform(ItemTransforms.TransformType.GUI),
-				getTransform(ItemTransforms.TransformType.GROUND),
-				getTransform(ItemTransforms.TransformType.FIXED)
+				getTransform(ItemDisplayContext.THIRD_PERSON_LEFT_HAND),
+				getTransform(ItemDisplayContext.THIRD_PERSON_RIGHT_HAND),
+				getTransform(ItemDisplayContext.FIRST_PERSON_LEFT_HAND),
+				getTransform(ItemDisplayContext.FIRST_PERSON_RIGHT_HAND),
+				getTransform(ItemDisplayContext.HEAD),
+				getTransform(ItemDisplayContext.GUI),
+				getTransform(ItemDisplayContext.GROUND),
+				getTransform(ItemDisplayContext.FIXED)
 		);
 	}
 	
@@ -195,7 +196,7 @@ public class SolarPanelBakedModel
 		return ItemOverrides.EMPTY;
 	}
 	
-	public ItemTransform getTransform(ItemTransforms.TransformType type)
+	public ItemTransform getTransform(ItemDisplayContext type)
 	{
 		switch(type)
 		{
