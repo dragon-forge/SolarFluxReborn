@@ -2,7 +2,7 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=20.0.1
+mod_version=20.0.2
 mod_license=All Rights Reserved
 mod_authors=Zeitheron
 mod_description=Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providing modpack devs the ability to create their own panels with ease!
@@ -10,7 +10,7 @@ issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=20.0.1
+hl_version=20.0.2
 maven_url=file:///SERVER//Maven
 
 # MC Info
