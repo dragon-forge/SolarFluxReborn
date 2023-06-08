@@ -2,15 +2,22 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=19.5.10
+mod_version=20.0.1
+mod_license=All Rights Reserved
+mod_authors=Zeitheron
+mod_description=Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providing modpack devs the ability to create their own panels with ease!
+issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=19.5.56
+hl_version=20.0.1
+maven_url=file:///SERVER//Maven
 
 # MC Info
-mc_version=1.19.3
-forge_version=44.1.0
+mc_version=1.20
+mc_range=[1.20,1.21)
+forge_version=46.0.1
+forge_range=[46,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 
 # Misc Info
@@ -18,6 +25,17 @@ java=17
 
 # Project ID on CurseForge
 cf_project=246974
+modrinth_project=4QG5lev4
 
 # alpha, beta, release
 release_type=release
+
+# List of mods separated by ;
+# If a specific mod for one platform is needed, @m: or @c: prefixes are used.
+# Example for adding Hammer Lib for both Modrinth & CurseForge: 
+# @m:PlkSuVtM;@c:hammer-lib;
+# Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
+required_mods=hammer-lib;
+optional_mods=
+incompatible_mods=
+embedded_mods=
