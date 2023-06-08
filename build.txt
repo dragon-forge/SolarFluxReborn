@@ -36,6 +36,6 @@ release_type=release
 # @m:PlkSuVtM;@c:hammer-lib;
 # Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
 required_mods=hammer-lib;
-optional_mods=
+optional_mods=@m:ae2;@c:applied-energistics-2;@c:draconic-evolution;@c:the-twilight-forest;@c:avaritia-1-10;
 incompatible_mods=
 embedded_mods=
