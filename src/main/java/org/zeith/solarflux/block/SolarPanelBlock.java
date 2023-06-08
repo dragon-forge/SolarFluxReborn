@@ -16,8 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
-import net.minecraft.world.level.storage.loot.LootContext;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
@@ -41,7 +40,7 @@ public class SolarPanelBlock
 	
 	public SolarPanelBlock(SolarPanel panel, ResourceLocation registryName)
 	{
-		super(Properties.of(Material.METAL)
+		super(Properties.of()
 				.sound(SoundType.METAL)
 				.dynamicShape()
 				.noOcclusion()
@@ -89,7 +88,7 @@ public class SolarPanelBlock
 	}
 	
 	@Override
-	public List<ItemStack> getDrops(BlockState state, LootContext.Builder builder)
+	public List<ItemStack> getDrops(BlockState state, LootParams.Builder builder)
 	{
 		NonNullList<ItemStack> stacks = NonNullList.create();
 		
@@ -177,7 +176,7 @@ public class SolarPanelBlock
 					for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
 					{
 						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
-						if(stack.sameItem(held) && ItemStack.tagMatches(stack, held))
+						if(ItemStack.isSameItemSameTags(stack, held))
 						{
 							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), Math.min(iu.getMaxStackSize(stack) - stack.getCount(), held.getCount()));
 							stack.grow(allow);

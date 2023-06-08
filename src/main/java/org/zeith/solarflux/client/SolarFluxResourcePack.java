@@ -185,7 +185,7 @@ public class SolarFluxResourcePack
 		if(deserializer.getMetadataSectionName().equals("pack"))
 		{
 			JsonObject obj = new JsonObject();
-			obj.addProperty("pack_format", PackType.CLIENT_RESOURCES.getVersion(SharedConstants.getCurrentVersion()));
+			obj.addProperty("pack_format", SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES));
 			obj.addProperty("description", "Generated resources for SolarFlux");
 			return deserializer.fromJson(obj);
 		}

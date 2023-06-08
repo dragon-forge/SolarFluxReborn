@@ -55,7 +55,6 @@ info.solarflux.capacity_upgrade=Increases the internal capacity by %.2f%%.
 info.solarflux.furnace_upgrade=Accumulates energy to heat vanilla furnaces.
 info.solarflux.dispersive_upgrade=Disperses energy to nearby players in the %d block range.
 info.solarflux.block_charging_upgrade=Wirelessly transmits energy to a specified block in the %d range.
-info.solarflux.craftitem=Crafting item.
 
 ## AVARITIA COMPATIBILITY ##
 block.solarflux.sp_avaritia.neutronium=Neutronium Solar Panel

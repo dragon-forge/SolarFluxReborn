@@ -268,7 +268,7 @@ public class SolarPanelTile
 		energy += Math.min(capacity.getValueL() - energy, gen * suppressed);
 		currentGeneration = gen;
 		
-		energy = Mth.clamp(energy, 0L, capacity.getValueL());
+		energy = clamp(energy, 0L, capacity.getValueL());
 		
 		for(Direction hor : DIRECTIONS_HORIZONTAL)
 		{
@@ -399,7 +399,7 @@ public class SolarPanelTile
 	@Override
 	public void energy(long newEnergy)
 	{
-		energy = Mth.clamp(newEnergy, 0L, capacity.getValueL());
+		energy = clamp(newEnergy, 0L, capacity.getValueL());
 	}
 	
 	@Override
@@ -570,5 +570,11 @@ public class SolarPanelTile
 	public void setDelegate(SolarPanel delegate)
 	{
 		this.delegate = delegate;
+	}
+	
+	
+	public static long clamp(long val, long min, long max)
+	{
+		return Math.min(Math.max(val, min), max);
 	}
 }
