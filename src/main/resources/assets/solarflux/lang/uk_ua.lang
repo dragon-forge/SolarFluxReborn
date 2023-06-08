@@ -53,6 +53,7 @@ info.solarflux.capacity_upgrade=Збільшують внутрішню ємні
 info.solarflux.furnace_upgrade=Накопичує енергію для нагрівання ванільних печей.
 info.solarflux.dispersive_upgrade=Disperses energy to nearby players in the %d block range.
 info.solarflux.block_charging_upgrade=Wirelessly transmits energy to a specified block in the %d range.
+info.solarflux.craftitem=Інгредієнт у рецептах.
 
 ## AVARITIA COMPATIBILITY ##
 block.solarflux.sp_avaritia.neutronium=Нейтрониевая солнечная панель

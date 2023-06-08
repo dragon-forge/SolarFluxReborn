@@ -4,15 +4,15 @@ import net.minecraft.world.item.Item;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.solarflux.compat.twilightforest.items.TwiLightUpgrade;
 
-import static org.zeith.solarflux.init.ItemsSF.newMaterial;
+import static org.zeith.solarflux.init.ItemsSF.newItem;
 
 public interface ContentsSFTF
 {
 	@RegistryName("twilight_cell_1")
-	Item TWILIGHT_CELL_1 = newMaterial();
+	Item TWILIGHT_CELL_1 = newItem();
 	
 	@RegistryName("twilight_cell_2")
-	Item TWILIGHT_CELL_2 = newMaterial();
+	Item TWILIGHT_CELL_2 = newItem();
 	
 	@RegistryName("twilight_upgrade")
 	TwiLightUpgrade TWI_LIGHT_UPGRADE = new TwiLightUpgrade();

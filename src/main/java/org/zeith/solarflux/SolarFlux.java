@@ -26,7 +26,6 @@ import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
 import org.zeith.hammerlib.compat.base.CompatList;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
-import org.zeith.hammerlib.proxy.HLConstants;
 import org.zeith.hammerlib.util.CommonMessages;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
@@ -47,10 +46,7 @@ public class SolarFlux
 	
 	@CreativeTab.RegisterTab
 	public static final CreativeTab ITEM_GROUP = new CreativeTab(new ResourceLocation(InfoSF.MOD_ID, "root"),
-			b -> b
-					.icon(ItemsSF.PHOTOVOLTAIC_CELL_3::getDefaultInstance)
-					.title(Component.translatable("itemGroup." + MOD_ID))
-					.withTabsBefore(HLConstants.HL_TAB.id())
+			b -> b.icon(ItemsSF.PHOTOVOLTAIC_CELL_3::getDefaultInstance).title(Component.translatable("itemGroup." + MOD_ID))
 	);
 	
 	public static final SFCompatList SF_COMPAT = CompatList.gather(SolarFluxCompat.class, SFCompatList::new);

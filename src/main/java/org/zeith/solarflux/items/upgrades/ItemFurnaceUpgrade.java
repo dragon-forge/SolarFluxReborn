@@ -62,27 +62,29 @@ public class ItemFurnaceUpgrade
 		}
 	}
 	
-	public static boolean canSmelt(AbstractFurnaceBlockEntity f, @Nullable Recipe<?> recipe)
+	public static boolean canSmelt(AbstractFurnaceBlockEntity f, @Nullable Recipe<?> recipeIn)
 	{
-		if(!f.getItem(0).isEmpty() && recipe != null)
+		if(!f.getItem(0).isEmpty() && recipeIn != null)
 		{
-			ItemStack result = recipe.getResultItem(f.getLevel().registryAccess());
-			if(result.isEmpty()) return false;
-			else
+			ItemStack itemstack = recipeIn.getResultItem();
+			if(itemstack.isEmpty())
 			{
-				ItemStack curResIt = f.getItem(2);
-				if(curResIt.isEmpty())
+				return false;
+			} else
+			{
+				ItemStack itemstack1 = f.getItem(2);
+				if(itemstack1.isEmpty())
 				{
 					return true;
-				} else if(!ItemStack.isSameItem(curResIt, result))
+				} else if(!itemstack1.sameItem(itemstack))
 				{
 					return false;
-				} else if(curResIt.getCount() + result.getCount() <= f.getMaxStackSize() && curResIt.getCount() + result.getCount() <= curResIt.getMaxStackSize())
+				} else if(itemstack1.getCount() + itemstack.getCount() <= f.getMaxStackSize() && itemstack1.getCount() + itemstack.getCount() <= itemstack1.getMaxStackSize())
 				{
 					return true;
 				} else
 				{
-					return curResIt.getCount() + result.getCount() <= result.getMaxStackSize();
+					return itemstack1.getCount() + itemstack.getCount() <= itemstack.getMaxStackSize();
 				}
 			}
 		} else
