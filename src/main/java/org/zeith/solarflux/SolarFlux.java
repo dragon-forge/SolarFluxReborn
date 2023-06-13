@@ -60,7 +60,7 @@ public class SolarFlux
 		var modBus = FMLJavaModLoadingContext.get().getModEventBus();
 		
 		MinecraftForge.EVENT_BUS.register(this);
-		HammerLib.EVENT_BUS.addListener(RecipesSF::addRecipes);
+		modBus.addListener(RecipesSF::addRecipes);
 		
 		SolarPanelsSF.init();
 		SF_COMPAT.setupSolarPanels();
