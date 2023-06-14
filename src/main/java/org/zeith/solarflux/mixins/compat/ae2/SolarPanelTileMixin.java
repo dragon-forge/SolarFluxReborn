@@ -143,10 +143,6 @@ public abstract class SolarPanelTileMixin
 		return mainNode;
 	}
 	
-	public void aegrid$securityBreak()
-	{
-	}
-	
 	public double ae$getAECurrentPower()
 	{
 		return PowerUnits.RF.convertTo(PowerUnits.AE, energy);
@@ -201,12 +197,7 @@ public abstract class SolarPanelTileMixin
 		if(getUpgrades(ContentsSFAE2.ENERGY_UPGRADE) <= 0)
 			return null;
 		
-		var node = getMainNode().getNode();
-		
-		if(node != null && node.isExposedOnSide(dir))
-			return node;
-		
-		return null;
+		return getMainNode().getNode();
 	}
 	
 	public void sfr$setConnectedToAENetwork(boolean connected)

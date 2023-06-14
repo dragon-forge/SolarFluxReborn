@@ -1,16 +1,23 @@
 # Mod Info
+mod_version=20.1.3
+build_candidate=false
+
+# Mod dependencies (jei is not a requirement, but HammerLib is)
+hl_version=20.1.3
+jei_version=15.0.0.12
+
+# Persistent mod info
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=20.1.1
 mod_license=All Rights Reserved
 mod_authors=Zeitheron
 mod_description=Solar Flux Reborn is aimed at implementing easy-to-use solar panels and providing modpack devs the ability to create their own panels with ease!
+mod_credits=Nauktis for original Solar Flux for 1.7
 issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=20.1.2
 maven_url=file:///SERVER//Maven
 
 # MC Info

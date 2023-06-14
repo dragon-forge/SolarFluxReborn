@@ -10,7 +10,7 @@ license="${mod_license}"
     updateJSONURL="https://api.modrinth.com/updates/${modrinth_project}/forge_updates.json"
     displayURL="https://modrinth.com/mod/${modrinth_project}"
     # logoFile="assets/solarflux/textures/logo.png"
-    credits = "Nauktis for original Solar Flux for 1.7"
+    credits = "${mod_credits}"
     authors="${mod_authors}"
     description='''${mod_description}'''
 
