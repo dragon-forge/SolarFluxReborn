@@ -1,0 +1,81 @@
+
+itemGroup.solarflux=Solar Flux [Reborn]
+
+block.solarflux.sp_1=Solární panel I
+block.solarflux.sp_2=Solární panel II
+block.solarflux.sp_3=Solární panel III
+block.solarflux.sp_4=Solární panel IV
+block.solarflux.sp_5=Solární panel V
+block.solarflux.sp_6=Solární panel VI
+block.solarflux.sp_7=Solární panel VII
+block.solarflux.sp_8=Solární panel VIII
+
+item.solarflux.mirror=Zrcadlo
+item.solarflux.blazing_coating=Žhnoucí povlak
+item.solarflux.emerald_glass=Smaragdové sklo
+item.solarflux.ender_glass=Enderitové sklo
+item.solarflux.photovoltaic_cell_1=Fotovoltaický článek I
+item.solarflux.photovoltaic_cell_2=Fotovoltaický článek II
+item.solarflux.photovoltaic_cell_3=Fotovoltaický článek III
+item.solarflux.photovoltaic_cell_4=Fotovoltaický článek IV
+item.solarflux.photovoltaic_cell_5=Fotovoltaický článek V
+item.solarflux.photovoltaic_cell_6=Fotovoltaický článek VI
+item.solarflux.blank_upgrade=Prázdné vylepšení
+item.solarflux.efficiency_upgrade=Vylepšení účinnosti
+item.solarflux.low_light_upgrade=Vylepšení nízkého světla
+item.solarflux.traversal_upgrade=Vylepšení strojové cesty
+item.solarflux.transfer_rate_upgrade=Vylepšení přenosové rychlosti
+item.solarflux.capacity_upgrade=Vylepšení kapacity
+item.solarflux.furnace_upgrade=Pecové vylepšení
+item.solarflux.dispersive_upgrade=Dávkovací vylepšení
+item.solarflux.block_charging_upgrade=Vylepšení nabíjení bloků
+
+info.solarflux.energy.stored1=Uloženo: %,d FE
+info.solarflux.energy.stored2=Uloženo: %,d/%,d FE
+info.solarflux.energy.generation=Výroba: %,d FE/tick
+info.solarflux.energy.transfer=Přenos: %,d FE/tick
+info.solarflux.energy.capacity=Kapacita: %,d FE
+info.solarflux.energy.efficiency=Účinnost: %,d%%
+info.solarflux.sun.intensity=Úroveň světla: %,d%%
+info.solarflux.upgrades.installed=Vylepšení
+info.solarflux.hold.for.info=Podrž %s pro detaily
+info.solarflux.shift=Shift
+info.solarflux.maximum=Maximum
+info.solarflux.contentretained=Obsah sebrán
+info.solarflux.resetcontent=Polož do výrobní mřížky pro resetování obsahu
+info.solarflux.decreasingReturnsToScale=Snižující vracení ke škále
+info.solarflux.constantReturnsToScale=Opakované vracení ke škále
+info.solarflux.increasingReturnsToScale=Zvyšující vracení ke škále
+info.solarflux.solar.panel.upgrade=Vylepšení solárních panelů
+info.solarflux.efficiency_upgrade=Zvyšuje generovaný počet FE o %.2f%%.
+info.solarflux.upgrade.low.light=Vyrábí víc FE v tmavých prostředích ale méně v plně osvícených
+info.solarflux.traversal_upgrade=Rozesílá energi mezi stroj(i) v dosahu bloků %d.
+info.solarflux.transfer_rate_upgrade=Zvyšuje přenosovou rychlost o %.2f%%.
+info.solarflux.capacity_upgrade=Zvyšuje kapacitu o %.2f%%.
+info.solarflux.furnace_upgrade=Akumuluje energii pro ohřátí Vanilla pecí.
+info.solarflux.dispersive_upgrade=Dávkuje energi nejbližším hráčům v dosahu bloků %d.
+info.solarflux.block_charging_upgrade=Bezdrátově přenáší energii do stroje v blokovém dosahu %d.
+
+## AVARITIA COMPATIBILITY ##
+block.solarflux.sp_avaritia.neutronium=Neutroniový solární panel
+block.solarflux.sp_avaritia.infinity=Solární panel nekonečna
+
+## DRACONIC EVOLUTION ##
+block.solarflux.sp_de.wyvern=Wyvernový solární panel
+block.solarflux.sp_de.draconic=Draconický solární panel
+block.solarflux.sp_de.chaotic=Chaotický solární panel
+
+## TWILIGHT FOREST ##
+block.solarflux.sp_tf.carminite=Karminitový solární panel
+block.solarflux.sp_tf.fiery=Ohnivý solární panel
+
+item.solarflux.twilightforest.twilight_cell_1=Twilightový článek I
+item.solarflux.twilightforest.twilight_cell_2=Twilightový článek II
+item.solarflux.twilightforest.twilight_upgrade=Twilightové vylepšení světla
+
+info.solarflux.twilightforest.twilight_upgrade=Částečně zvyšuje světlo získané solárními panely v Twilight Forestu.
+
+## APPLIED ENERGISTICS ##
+item.solarflux.ae2.energy_upgrade=AEU vylepšení energie
+
+info.solarflux.ae2.energy_upgrade=Dovoluje napojení solárního panelu do mřížky ME.
