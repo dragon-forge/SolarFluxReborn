@@ -2,7 +2,7 @@
 mod_id=solarflux
 archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
-mod_version=16.4.10
+mod_version=16.5.11
 build_candidate=true
 
 # Maven Info
@@ -24,6 +24,17 @@ certificateFingerprint=9f5e2a811a8332a842b34f6967b7db0ac4f24856
 
 # Project ID on CurseForge
 cf_project=246974
+modrinth_project=4QG5lev4
 
 # alpha, beta, release
 release_type=release
+
+# List of mods separated by ;
+# If a specific mod for one platform is needed, @m: or @c: prefixes are used.
+# Example for adding Hammer Lib for both Modrinth & CurseForge:
+# @m:PlkSuVtM;@c:hammer-lib;
+# Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
+required_mods=hammer-lib;
+optional_mods=@m:ae2;@c:applied-energistics-2;@c:draconic-evolution;@c:the-twilight-forest;
+incompatible_mods=
+embedded_mods=

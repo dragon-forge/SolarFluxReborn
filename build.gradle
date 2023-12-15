@@ -15,6 +15,11 @@ buildscript {
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
+
+plugins {
+    id "com.modrinth.minotaur" version "2.+"
+}
+
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'idea'
 apply plugin: 'maven-publish'
@@ -150,25 +155,154 @@ task deobfJar(type: Jar) {
 }
 
 curseforge {
-	apiKey = System.env.CURSEFORGE_API_KEY
-	project {
-		id = "${config.cf_project}"
-		changelogType = 'html'
-		changelog = ""
-		releaseType = "${config.release_type}"
-		addGameVersion "${config.mc_version}"
-		addGameVersion "Forge"
-		mainArtifact(jar) {
-		  displayName = "[1.16.5] ${config.mod_name} - ${config.mod_version}"
-		}
-        relations {
-            requiredDependency 'Hammer-Lib'
-
-            optionalDependency 'Draconic-Evolution'
-            optionalDependency 'Applied-Energistics-2'
-            optionalDependency 'The-Twilight-Forest'
+    apiKey = System.env.CURSEFORGE_TOKEN != null ? System.env.CURSEFORGE_TOKEN : "NONE"
+    project {
+        id = config.cf_project
+        changelogType = 'html'
+        changelog = ""
+        releaseType = config.release_type
+        addGameVersion config.mc_version
+        addGameVersion "Forge"
+        mainArtifact(jar) {
+            displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
         }
-	}
+
+        def reqDeps = new ArrayList()
+        def optDeps = new ArrayList()
+        def incompat = new ArrayList()
+        def embLibs = new ArrayList()
+
+        def mods = config.required_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        reqDeps.add pars[1].trim()
+                    }
+                } else
+                    reqDeps.add one.trim()
+            }
+
+        mods = config.optional_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        optDeps.add pars[1].trim()
+                    }
+                } else
+                    optDeps.add one.trim()
+            }
+
+        mods = config.incompatible_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        incompat.add pars[1].trim()
+                    }
+                } else
+                    incompat.add one.trim()
+            }
+
+        mods = config.embedded_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("c")) {
+                        embLibs.add pars[1].trim()
+                    }
+                } else
+                    embLibs.add one.trim()
+            }
+
+        if (reqDeps.size() > 0 || optDeps.size() > 0 || incompat.size() > 0 || embLibs.size() > 0) {
+            relations {
+                reqDeps.each { dep ->
+                    requiredDependency dep
+                }
+                optDeps.each { dep ->
+                    optionalDependency dep
+                }
+                incompat.each { dep ->
+                    incompatible dep
+                }
+                embLibs.each { dep ->
+                    embeddedLibrary dep
+                }
+            }
+        }
+    }
+}
+
+modrinth {
+    token = System.env.MODRINTH_TOKEN != null ? System.env.MODRINTH_TOKEN : "NONE"
+    projectId = config.modrinth_project
+    versionNumber = config.mod_version
+    versionType = config.release_type
+    uploadFile = jar
+    gameVersions = [config.mc_version]
+    dependencies {
+        def mods = config.required_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        required.project pars[1].trim()
+                    }
+                } else
+                    required.project one.trim()
+            }
+
+        mods = config.optional_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        optional.project pars[1].trim()
+                    }
+                } else
+                    optional.project one.trim()
+            }
+
+        mods = config.incompatible_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        incompatible.project pars[1].trim()
+                    }
+                } else
+                    incompatible.project one.trim()
+            }
+
+        mods = config.embedded_mods.split(";")
+        if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
+            for (final def one in mods) {
+                if (one.isBlank()) continue
+                if (one.startsWith("@")) {
+                    def pars = one.substring(1).split(":", 2)
+                    if (pars[0].equalsIgnoreCase("m")) {
+                        embedded.project pars[1].trim()
+                    }
+                } else
+                    embedded.project one.trim()
+            }
+    }
 }
 
 import net.minecraftforge.gradle.common.task.SignJar
