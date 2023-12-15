@@ -8,12 +8,12 @@ import static org.zeith.solarflux.items.ItemsSF.newItem;
 
 public interface ContentsSFTF
 {
-	@RegistryName("twilightforest/twilight_cell_1")
+	@RegistryName("twilight_cell_1")
 	Item TWILIGHT_CELL_1 = newItem();
 	
-	@RegistryName("twilightforest/twilight_cell_2")
+	@RegistryName("twilight_cell_2")
 	Item TWILIGHT_CELL_2 = newItem();
 	
-	@RegistryName("twilightforest/twilight_upgrade")
+	@RegistryName("twilight_upgrade")
 	TwiLightUpgrade TWI_LIGHT_UPGRADE = new TwiLightUpgrade();
 }
