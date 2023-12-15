@@ -332,6 +332,22 @@ jar.finalizedBy('reobfJar')
 
 build.dependsOn signJar
 
+tasks.register('buildAndUploadMod') {
+    group = "upload"
+    dependsOn "curseforge${config.cf_project}", 'modrinth'
+
+    doLast {
+        println "Upload complete."
+    }
+}
+
+afterEvaluate {
+    if (!config.maven_url.isEmpty()) {
+        tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
+        tasks["modrinth"].dependsOn.add(publish)
+    }
+}
+
 publishing {
     publications {
         mavenJava(MavenPublication) {
