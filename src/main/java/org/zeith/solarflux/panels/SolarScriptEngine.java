@@ -1,5 +1,6 @@
 package org.zeith.solarflux.panels;
 
+import com.google.common.base.Suppliers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.MinecraftForge;
@@ -9,13 +10,14 @@ import net.minecraftforge.fml.ModList;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
+import org.zeith.solarflux.SolarFlux;
 
 import javax.script.Invocable;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class SolarScriptEngine
@@ -77,7 +79,7 @@ public class SolarScriptEngine
 	public static ScriptEngine newEngine()
 	{
 		// Use openjdk nashorn that forge adds as a library (nashorn-core-15.3.jar)
-		ScriptEngine se = NASHORN_FACTORY.getScriptEngine();
+		ScriptEngine se = NASHORN_FACTORY.getScriptEngine(SolarScriptEngine::checkClass);
 		try
 		{
 			se.put("panel", se.eval("function(){return Java.type('" + SolarPanel.class.getName() + "').customBuilder();}"));
@@ -89,7 +91,7 @@ public class SolarScriptEngine
 			se.put("isModLoaded", se.eval("function(mod){return Java.type('" + ModList.class.getName() + "').get().isLoaded(mod);}"));
 		} catch(ScriptException e)
 		{
-			e.printStackTrace();
+			SolarFlux.LOG.error("Failed to create new JS engine!", e);
 		}
 
 		return se;
@@ -101,5 +103,18 @@ public class SolarScriptEngine
 		if(o instanceof ItemStack s && s.isEmpty()) return true;
 		if(o instanceof FluidStack f && f.isEmpty()) return true;
 		return o == null;
+	}
+	
+	static final Supplier<Set<String>> ALLOWED_CLASSES = Suppliers.memoize(() -> new HashSet<>(Arrays.asList(
+			SolarPanel.class.getName(),
+			RecipeHelper.class.getName(),
+			SolarScriptEngine.class.getName(),
+			JSHelper.class.getName(),
+			ModList.class.getName()
+	)));
+	
+	static boolean checkClass(String s)
+	{
+		return ALLOWED_CLASSES.get().contains(s);
 	}
 }

@@ -59,6 +59,8 @@ public class SolarFluxResourcePack
 		
 		resourceMap.clear();
 		
+		File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
+		
 		ItemsSF.JS_MATERIALS.forEach(i ->
 		{
 			ResourceLocation reg = i.getRegistryName();
@@ -67,7 +69,6 @@ public class SolarFluxResourcePack
 			
 			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":item/materials/" + reg.getPath() + "\"}}"));
 			
-			File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 			File items = new File(textures, "item");
 			ResourceLocation textures_items = new ResourceLocation(reg.getNamespace(), "textures/item/materials/" + reg.getPath() + ".png");
 			{
@@ -95,8 +96,7 @@ public class SolarFluxResourcePack
 			
 			if(si.isCustom)
 			{
-				File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
-				File blocks = new File(textures, "blocks");
+				File blocks = new File(textures, "block");
 				
 				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png");
 				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png");
@@ -127,7 +127,7 @@ public class SolarFluxResourcePack
 	
 	@Nullable
 	@Override
-	public IoSupplier<InputStream> getRootResource(String... p_252049_)
+	public IoSupplier<InputStream> getRootResource(String... path)
 	{
 		return null;
 	}
@@ -158,18 +158,12 @@ public class SolarFluxResourcePack
 	@Override
 	public void listResources(PackType type, String namespace, String dir, ResourceOutput out)
 	{
-		if(namespace.equals("solarflux"))
-		{
-			init();
-			
-			for(var e : resourceMap.entrySet())
-			{
-				if(e.getKey().getPath().startsWith(dir) && e.getValue().exists())
-				{
-					out.accept(e.getKey(), e.getValue()::create);
-				}
-			}
-		}
+		if(!namespace.equals("solarflux")) return;
+		init();
+		
+		for(var e : resourceMap.entrySet())
+			if(e.getKey().getPath().startsWith(dir) && e.getValue().exists())
+				out.accept(e.getKey(), e.getValue()::create);
 	}
 	
 	@Override
