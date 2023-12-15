@@ -33,9 +33,12 @@ public class SolarPanelBlock
 {
 	public final SolarPanel panel;
 	
-	public SolarPanelBlock(SolarPanel panel)
+	public final ResourceLocation identifier;
+	
+	public SolarPanelBlock(ResourceLocation identifier, SolarPanel panel)
 	{
 		super(Properties.of(Material.METAL).noOcclusion().harvestLevel(1).harvestTool(ToolType.PICKAXE).strength(1.5F).sound(SoundType.METAL));
+		this.identifier = identifier;
 		this.panel = panel;
 	}
 	

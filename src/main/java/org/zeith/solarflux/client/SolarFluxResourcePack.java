@@ -70,7 +70,7 @@ public class SolarFluxResourcePack
 		SolarPanels.listPanels().forEach(si ->
 		{
 			SolarPanelBlock blk = si.getBlock();
-			ResourceLocation reg = blk.getRegistryName();
+			ResourceLocation reg = blk.identifier;
 			
 			ResourceLocation blockstate = new ResourceLocation(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
 			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/" + reg.getPath() + ".json");

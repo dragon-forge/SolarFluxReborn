@@ -1,32 +1,22 @@
 package org.zeith.solarflux.compat.ae2;
 
-import appeng.core.AELog;
-import appeng.core.Api;
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import appeng.core.*;
+import it.unimi.dsi.fastutil.longs.*;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.IWorld;
-import net.minecraft.world.World;
+import net.minecraft.util.math.*;
+import net.minecraft.world.*;
 import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.ChunkEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.world.*;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.server.FMLServerStoppingEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import org.zeith.hammerlib.core.adapter.RegistryAdapter;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.compat.ISFCompat;
-import org.zeith.solarflux.compat.SFCompat;
+import org.zeith.solarflux.compat.*;
 import org.zeith.solarflux.compat.ae2.tile.IAE2SolarPanelTile;
 import org.zeith.solarflux.items.ItemsSF;
 import org.zeith.solarflux.panels.SolarPanels;
@@ -49,13 +39,7 @@ public class AE2Compat
 		mcf.addListener(this::onUnloadWorld);
 		mcf.addListener(this::shutdown);
 		
-		IEventBus mb = FMLJavaModLoadingContext.get().getModEventBus();
-		mb.addGenericListener(Item.class, this::registerItems);
-	}
-	
-	public void registerItems(RegistryEvent.Register<Item> itemRegistry)
-	{
-		RegistryAdapter.register(itemRegistry.getRegistry(), ContentsSFAE2.class, SolarFlux.MOD_ID);
+		createRegistrationKernel(ContentsSFAE2.class, "ae2/");
 	}
 	
 	@Override

@@ -1,24 +1,16 @@
 package org.zeith.solarflux.compat.twilightforest;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.Items;
-import net.minecraft.tags.ITag;
-import net.minecraft.tags.ItemTags;
+import net.minecraft.item.*;
+import net.minecraft.tags.*;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.ForgeRegistries;
-import org.zeith.hammerlib.core.adapter.RegistryAdapter;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.cfg.ConfigFile;
 import org.zeith.hammerlib.util.cfg.entries.ConfigEntryCategory;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.compat.ISFCompat;
-import org.zeith.solarflux.compat.SFCompat;
-import org.zeith.solarflux.items.ItemEfficiencyUpgrade;
-import org.zeith.solarflux.items.ItemsSF;
-import org.zeith.solarflux.panels.SolarPanel;
-import org.zeith.solarflux.panels.SolarPanels;
+import org.zeith.solarflux.compat.*;
+import org.zeith.solarflux.items.*;
+import org.zeith.solarflux.panels.*;
 
 import java.io.File;
 
@@ -37,12 +29,7 @@ public class TwilightForestCompat
 	
 	public TwilightForestCompat()
 	{
-		FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::registerItems);
-	}
-	
-	public void registerItems(RegistryEvent.Register<Item> itemRegistry)
-	{
-		RegistryAdapter.register(itemRegistry.getRegistry(), ContentsSFTF.class, SolarFlux.MOD_ID);
+		createRegistrationKernel(ContentsSFTF.class, "twilightforest/");
 	}
 	
 	public boolean enabled = true;

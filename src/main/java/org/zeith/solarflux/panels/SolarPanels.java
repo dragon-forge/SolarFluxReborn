@@ -22,7 +22,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Consumer;
+import java.util.function.*;
 import java.util.stream.Stream;
 
 @SimplyRegister
@@ -41,9 +41,11 @@ public class SolarPanels
 	};
 	
 	@SimplyRegister
-	public static void registerPanels(Consumer<Block> registry)
+	public static void registerPanels(BiConsumer<ResourceLocation, Block> registry)
 	{
-		listPanelBlocks().forEach(registry);
+		listPanelBlocks().forEach(panel ->
+				registry.accept(panel.identifier, panel)
+		);
 	}
 	
 	public static double LOOSE_ENERGY;

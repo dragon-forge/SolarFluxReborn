@@ -8,7 +8,7 @@ build_candidate=true
 # Maven Info
 maven_group=org.zeith.solarflux
 build_candidate=true
-hl_version=16.4.31
+hl_version=16.5.50
 
 # MC Info
 mc_version=1.16.5

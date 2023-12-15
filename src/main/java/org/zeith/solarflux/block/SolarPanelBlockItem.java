@@ -26,7 +26,6 @@ public class SolarPanelBlockItem
 	public SolarPanelBlockItem(SolarPanelBlock blockIn, Properties builder)
 	{
 		super(blockIn, builder);
-		setRegistryName(blockIn.getRegistryName());
 		this.panelBlock = blockIn;
 	}
 
