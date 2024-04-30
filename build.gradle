@@ -285,7 +285,7 @@ curseforge {
         changelog = ""
         releaseType = config.release_type
         addGameVersion config.mc_version
-        addGameVersion "Forge"
+        addGameVersion "NeoForge"
         mainArtifact(jar) {
             displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
         }
