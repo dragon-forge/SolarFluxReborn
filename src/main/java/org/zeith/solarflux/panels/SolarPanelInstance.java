@@ -2,7 +2,7 @@ package org.zeith.solarflux.panels;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.minecraftforge.common.util.INBTSerializable;
+import org.zeith.solarflux.api.INBTSerializable;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.init.SolarPanelsSF;
 
@@ -13,7 +13,7 @@ import org.zeith.solarflux.init.SolarPanelsSF;
  * @author Zeith
  */
 public class SolarPanelInstance
-		implements INBTSerializable<CompoundTag>
+		implements INBTSerializable
 {
 	/**
 	 * The {@link ISolarPanelTile} info delegate for this instance.

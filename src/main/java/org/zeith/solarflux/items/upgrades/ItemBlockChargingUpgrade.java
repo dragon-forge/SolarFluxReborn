@@ -12,11 +12,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
+import org.zeith.solarflux.api.IFurnaceBlockEntity;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
@@ -57,34 +56,39 @@ public class ItemBlockChargingUpgrade
 	@Override
 	public InteractionResult useOn(UseOnContext context)
 	{
-		BlockEntity tile = context.getLevel().getBlockEntity(context.getClickedPos());
+		Level level = context.getLevel();
+		BlockPos pos = context.getClickedPos();
+		BlockEntity tile = level.getBlockEntity(pos);
 		
 		// Allow furnaces to be bound as well.
-		if(tile instanceof AbstractFurnaceBlockEntity furnace && context.getClickedFace() == Direction.UP)
+		if(tile instanceof IFurnaceBlockEntity furnace && context.getClickedFace() == furnace.getSideForSolarPanel())
 		{
 			ItemStack held = context.getItemInHand();
 			CompoundTag nbt = held.getTag();
 			if(nbt == null)
 				held.setTag(nbt = new CompoundTag());
-			nbt.putString("Dim", context.getLevel().dimension().location().toString());
-			nbt.putLong("Pos", context.getClickedPos().asLong());
+			nbt.putString("Dim", level.dimension().location().toString());
+			nbt.putLong("Pos", pos.asLong());
 			nbt.putByte("Face", (byte) context.getClickedFace().ordinal());
-			context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
+			level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
 			return InteractionResult.SUCCESS;
 		}
 		
-		return tile != null ? tile.getCapability(ForgeCapabilities.ENERGY, context.getClickedFace()).filter(IEnergyStorage::canReceive).map(estorage ->
+		var estorage = level.getCapability(Capabilities.EnergyStorage.BLOCK, pos, context.getClickedFace());
+		if(estorage != null && estorage.canReceive())
 		{
 			ItemStack held = context.getItemInHand();
 			CompoundTag nbt = held.getTag();
 			if(nbt == null)
 				held.setTag(nbt = new CompoundTag());
-			nbt.putString("Dim", context.getLevel().dimension().location().toString());
-			nbt.putLong("Pos", context.getClickedPos().asLong());
+			nbt.putString("Dim", level.dimension().location().toString());
+			nbt.putLong("Pos", pos.asLong());
 			nbt.putByte("Face", (byte) context.getClickedFace().ordinal());
-			context.getLevel().playSound(null, context.getClickedPos(), SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
+			level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
 			return InteractionResult.SUCCESS;
-		}).orElse(InteractionResult.FAIL) : InteractionResult.FAIL;
+		}
+		
+		return InteractionResult.FAIL;
 	}
 	
 	@Override
@@ -97,16 +101,17 @@ public class ItemBlockChargingUpgrade
 	public boolean canInstall(ISolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
 	{
 		BlockPos pos;
-		BlockEntity t;
 		return isFoil(stack) &&
-				(!stack.getTag().contains("Dim", Tag.TAG_STRING)
-						|| tile.level().dimension().location().toString().equals(stack.getTag().getString("Dim")))
-				&& tile.pos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= BLOCK_CHARGING_UPGRADE_RANGE
-				&& (t = tile.level().getBlockEntity(pos)) != null
-				&& (
-				(t instanceof AbstractFurnaceBlockEntity && DIRECTIONS[stack.getTag().getByte("Face")] == Direction.UP && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
-						|| t.getCapability(ForgeCapabilities.ENERGY, DIRECTIONS[stack.getTag().getByte("Face")]).isPresent()
-		);
+			   (
+					   !stack.getTag().contains("Dim", Tag.TAG_STRING)
+					   || tile.level().dimension().location().toString().equals(stack.getTag().getString("Dim"))
+			   )
+			   && tile.pos().distSqr(pos = BlockPos.of(stack.getTag().getLong("Pos"))) <= BLOCK_CHARGING_UPGRADE_RANGE
+			   
+			   && (
+					   (tile.level().getBlockEntity(pos) instanceof IFurnaceBlockEntity furnace && DIRECTIONS[stack.getTag().getByte("Face")] == furnace.getSideForSolarPanel() && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
+					   || tile.level().getCapability(Capabilities.EnergyStorage.BLOCK, pos, DIRECTIONS[stack.getTag().getByte("Face")]) != null
+			   );
 	}
 	
 	@Override

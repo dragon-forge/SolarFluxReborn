@@ -1,10 +1,10 @@
 package org.zeith.solarflux.items.upgrades._base;
 
 import net.minecraft.Util;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.zeith.hammerlib.compat.base.Ability;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.solarflux.SolarFlux;
@@ -41,7 +41,7 @@ public class UpgradeSystem
 	@SubscribeEvent
 	public static void loadComplete(FMLLoadCompleteEvent e)
 	{
-		UPGRADE_ITEMS = ForgeRegistries.ITEMS.getValues().stream().filter(UpgradeItem.class::isInstance).map(UpgradeItem.class::cast).collect(Collectors.toList());
+		UPGRADE_ITEMS = BuiltInRegistries.ITEM.stream().filter(UpgradeItem.class::isInstance).map(UpgradeItem.class::cast).collect(Collectors.toList());
 		SolarFlux.LOG.info("Registered " + UPGRADE_ITEMS.size() + " upgrades for Solar Panels.");
 	}
 }

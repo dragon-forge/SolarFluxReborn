@@ -6,20 +6,18 @@ import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
-import net.minecraftforge.client.model.geometry.IUnbakedGeometry;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.zeith.hammerlib.client.model.IBakedModel;
-import org.zeith.hammerlib.client.model.LoadUnbakedGeometry;
+import org.zeith.hammerlib.client.model.*;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.solarflux.block.SolarPanelBlock;
 
@@ -36,10 +34,10 @@ public class SolarPanelItemModel
 	
 	public SolarPanelItemModel(JsonObject obj, JsonDeserializationContext context)
 	{
-		this.block = Cast.optionally(ForgeRegistries.BLOCKS.getValue(new ResourceLocation(GsonHelper.getAsString(obj, "panel"))), SolarPanelBlock.class)
+		this.block = Cast.optionally(BuiltInRegistries.BLOCK.get(new ResourceLocation(GsonHelper.getAsString(obj, "panel"))), SolarPanelBlock.class)
 				.orElseThrow(() -> new JsonSyntaxException("Unable to find solar panel block by id '" + GsonHelper.getAsString(obj, "panel") + "'"));
 		
-		var registryName = ForgeRegistries.BLOCKS.getKey(block);
+		var registryName = BuiltInRegistries.BLOCK.getKey(block);
 		
 		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_base"));
 		topTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_top"));

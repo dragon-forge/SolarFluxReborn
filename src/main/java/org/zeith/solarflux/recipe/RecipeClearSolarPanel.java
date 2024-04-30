@@ -1,7 +1,6 @@
 package org.zeith.solarflux.recipe;
 
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import org.zeith.hammerlib.core.adapter.recipe.RecipeBuilder;
@@ -11,9 +10,9 @@ import org.zeith.solarflux.block.SolarPanelBlock;
 public class RecipeClearSolarPanel
 		extends ShapelessRecipe
 {
-	public RecipeClearSolarPanel(ResourceLocation id, String group, ItemStack result, NonNullList<Ingredient> input)
+	public RecipeClearSolarPanel(String group, ItemStack result, NonNullList<Ingredient> input)
 	{
-		super(id, group, CraftingBookCategory.MISC, result, input);
+		super(group, CraftingBookCategory.MISC, result, input);
 	}
 	
 	@Override
@@ -49,7 +48,7 @@ public class RecipeClearSolarPanel
 			validate();
 			if(ingredients.isEmpty())
 				throw new IllegalStateException(getClass().getSimpleName() + " does not have any defined ingredients!");
-			event.register(getIdentifier(), new RecipeClearSolarPanel(getIdentifier(), group, result, ingredients));
+			event.register(getIdentifier(), new RecipeClearSolarPanel(group, result, ingredients));
 		}
 	}
 }

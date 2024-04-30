@@ -5,24 +5,23 @@ import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.event.lifecycle.*;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.api.items.CreativeTab;
+import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
+import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.compat.base.CompatList;
 import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
@@ -43,7 +42,7 @@ public class SolarFlux
 {
 	public static final String MOD_ID = "solarflux";
 	public static final Logger LOG = LogManager.getLogger();
-	public static final SFRCommonProxy PROXY = DistExecutor.unsafeRunForDist(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
+	public static final SFRCommonProxy PROXY = IProxy.create(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
 	
 	@CreativeTab.RegisterTab
 	public static final CreativeTab ITEM_GROUP = new CreativeTab(new ResourceLocation(InfoSF.MOD_ID, "root"),
@@ -53,13 +52,13 @@ public class SolarFlux
 					.withTabsBefore(HLConstants.HL_TAB.id())
 	);
 	
-	public static final SFCompatList SF_COMPAT = CompatList.gather(SolarFluxCompat.class, SFCompatList::new);
+	public static SFCompatList SF_COMPAT ;
 	
-	public SolarFlux()
+	public SolarFlux(IEventBus modBus)
 	{
-		var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+		SF_COMPAT = CompatList.gather(SolarFluxCompat.class, CompatContext.builder(modBus).build(), SFCompatList::new);
 		
-		MinecraftForge.EVENT_BUS.register(this);
+		NeoForge.EVENT_BUS.register(this);
 		modBus.addListener(RecipesSF::addRecipes);
 		
 		SolarPanelsSF.init();
@@ -69,7 +68,8 @@ public class SolarFlux
 		ResourcePackAdapter.registerResourcePack(SolarFluxResourcePack.getPackInstance());
 		
 		CommonMessages.printMessageOnIllegalRedistribution(SolarFlux.class,
-				LOG, "Solar Flux Reborn", "https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn");
+				LOG, "Solar Flux Reborn", "https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn"
+		);
 	}
 	
 	public static ResourceLocation id(String s)
@@ -103,7 +103,7 @@ public class SolarFlux
 		}
 	}
 	
-	@EventBusSubscriber(bus = Bus.MOD)
+	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 	public static class ModEvents
 	{
 		@SubscribeEvent
@@ -119,26 +119,20 @@ public class SolarFlux
 		}
 		
 		@SubscribeEvent
-		@OnlyIn(Dist.CLIENT)
-		public static void clientSetup(FMLClientSetupEvent e)
-		{
-			PROXY.clientSetup();
-		}
-		
-		@SubscribeEvent
 		public static void fingerprintCheck(FMLFingerprintCheckEvent e)
 		{
 			CommonMessages.printMessageOnFingerprintViolation(e, "97e852e9b3f01b83574e8315f7e77651c6605f2b455919a7319e9869564f013c",
-					LOG, "Solar Flux Reborn", "https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn");
+					LOG, "Solar Flux Reborn", "https://www.curseforge.com/minecraft/mc-mods/solar-flux-reborn"
+			);
 		}
 		
 		@SubscribeEvent
 		@OnlyIn(Dist.CLIENT)
 		public static void modelBake(ModelEvent.ModifyBakingResult e)
 		{
-			SolarPanelsSF.listPanelBlocks()
+			SolarPanelsSF.listPanels()
 					.forEach(spb ->
-							e.getModels().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb))
+							e.getModels().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb.getBlock()))
 					);
 		}
 	}

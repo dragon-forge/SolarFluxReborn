@@ -1,7 +1,7 @@
 package org.zeith.solarflux.container;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
 import org.zeith.solarflux.block.SolarPanelTile;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;

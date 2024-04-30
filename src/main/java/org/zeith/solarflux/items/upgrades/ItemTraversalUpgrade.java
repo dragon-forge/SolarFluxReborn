@@ -3,9 +3,7 @@ package org.zeith.solarflux.items.upgrades;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.util.BlockPosFace;
@@ -50,19 +48,13 @@ public class ItemTraversalUpgrade
 				var p = pos.relative(face);
 				if(p.distSqr(cache.get(0)) > TRAVERSAL_UPGRADE_RANGE)
 					continue;
-				BlockEntity t = tile.level().getBlockEntity(p);
-				if(t != null)
-					t.getCapability(ForgeCapabilities.ENERGY, face.getOpposite())
-							.filter(IEnergyStorage::canReceive)
-							.ifPresent(e ->
-							{
-								if(!cache.contains(p))
-								{
-									cache.add(p);
-									BlockPosFace bpf = new BlockPosFace(p, face.getOpposite());
-									acceptors.add(bpf);
-								}
-							});
+				var e = tile.level().getCapability(Capabilities.EnergyStorage.BLOCK, p, face.getOpposite());
+				if(e != null && e.canReceive() && !cache.contains(p))
+				{
+					cache.add(p);
+					BlockPosFace bpf = new BlockPosFace(p, face.getOpposite());
+					acceptors.add(bpf);
+				}
 			}
 		}
 	}

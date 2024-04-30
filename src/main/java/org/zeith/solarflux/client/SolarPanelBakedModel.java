@@ -8,15 +8,15 @@ import net.minecraft.client.resources.model.BlockModelRotation;
 import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.IDynamicBakedModel;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.neoforge.client.model.IDynamicBakedModel;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -40,7 +40,7 @@ public class SolarPanelBakedModel
 	public SolarPanelBakedModel(SolarPanelBlock spb)
 	{
 		this.block = spb;
-		this.registryName = ForgeRegistries.BLOCKS.getKey(spb);
+		this.registryName = BuiltInRegistries.BLOCK.getKey(spb);
 	}
 	
 	@Override
@@ -66,7 +66,8 @@ public class SolarPanelBakedModel
 								16,
 								16
 						}, 4)), //
-						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName
+				));
 				
 				// world/pos not set? no connected textures == no crash!
 				if(world == null || pos == null)
@@ -88,7 +89,8 @@ public class SolarPanelBakedModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(east = world.getBlockState(pos.east()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -104,7 +106,8 @@ public class SolarPanelBakedModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(north = world.getBlockState(pos.north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -115,7 +118,8 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(south = world.getBlockState(pos.south()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -126,7 +130,8 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -137,7 +142,8 @@ public class SolarPanelBakedModel
 									1,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -148,7 +154,8 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -159,7 +166,8 @@ public class SolarPanelBakedModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 				
 				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block)
 					quads.add(COOKER.bakeQuad( //
@@ -170,7 +178,8 @@ public class SolarPanelBakedModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+					));
 			}
 		return quads;
 	}

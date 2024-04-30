@@ -2,14 +2,15 @@ package org.zeith.solarflux.client;
 
 import com.google.gson.JsonObject;
 import net.minecraft.SharedConstants;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
+import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -79,7 +80,7 @@ public class SolarFluxResourcePack
 		SolarPanelsSF.listPanels().forEach(si ->
 		{
 			SolarPanelBlock blk = si.getBlock();
-			ResourceLocation reg = ForgeRegistries.BLOCKS.getKey(blk);
+			ResourceLocation reg = BuiltInRegistries.BLOCK.getKey(blk);
 			
 			ResourceLocation blockstate = new ResourceLocation(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
 			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
@@ -136,6 +137,7 @@ public class SolarFluxResourcePack
 	public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location)
 	{
 		var res = resourceMap.get(location);
+		SolarFlux.LOG.info("GET SFR RES " + location + " => " + res);
 		if(res == null) return null;
 		
 		if(!res.exists()) return null;

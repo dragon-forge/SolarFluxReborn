@@ -1,10 +1,8 @@
 package org.zeith.solarflux.compat._base;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.registries.RegisterEvent;
-import org.zeith.hammerlib.compat.base.Ability;
-import org.zeith.hammerlib.compat.base.BaseCompat;
+import net.neoforged.neoforge.registries.RegisterEvent;
+import org.zeith.hammerlib.compat.base.*;
 import org.zeith.hammerlib.core.adapter.RegistryAdapter;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.compat._abilities.AddedSolarPanels;
@@ -59,10 +57,11 @@ public class SolarFluxCompat
 	
 	private final List<Class<?>> simplyRegisterClasses;
 	
-	public SolarFluxCompat(Class<?>... simplyRegisterClasses)
+	public SolarFluxCompat(CompatContext ctx, Class<?>... simplyRegisterClasses)
 	{
+		super(ctx);
 		this.simplyRegisterClasses = Arrays.asList(simplyRegisterClasses);
-		FMLJavaModLoadingContext.get().getModEventBus().addListener(this::registerStuff);
+		ctx.getModBus().addListener(this::registerStuff);
 	}
 	
 	private void registerStuff(RegisterEvent event)

@@ -1,8 +1,8 @@
 package org.zeith.solarflux.block;
 
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -36,18 +36,10 @@ public class SolarPanelBlock
 		implements ICustomBlockItem
 {
 	public final SolarPanel panel;
-	public final ResourceLocation registryName;
 	
-	public SolarPanelBlock(SolarPanel panel, ResourceLocation registryName)
+	public SolarPanelBlock(SolarPanel panel, Properties properties)
 	{
-		super(Properties.of()
-				.sound(SoundType.METAL)
-				.dynamicShape()
-				.noOcclusion()
-				.strength(1.5F)
-				.requiresCorrectToolForDrops()
-		);
-		this.registryName = registryName;
+		super(properties);
 		bindTool();
 		this.panel = panel;
 	}
@@ -55,11 +47,6 @@ public class SolarPanelBlock
 	protected void bindTool()
 	{
 		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, Tiers.IRON, this);
-	}
-	
-	public ResourceLocation getRegistryName()
-	{
-		return registryName;
 	}
 	
 	@Nullable
@@ -99,6 +86,12 @@ public class SolarPanelBlock
 			stacks.add(new ItemStack(panel));
 		
 		return stacks;
+	}
+	
+	@Override
+	protected MapCodec<? extends BaseEntityBlock> codec()
+	{
+		return null;
 	}
 	
 	@Override

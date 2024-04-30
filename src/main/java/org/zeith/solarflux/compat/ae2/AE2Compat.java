@@ -3,6 +3,7 @@ package org.zeith.solarflux.compat.ae2;
 import appeng.core.definitions.AEBlocks;
 import net.minecraft.resources.ResourceLocation;
 import org.zeith.hammerlib.compat.base.BaseCompat;
+import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
@@ -20,9 +21,9 @@ public class AE2Compat
 {
 	public final ResourceLocation aeuEnergyUpgrade = SolarFlux.id("ae2/energy_upgrade");
 	
-	public AE2Compat()
+	public AE2Compat(CompatContext ctx)
 	{
-		super(ContentsSFAE2.class);
+		super(ctx, ContentsSFAE2.class);
 	}
 	
 	@Override

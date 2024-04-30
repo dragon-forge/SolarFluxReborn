@@ -1,15 +1,10 @@
 package org.zeith.solarflux.proxy;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.zeith.hammerlib.api.proxy.IProxy;
 
 public class SFRCommonProxy
+		implements IProxy
 {
-	@OnlyIn(Dist.CLIENT)
-	public void clientSetup()
-	{
-	}
-
 	public void commonSetup()
 	{
 	}

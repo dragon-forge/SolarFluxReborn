@@ -4,7 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
+import net.neoforged.neoforge.common.Tags;
 import org.zeith.hammerlib.core.init.TagsHL;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.init.ItemsSF;

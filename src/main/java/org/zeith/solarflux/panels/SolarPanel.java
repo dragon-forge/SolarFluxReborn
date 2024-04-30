@@ -7,6 +7,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import org.jetbrains.annotations.ApiStatus;
 import org.zeith.hammerlib.core.adapter.recipe.ShapedRecipeBuilder;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
@@ -167,7 +169,12 @@ public class SolarPanel
 	
 	protected SolarPanelBlock createBlock()
 	{
-		return new SolarPanelBlock(this, new ResourceLocation(InfoSF.MOD_ID, "sp_" + name));
+		return new SolarPanelBlock(this, BlockBehaviour.Properties.of()
+				.sound(SoundType.METAL)
+				.dynamicShape()
+				.noOcclusion()
+				.strength(1.5F)
+				.requiresCorrectToolForDrops());
 	}
 	
 	/**
@@ -711,7 +718,7 @@ public class SolarPanel
 			
 			this.panel.recipes.add(evt ->
 			{
-				ResourceLocation prn = panel.getBlock().getRegistryName();
+				ResourceLocation prn = panel.getRegistryName();
 				ShapedRecipeBuilder builder = evt.shaped()
 						.id(new ResourceLocation(prn.getNamespace(), "builtin/generated_" + prn.getPath() + "_x_" + amount + "_ln" + lineNumber))
 						.result(new ItemStack(panel, amount));
@@ -720,6 +727,11 @@ public class SolarPanel
 			});
 			return this.panel;
 		}
+	}
+	
+	public ResourceLocation getRegistryName()
+	{
+		return new ResourceLocation(InfoSF.MOD_ID, "sp_" + name);
 	}
 	
 	/**
@@ -821,11 +833,11 @@ public class SolarPanel
 			
 			
 			this.height = cat.getElement(ConfiguredLib.DECIMAL, "Height")
-					.withRange(DecimalValueRange.range(0, 16))
-					.withDefault(base.delegateDataBase.height * 16F)
-					.withComment("How high is this solar panel?")
-					.getValue()
-					.floatValue() / 16F;
+								  .withRange(DecimalValueRange.range(0, 16))
+								  .withDefault(base.delegateDataBase.height * 16F)
+								  .withComment("How high is this solar panel?")
+								  .getValue()
+								  .floatValue() / 16F;
 		}
 		
 		/**

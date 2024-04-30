@@ -2,11 +2,11 @@ package org.zeith.solarflux.items.upgrades._base;
 
 import com.google.common.base.Suppliers;
 import net.minecraft.Util;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.compat.base.Ability;
@@ -45,7 +45,7 @@ public abstract class UpgradeItem
 	{
 	}
 	
-	protected Supplier<String> tooltipId = Suppliers.memoize(() -> Util.makeDescriptionId("info", ForgeRegistries.ITEMS.getKey(this)));
+	protected Supplier<String> tooltipId = Suppliers.memoize(() -> Util.makeDescriptionId("info", BuiltInRegistries.ITEM.getKey(this)));
 	
 	protected Object[] hoverTextData(ItemStack stack)
 	{

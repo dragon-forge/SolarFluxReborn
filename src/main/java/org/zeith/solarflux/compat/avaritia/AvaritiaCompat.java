@@ -1,15 +1,18 @@
 package org.zeith.solarflux.compat.avaritia;
 
-import morph.avaritia.init.AvaritiaModContent;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 import org.zeith.hammerlib.compat.base.BaseCompat;
+import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.panels.SolarPanel;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.*;
 
 @BaseCompat.LoadCompat(
@@ -23,6 +26,11 @@ public class AvaritiaCompat
 	public final ResourceLocation infinityRecipe = SolarFlux.id("solar_panels/avaritia/infinity");
 	
 	public SolarPanel neutronium, infinity;
+	
+	public AvaritiaCompat(CompatContext ctx)
+	{
+		super(ctx);
+	}
 	
 	@Override
 	public void registerSolarPanels(Supplier<SolarPanel.Builder> factory, Function<SolarPanel.Builder, SolarPanel> registrar)
@@ -56,15 +64,19 @@ public class AvaritiaCompat
 	{
 		try
 		{
+			Map<String, Item> itemMap = new HashMap<>();
+			Function<String, Item> aItemF = k -> BuiltInRegistries.ITEM.get(new ResourceLocation("avaritia", k));
+			Function<String, Item> item = key -> itemMap.computeIfAbsent(key, aItemF);
+			
 			extremeShaped(e)
 					.id(neutroniumRecipe)
 					.result(neutronium, 2)
 					.shape("  nn nn  ", " nccsccn ", "nc  g  cn", "nc ppp cn", " sgpipgs ", "nc ppp cn", "nc  g  cn", " nccsccn ", "  nn nn  ")
-					.map('n', AvaritiaModContent.NEUTRONIUM_INGOT.get())
-					.map('c', AvaritiaModContent.CRYSTAL_MATRIX_INGOT.get())
-					.map('g', AvaritiaModContent.NEUTRON_NUGGET.get())
-					.map('p', AvaritiaModContent.NEUTRON_PILE.get())
-					.map('i', AvaritiaModContent.INFINITY_CATALYST.get())
+					.map('n', item.apply("neutronium_ingot"))
+					.map('c', item.apply("crystal_matrix_ingot"))
+					.map('g', item.apply("neutron_nugget"))
+					.map('p', item.apply("neutron_pile"))
+					.map('i', item.apply("infinity_catalyst"))
 					.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[7]))
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
@@ -72,13 +84,13 @@ public class AvaritiaCompat
 					.id(infinityRecipe)
 					.result(infinity, 3)
 					.shape("  nn nn  ", " nccsccn ", "nc  g  cn", "nc pip cn", " sgiFigs ", "nc pip cn", "nc  g  cn", " nccsccn ", "  nn nn  ")
-					.map('n', AvaritiaModContent.NEUTRONIUM_INGOT.get())
-					.map('c', AvaritiaModContent.CRYSTAL_MATRIX_INGOT.get())
-					.map('g', AvaritiaModContent.NEUTRON_NUGGET.get())
-					.map('p', AvaritiaModContent.NEUTRON_PILE.get())
+					.map('n', item.apply("neutronium_ingot"))
+					.map('c', item.apply("crystal_matrix_ingot"))
+					.map('g', item.apply("neutron_nugget"))
+					.map('p', item.apply("neutron_pile"))
 					.map('F', SolarPanelsSF.getGeneratingSolars(neutronium))
-					.map('i', AvaritiaModContent.INFINITY_INGOT.get())
-					.map('s', new ItemStack(AvaritiaModContent.NEUTRONIUM_STORAGE_BLOCK.get()))
+					.map('i', item.apply("infinity_catalyst"))
+					.map('s', item.apply("neutronium_block"))
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		} catch(LinkageError error)
 		{

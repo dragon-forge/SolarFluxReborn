@@ -133,9 +133,9 @@ public abstract class SolarPanelTileMixin
 	public double ae$extractAEPower(double toExtract, Actionable action, PowerMultiplier mult)
 	{
 		if(getUpgrades(ContentsSFAE2.ENERGY_UPGRADE) <= 0) return 0;
-		int fe = (int) Math.min(Math.floor(PowerUnits.AE.convertTo(PowerUnits.RF, toExtract)), Integer.MAX_VALUE - 1);
+		int fe = (int) Math.min(Math.floor(PowerUnits.AE.convertTo(PowerUnits.FE, toExtract)), Integer.MAX_VALUE - 1);
 		fe = extractEnergy(fe, action.isSimulate());
-		return mult.multiply(PowerUnits.RF.convertTo(PowerUnits.AE, fe));
+		return mult.multiply(PowerUnits.FE.convertTo(PowerUnits.AE, fe));
 	}
 	
 	public IManagedGridNode aegrid$getMainNode()
@@ -145,12 +145,12 @@ public abstract class SolarPanelTileMixin
 	
 	public double ae$getAECurrentPower()
 	{
-		return PowerUnits.RF.convertTo(PowerUnits.AE, energy);
+		return PowerUnits.FE.convertTo(PowerUnits.AE, energy);
 	}
 	
 	public double ae$getAEMaxPower()
 	{
-		return PowerUnits.RF.convertTo(PowerUnits.AE, capacity().getValue());
+		return PowerUnits.FE.convertTo(PowerUnits.AE, capacity().getValue());
 	}
 	
 	public AccessRestriction ae$getPowerFlow()

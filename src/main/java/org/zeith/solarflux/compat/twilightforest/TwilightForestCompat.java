@@ -1,10 +1,11 @@
 package org.zeith.solarflux.compat.twilightforest;
 
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.hammerlib.compat.base.BaseCompat;
+import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
@@ -30,10 +31,11 @@ public class TwilightForestCompat
 	
 	private SolarPanel fiery, carminite;
 	
-	public TwilightForestCompat()
+	public TwilightForestCompat(CompatContext ctx)
 	{
-		super(ContentsSFTF.class);
+		super(ctx, ContentsSFTF.class);
 	}
+	
 	
 	@Override
 	public void registerSolarPanels(Supplier<SolarPanel.Builder> factory, Function<SolarPanel.Builder, SolarPanel> registrar)
@@ -68,7 +70,7 @@ public class TwilightForestCompat
 		var fieryIngot = ItemTags.create(new ResourceLocation("forge", "ingots/fiery"));
 		var knightmetal = ItemTags.create(new ResourceLocation("forge", "ingots/knightmetal"));
 		var steeleaf = ItemTags.create(new ResourceLocation("forge", "ingots/steeleaf"));
-		var torchberries = ForgeRegistries.ITEMS.getValue(new ResourceLocation("twilightforest", "torchberries"));
+		var torchberries = BuiltInRegistries.ITEM.get(new ResourceLocation("twilightforest", "torchberries"));
 		
 		e.shaped()
 				.id(twiLightUpgradeRecipe)

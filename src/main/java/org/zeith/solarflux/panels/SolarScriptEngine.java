@@ -3,18 +3,17 @@ package org.zeith.solarflux.panels;
 import com.google.common.base.Suppliers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fml.ModList;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
+import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 
-import javax.script.Invocable;
-import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import javax.script.*;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
@@ -52,10 +51,9 @@ public class SolarScriptEngine
 		});
 		this.engineInvocable = (Invocable) (this.engine = newEngine());
 		this.engine.eval(content.toString());
-		MinecraftForge.EVENT_BUS.register(this);
+		HammerLib.EVENT_BUS.addListener(this::reloadRecipes);
 	}
 
-	@SubscribeEvent
 	public void reloadRecipes(RegisterRecipesEvent e)
 	{
 		try

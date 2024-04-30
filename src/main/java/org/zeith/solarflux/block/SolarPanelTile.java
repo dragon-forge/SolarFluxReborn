@@ -2,6 +2,7 @@ package org.zeith.solarflux.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,14 +16,13 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.client.model.data.ModelData;
-import net.minecraftforge.client.model.data.ModelProperty;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.IEnergyStorage;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
@@ -49,10 +49,23 @@ import org.zeith.solarflux.util.BlockPosFace;
 import java.util.*;
 import java.util.stream.Stream;
 
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SolarPanelTile
 		extends TileSyncableTickable
 		implements IEnergyStorage, IContainerTile, ISolarPanelTile, ITooltipTile
 {
+	@SubscribeEvent
+	public static void capabilities(RegisterCapabilitiesEvent e)
+	{
+		e.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, TilesSF.SOLAR_PANEL,
+				(SolarPanelTile object, @Nullable Direction context) -> object
+		);
+		
+		e.registerBlockEntity(Capabilities.ItemHandler.BLOCK, TilesSF.SOLAR_PANEL,
+				(SolarPanelTile object, @Nullable Direction context) -> object.chargeInventory
+		);
+	}
+	
 	public long energy;
 	
 	public long currentGeneration;
@@ -188,7 +201,7 @@ public class SolarPanelTile
 			{
 				if(stack.getItem() instanceof UpgradeItem upgrade && upgrade.canStayInPanel(this, stack, upgradeInventory))
 				{
-					id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+					id = BuiltInRegistries.ITEM.getKey(stack.getItem());
 					if(!tickedUpgrades.contains(id))
 					{
 						upgrade.update(this, stack, getUpgrades(upgrade));
@@ -213,12 +226,13 @@ public class SolarPanelTile
 				stack = chargeInventory.getStackInSlot(i);
 				if(!stack.isEmpty())
 				{
-					stack.getCapability(ForgeCapabilities.ENERGY).filter(e -> e.getEnergyStored() < e.getMaxEnergyStored()).ifPresent(e ->
+					var e = stack.getCapability(Capabilities.EnergyStorage.ITEM);
+					if(e != null && e.getEnergyStored() < e.getMaxEnergyStored())
 					{
 						transfer.setBaseValue(getInstance().transfer);
 						int transfer = this.transfer.getValueI();
 						energy -= e.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
-					});
+					}
 				}
 			}
 		
@@ -287,28 +301,21 @@ public class SolarPanelTile
 		
 		for(Direction hor : DIRECTIONS_NO_UP)
 		{
-			BlockEntity tile = level.getBlockEntity(worldPosition.relative(hor));
-			if(tile == null) continue;
-			
-			tile.getCapability(ForgeCapabilities.ENERGY, hor.getOpposite()).ifPresent(storage ->
-			{
-				if(storage.canReceive())
-					energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
-			});
+			var storage = level.getCapability(Capabilities.EnergyStorage.BLOCK, worldPosition.relative(hor), hor.getOpposite());
+			if(storage == null) continue;
+			if(storage.canReceive()) energy -= storage.receiveEnergy(Math.min(getEnergyStored(), transfer), false);
+			if(energy < 1L) break;
 		}
 		
 		if(!traversal.isEmpty() && energy > 0L)
 		{
 			for(BlockPosFace traverse : traversal)
 			{
-				BlockEntity tile = level.getBlockEntity(traverse.pos);
-				if(tile == null) continue;
+				var storage = level.getCapability(Capabilities.EnergyStorage.BLOCK, traverse.pos, traverse.face);
+				if(storage == null) continue;
 				
-				tile.getCapability(ForgeCapabilities.ENERGY, traverse.face).ifPresent(storage ->
-				{
-					if(storage.canReceive())
-						energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
-				});
+				if(storage.canReceive())
+					energy -= storage.receiveEnergy(Math.min(getEnergyStored(), Math.round(transfer * traverse.rate)), false);
 				
 				if(energy < 1L) break;
 			}
@@ -455,19 +462,6 @@ public class SolarPanelTile
 		upgradeInventory.readFromNBT(nbt, "Upgrades");
 		chargeInventory.readFromNBT(nbt, "Chargeable");
 		energy = nbt.getLong("Energy");
-	}
-	
-	LazyOptional<IItemHandler> chargeableItems = LazyOptional.of(() -> chargeInventory);
-	LazyOptional<IEnergyStorage> energyStorageTile = LazyOptional.of(() -> SolarPanelTile.this);
-	
-	@Override
-	public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side)
-	{
-		if(cap == ForgeCapabilities.ITEM_HANDLER)
-			return chargeableItems.cast();
-		else if(cap == ForgeCapabilities.ENERGY)
-			return energyStorageTile.cast();
-		return super.getCapability(cap, side);
 	}
 	
 	int voxelTimer = 0;

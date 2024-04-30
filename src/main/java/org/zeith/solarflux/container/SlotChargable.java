@@ -1,9 +1,10 @@
 package org.zeith.solarflux.container;
 
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.energy.IEnergyStorage;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class SlotChargable
 		extends SlotItemHandler
@@ -16,7 +17,9 @@ public class SlotChargable
 	@Override
 	public boolean mayPlace(ItemStack stack)
 	{
-		return !stack.isEmpty() && stack.getCapability(ForgeCapabilities.ENERGY, null)
-				.map(e -> e.canReceive() && e.getEnergyStored() < e.getMaxEnergyStored()).orElse(Boolean.FALSE);
+		IEnergyStorage e;
+		return !stack.isEmpty()
+			   && (e = stack.getCapability(Capabilities.EnergyStorage.ITEM)) != null
+			   && e.canReceive() && e.getEnergyStored() < e.getMaxEnergyStored();
 	}
 }

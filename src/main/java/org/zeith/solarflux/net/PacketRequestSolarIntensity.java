@@ -3,11 +3,11 @@ package org.zeith.solarflux.net;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import org.zeith.hammerlib.api.lighting.ColoredLightManager;
-import org.zeith.hammerlib.net.IPacket;
-import org.zeith.hammerlib.net.PacketContext;
+import org.zeith.hammerlib.net.*;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.solarflux.block.SolarPanelTile;
 
+@MainThreaded
 public class PacketRequestSolarIntensity
 		implements IPacket
 {
@@ -43,9 +43,7 @@ public class PacketRequestSolarIntensity
 		var player = ctx.getSender();
 		if(player == null) return;
 		var level = player.serverLevel();
-		var bs = level.getBlockState(pos);
-		var be = level.getExistingBlockEntity(pos);
-		var spt = Cast.cast(be, SolarPanelTile.class);
+		var spt = Cast.cast(level.getBlockEntity(pos), SolarPanelTile.class);
 		if(spt == null) return;
 		sunIntensity = spt.sunIntensity;
 		ctx.withReply(this);

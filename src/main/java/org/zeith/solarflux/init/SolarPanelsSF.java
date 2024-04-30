@@ -4,9 +4,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.minecraftforge.forgespi.language.IModInfo;
+import net.neoforged.fml.ModList;
+import net.neoforged.fml.loading.FMLPaths;
+import net.neoforged.neoforgespi.language.IModInfo;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.configured.ConfiguredLib;
 import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
@@ -55,9 +55,9 @@ public class SolarPanelsSF
 	@SimplyRegister
 	public static void registerPanels(BiConsumer<ResourceLocation, Block> reg)
 	{
-		listPanelBlocks()
+		listPanels()
 				.forEach(panel ->
-						reg.accept(panel.getRegistryName(), panel)
+						reg.accept(panel.getRegistryName(), panel.getBlock())
 				);
 	}
 	

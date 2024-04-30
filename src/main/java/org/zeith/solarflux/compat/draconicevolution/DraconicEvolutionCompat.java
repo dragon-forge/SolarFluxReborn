@@ -1,12 +1,13 @@
 package org.zeith.solarflux.compat.draconicevolution;
 
 import com.brandon3055.brandonscore.api.TechLevel;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.zeith.hammerlib.compat.base.BaseCompat;
+import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
@@ -30,6 +31,11 @@ public class DraconicEvolutionCompat
 	public final ResourceLocation chaoticRecipe = SolarFlux.id("solar_panels/draconicevolution/chaotic");
 	
 	public SolarPanel wyvern, draconic, chaotic;
+	
+	public DraconicEvolutionCompat(CompatContext ctx, Class<?>... simplyRegisterClasses)
+	{
+		super(ctx, simplyRegisterClasses);
+	}
 	
 	@Override
 	public void registerSolarPanels(Supplier<SolarPanel.Builder> factory, Function<SolarPanel.Builder, SolarPanel> registrar)
@@ -72,7 +78,7 @@ public class DraconicEvolutionCompat
 	{
 		try
 		{
-			Function<String, Item> items = (id) -> ForgeRegistries.ITEMS.getValue(new ResourceLocation("draconicevolution", id));
+			Function<String, Item> items = (id) -> BuiltInRegistries.ITEM.get(new ResourceLocation("draconicevolution", id));
 			
 			var chaoticCore = items.apply("chaotic_core");
 			var awakenedCore = items.apply("awakened_core");
