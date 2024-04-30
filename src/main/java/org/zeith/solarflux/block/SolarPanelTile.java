@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -27,7 +26,10 @@ import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
+import org.zeith.hammerlib.net.Network;
+import org.zeith.hammerlib.proxy.HLConstants;
 import org.zeith.hammerlib.tiles.TileSyncableTickable;
+import org.zeith.hammerlib.tiles.tooltip.*;
 import org.zeith.hammerlib.util.java.tuples.Tuple2;
 import org.zeith.hammerlib.util.java.tuples.Tuples;
 import org.zeith.hammerlib.util.mcf.NormalizedTicker;
@@ -39,6 +41,7 @@ import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.init.TilesSF;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
+import org.zeith.solarflux.net.PacketRequestSolarIntensity;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
 import org.zeith.solarflux.util.BlockPosFace;
@@ -48,12 +51,12 @@ import java.util.stream.Stream;
 
 public class SolarPanelTile
 		extends TileSyncableTickable
-		implements IEnergyStorage, IContainerTile, ISolarPanelTile
+		implements IEnergyStorage, IContainerTile, ISolarPanelTile, ITooltipTile
 {
 	public long energy;
 	
 	public long currentGeneration;
-	public float sunIntensity;
+	public float sunIntensity = 1.0E-30F;
 	
 	private SolarPanel delegate;
 	private SolarPanelInstance instance;
@@ -66,6 +69,8 @@ public class SolarPanelTile
 	public final SimpleAttributeProperty generation = new SimpleAttributeProperty();
 	public final SimpleAttributeProperty transfer = new SimpleAttributeProperty();
 	public final SimpleAttributeProperty capacity = new SimpleAttributeProperty();
+	
+	protected int refreshTimer = 0;
 	
 	public SolarPanelTile(BlockPos pos, BlockState state)
 	{
@@ -252,6 +257,9 @@ public class SolarPanelTile
 		if(cache$seeSkyTimer > 0)
 			--cache$seeSkyTimer;
 		
+		if(refreshTimer > 0)
+			--refreshTimer;
+		
 		if(level.isClientSide)
 			return;
 		
@@ -366,8 +374,8 @@ public class SolarPanelTile
 		{
 			cache$seeSkyTimer = 20;
 			cache$seeSky = level != null &&
-					level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
-					level.canSeeSky(worldPosition.above());
+						   level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
+						   level.canSeeSky(worldPosition.above());
 		}
 		return cache$seeSky;
 	}
@@ -549,11 +557,15 @@ public class SolarPanelTile
 	public ItemStack generateItem(ItemLike item)
 	{
 		ItemStack stack = new ItemStack(item);
-		CompoundTag tag = new CompoundTag();
-		tag.putLong("Energy", energy - Math.round(energy * SolarPanelsSF.LOOSE_ENERGY / 100D));
-		upgradeInventory.writeToNBT(tag, "Upgrades");
-		chargeInventory.writeToNBT(tag, "Chargeable");
-		stack.setTag(tag);
+		long reducedEnergy = energy - Math.round(energy * SolarPanelsSF.LOOSE_ENERGY / 100D);
+		if(reducedEnergy > 0 || !chargeInventory.isEmpty() || !upgradeInventory.isEmpty())
+		{
+			CompoundTag tag = new CompoundTag();
+			tag.putLong("Energy", reducedEnergy);
+			upgradeInventory.writeToNBT(tag, "Upgrades");
+			chargeInventory.writeToNBT(tag, "Chargeable");
+			stack.setTag(tag);
+		}
 		return stack;
 	}
 	
@@ -567,11 +579,41 @@ public class SolarPanelTile
 		}
 	}
 	
+	@Override
+	public boolean isEngineSupported(EnumTooltipEngine engine)
+	{
+		return (HLConstants.enableHammerLibTooltipEngine && SolarPanelsSF.enableHammerLibTooltips) || engine != EnumTooltipEngine.HAMMER_LIB;
+	}
+	
+	@Override
+	public void addTooltip(ITooltipConsumer consumer, Player player)
+	{
+		if(level().isClientSide() && (refreshTimer <= 0 || sunIntensity == 1.0E-30F))
+		{
+			refreshTimer = 5;
+			Network.sendToServer(new PacketRequestSolarIntensity(pos(), 0F));
+			if(sunIntensity == 1.0E-30F)
+				return;
+		}
+		
+		consumer.addLine(Component.literal(Component.translatable("info.solarflux.sun.intensity").getString().replaceFirst(":.*$", ":")));
+		
+		var bar = new ProgressBar(100)
+				.withStyle(ProgressBar.ProgressBarStyle.FORGE_ENERGY_STYLE)
+				.setProgress(Math.round(100 * sunIntensity))
+				.withNumberFormat(EnumNumberFormat.FULL);
+		
+		bar.filledMainColor = 0xFFE1B83B;
+		bar.filledAlternateColor = 0xFF864F08;
+		bar.suffix = "%";
+		
+		consumer.addBar(bar);
+	}
+	
 	public void setDelegate(SolarPanel delegate)
 	{
 		this.delegate = delegate;
 	}
-	
 	
 	public static long clamp(long val, long min, long max)
 	{

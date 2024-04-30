@@ -37,6 +37,7 @@ public class SolarPanelsSF
 	public static float TRANSFER_RATE_UPGRADE_INCREASE = 0.15F;
 	public static float BLOCK_CHARGING_UPGRADE_RANGE = 16;
 	public static int TRAVERSAL_UPGRADE_RANGE = 5;
+	public static boolean enableHammerLibTooltips = true;
 	
 	public static final SolarPanel[] CORE_PANELS = new SolarPanel[8];
 	public static File CONFIG_DIR;
@@ -138,6 +139,11 @@ public class SolarPanelsSF
 					.withDefault(0.4F)
 					.withComment("How much energy should be generated when it is thundering? 0 - nothing, 1 - full power.")
 					.getValueF();
+			
+			enableHammerLibTooltips = main.getElement(ConfiguredLib.BOOLEAN, "Enable HammerLib Tooltips")
+					.withDefault(true)
+					.withComment("Should HammerLib display tooltips on the solar panels if no tooltip engine providers exist?")
+					.getValue();
 		}
 		
 		var upgrades = cfgs.setupCategory("Upgrades");
