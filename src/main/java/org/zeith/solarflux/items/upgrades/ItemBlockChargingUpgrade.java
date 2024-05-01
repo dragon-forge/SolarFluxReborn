@@ -87,12 +87,10 @@ public class ItemBlockChargingUpgrade
 		
 		BlockPos pos;
 		return face != null
-			   && tile.level().dimension().location().equals(face.pos().dimension())
+			   && tile.level().dimension().equals(face.pos().dimension())
 			   && tile.pos().distSqr(pos = face.pos().pos()) <= BLOCK_CHARGING_UPGRADE_RANGE
-			   && (
-					   (tile.level().getBlockEntity(pos) instanceof IFurnaceBlockEntity furnace && face.dir() == furnace.getSideForSolarPanel() && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0)
-					   || tile.level().getCapability(Capabilities.EnergyStorage.BLOCK, pos, face.dir()) != null
-			   );
+			   && (tile.level().getCapability(Capabilities.EnergyStorage.BLOCK, pos, face.dir()) != null
+				   || (tile.level().getBlockEntity(pos) instanceof IFurnaceBlockEntity furnace && face.dir() == furnace.getSideForSolarPanel() && tile.getUpgrades(ItemsSF.FURNACE_UPGRADE) > 0));
 	}
 	
 	@Override

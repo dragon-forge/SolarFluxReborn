@@ -2,7 +2,9 @@ package org.zeith.solarflux.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -543,21 +545,48 @@ public class SolarPanelTile
 		{
 			stack.set(PanelDataComponent.TYPE, new PanelDataComponent(
 					reducedEnergy,
-					List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList()),
-					List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList())
-			));
+					List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList()),
+					List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList())
+					));
 		}
 		return stack;
 	}
 	
-	public void loadFromItem(ItemStack stack)
+	public PanelDataComponent saveToComponent()
 	{
-		var type = stack.get(PanelDataComponent.TYPE);
-		if(type == null || type.isEmpty()) return;
-		
-		energy = type.energy();
-		load(type.upgrades(), upgradeInventory);
-		load(type.chargeable(), chargeInventory);
+		return new PanelDataComponent(
+				energy,
+				List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList()),
+				List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList())
+		);
+	}
+	
+	public void loadFromItem(PanelDataComponent component)
+	{
+		energy = component.energy();
+		load(component.upgrades(), upgradeInventory);
+		load(component.chargeable(), chargeInventory);
+	}
+	
+	@Override
+	protected void applyImplicitComponents(DataComponentInput input)
+	{
+		super.applyImplicitComponents(input);
+		loadFromItem(input.getOrDefault(PanelDataComponent.TYPE, PanelDataComponent.EMPTY));
+	}
+	
+	@Override
+	protected void collectImplicitComponents(DataComponentMap.Builder builder)
+	{
+		super.collectImplicitComponents(builder);
+		builder.set(PanelDataComponent.TYPE, saveToComponent());
+	}
+	
+	@Override
+	public void removeComponentsFromTag(CompoundTag tag)
+	{
+		super.removeComponentsFromTag(tag);
+		tag.remove("HL");
 	}
 	
 	protected void load(List<ItemStack> from, SimpleInventory target)

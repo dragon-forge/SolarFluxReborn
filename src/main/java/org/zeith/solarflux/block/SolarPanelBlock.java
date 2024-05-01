@@ -37,11 +37,14 @@ public class SolarPanelBlock
 {
 	public final SolarPanel panel;
 	
+	public final MapCodec<SolarPanelBlock> CODEC;
+	
 	public SolarPanelBlock(SolarPanel panel, Properties properties)
 	{
 		super(properties);
 		bindTool();
 		this.panel = panel;
+		this.CODEC = simpleCodec(props -> new SolarPanelBlock(panel, props));;
 	}
 	
 	protected void bindTool()
@@ -54,25 +57,6 @@ public class SolarPanelBlock
 	public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type)
 	{
 		return BlockAPI.ticker();
-	}
-	
-	@Override
-	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
-	{
-		var com = stack.get(PanelDataComponent.TYPE);
-		if(com.isEmpty()) return;
-		
-		SolarPanelTile spt = null;
-		BlockEntity tile = level.getBlockEntity(pos);
-		if(tile instanceof SolarPanelTile)
-			spt = (SolarPanelTile) tile;
-		else
-		{
-			spt = (SolarPanelTile) newBlockEntity(pos, state);
-			level.setBlockEntity(spt);
-		}
-		
-		spt.loadFromItem(stack);
 	}
 	
 	@Override
@@ -92,7 +76,7 @@ public class SolarPanelBlock
 	@Override
 	protected MapCodec<? extends BaseEntityBlock> codec()
 	{
-		return null;
+		return CODEC;
 	}
 	
 	@Override
