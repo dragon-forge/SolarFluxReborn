@@ -3,7 +3,6 @@ package org.zeith.solarflux.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -17,7 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -25,6 +24,7 @@ import net.neoforged.neoforge.client.model.data.ModelProperty;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
+import org.zeith.hammerlib.api.io.NBTSerializable;
 import org.zeith.hammerlib.api.tiles.IContainerTile;
 import org.zeith.hammerlib.net.Network;
 import org.zeith.hammerlib.proxy.HLConstants;
@@ -39,17 +39,17 @@ import org.zeith.solarflux.compat._abilities.SFAbilities;
 import org.zeith.solarflux.container.SolarPanelContainer;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.init.TilesSF;
+import org.zeith.solarflux.items.data.PanelDataComponent;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
 import org.zeith.solarflux.net.PacketRequestSolarIntensity;
-import org.zeith.solarflux.panels.SolarPanel;
-import org.zeith.solarflux.panels.SolarPanelInstance;
+import org.zeith.solarflux.panels.*;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import java.util.*;
 import java.util.stream.Stream;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class SolarPanelTile
 		extends TileSyncableTickable
 		implements IEnergyStorage, IContainerTile, ISolarPanelTile, ITooltipTile
@@ -66,6 +66,7 @@ public class SolarPanelTile
 		);
 	}
 	
+	@NBTSerializable("Energy")
 	public long energy;
 	
 	public long currentGeneration;
@@ -74,7 +75,10 @@ public class SolarPanelTile
 	private SolarPanel delegate;
 	private SolarPanelInstance instance;
 	
+	@NBTSerializable("Upgrades")
 	public final SimpleInventory upgradeInventory = new SimpleInventory(5);
+	
+	@NBTSerializable("Chargeable")
 	public final SimpleInventory chargeInventory = new SimpleInventory(1);
 	
 	public final List<BlockPosFace> traversal = new ArrayList<>();
@@ -447,23 +451,6 @@ public class SolarPanelTile
 				.build();
 	}
 	
-	@Override
-	public CompoundTag writeNBT(CompoundTag nbt)
-	{
-		upgradeInventory.writeToNBT(nbt, "Upgrades");
-		chargeInventory.writeToNBT(nbt, "Chargeable");
-		nbt.putLong("Energy", energy);
-		return nbt;
-	}
-	
-	@Override
-	public void readNBT(CompoundTag nbt)
-	{
-		upgradeInventory.readFromNBT(nbt, "Upgrades");
-		chargeInventory.readFromNBT(nbt, "Chargeable");
-		energy = nbt.getLong("Energy");
-	}
-	
 	int voxelTimer = 0;
 	VoxelShape shape;
 	
@@ -554,23 +541,30 @@ public class SolarPanelTile
 		long reducedEnergy = energy - Math.round(energy * SolarPanelsSF.LOOSE_ENERGY / 100D);
 		if(reducedEnergy > 0 || !chargeInventory.isEmpty() || !upgradeInventory.isEmpty())
 		{
-			CompoundTag tag = new CompoundTag();
-			tag.putLong("Energy", reducedEnergy);
-			upgradeInventory.writeToNBT(tag, "Upgrades");
-			chargeInventory.writeToNBT(tag, "Chargeable");
-			stack.setTag(tag);
+			stack.set(PanelDataComponent.TYPE, new PanelDataComponent(
+					reducedEnergy,
+					List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList()),
+					List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList())
+			));
 		}
 		return stack;
 	}
 	
 	public void loadFromItem(ItemStack stack)
 	{
-		if(stack.hasTag())
-		{
-			energy = stack.getTag().getLong("Energy");
-			upgradeInventory.readFromNBT(stack.getTag(), "Upgrades");
-			chargeInventory.readFromNBT(stack.getTag(), "Chargeable");
-		}
+		var type = stack.get(PanelDataComponent.TYPE);
+		if(type == null || type.isEmpty()) return;
+		
+		energy = type.energy();
+		load(type.upgrades(), upgradeInventory);
+		load(type.chargeable(), chargeInventory);
+	}
+	
+	protected void load(List<ItemStack> from, SimpleInventory target)
+	{
+		int j = Math.min(from.size(), target.getSlots());
+		for(int i = 0; i < j; i++)
+			target.setStackInSlot(i, from.get(i).copy());
 	}
 	
 	@Override

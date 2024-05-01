@@ -1,16 +1,18 @@
 package org.zeith.solarflux.compat.twilightforest.items;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.*;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.compat.base.Ability;
 import org.zeith.solarflux.api.ISolarPanelTile;
-import org.zeith.solarflux.items.upgrades._base.*;
+import org.zeith.solarflux.items.upgrades._base.ISunIntensityMod;
+import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 
-import java.util.*;
+import java.util.Optional;
 
 public class TwiLightUpgrade
 		extends UpgradeItem
@@ -25,7 +27,7 @@ public class TwiLightUpgrade
 	
 	public static boolean isTwilight(Level level)
 	{
-		return level != null && Objects.equals(level.dimensionTypeId(), TWILIGHT_DIM_TYPE);
+		return level != null && level.dimensionTypeRegistration().unwrapKey().map(TWILIGHT_DIM_TYPE::equals).orElse(false);
 	}
 	
 	@Override

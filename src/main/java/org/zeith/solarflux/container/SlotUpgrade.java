@@ -50,7 +50,7 @@ public class SlotUpgrade
 				if(itemstack.isEmpty())
 				{
 					this.set(item.split(insert));
-				} else if(ItemStack.isSameItemSameTags(itemstack, item))
+				} else if(ItemStack.isSameItemSameComponents(itemstack, item))
 				{
 					item.shrink(insert);
 					itemstack.grow(insert);

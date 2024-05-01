@@ -3,10 +3,11 @@ package org.zeith.solarflux.client;
 import com.google.gson.JsonObject;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.PackResources;
-import net.minecraft.server.packs.PackType;
+import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
@@ -176,7 +177,8 @@ public class SolarFluxResourcePack
 	}
 	
 	@Override
-	public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer) throws IOException
+	public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer)
+			throws IOException
 	{
 		if(deserializer.getMetadataSectionName().equals("pack"))
 		{
@@ -186,6 +188,19 @@ public class SolarFluxResourcePack
 			return deserializer.fromJson(obj);
 		}
 		return null;
+	}
+	
+	protected final PackLocationInfo loca = new PackLocationInfo(
+			packId(),
+			Component.literal(packId()),
+			PackSource.BUILT_IN,
+			Optional.empty()
+	);
+	
+	@Override
+	public PackLocationInfo location()
+	{
+		return loca;
 	}
 	
 	@Override
@@ -207,7 +222,8 @@ public class SolarFluxResourcePack
 				}
 				
 				@Override
-				public InputStream create() throws IOException
+				public InputStream create()
+						throws IOException
 				{
 					return streamable.get();
 				}
@@ -216,12 +232,14 @@ public class SolarFluxResourcePack
 		
 		boolean exists();
 		
-		InputStream create() throws IOException;
+		InputStream create()
+				throws IOException;
 	}
 	
 	@FunctionalInterface
 	public interface IIOSupplier<T>
 	{
-		T get() throws IOException;
+		T get()
+				throws IOException;
 	}
 }

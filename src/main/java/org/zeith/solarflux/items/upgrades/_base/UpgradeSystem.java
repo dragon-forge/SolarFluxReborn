@@ -3,7 +3,7 @@ package org.zeith.solarflux.items.upgrades._base;
 import net.minecraft.Util;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
 import org.zeith.hammerlib.compat.base.Ability;
 import org.zeith.hammerlib.util.java.Cast;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class UpgradeSystem
 {
 	private static List<UpgradeItem> UPGRADE_ITEMS;

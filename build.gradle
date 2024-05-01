@@ -7,7 +7,7 @@ buildscript {
 plugins {
     id 'java-library'
     id "com.modrinth.minotaur" version "2.+"
-    id 'net.neoforged.gradle.userdev' version '7.0.71'
+    id 'net.neoforged.gradle.userdev' version '7.0.109'
 }
 
 apply plugin: 'idea'
@@ -30,7 +30,7 @@ base {
     archivesName = "${config.archive_name}-${config.mc_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
@@ -89,9 +89,9 @@ dependencies {
     implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}"
 
     if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
-        compileOnly "mezz.jei:jei-${config.mc_version}-common-api:${config.jei_version}"
-        compileOnly "mezz.jei:jei-${config.mc_version}-neoforge-api:${config.jei_version}"
-        runtimeOnly "mezz.jei:jei-${config.mc_version}-neoforge:${config.jei_version}"
+        compileOnly "mezz.jei:jei-${config.jei_mc_version}-common-api:${config.jei_version}"
+        compileOnly "mezz.jei:jei-${config.jei_mc_version}-neoforge-api:${config.jei_version}"
+        //runtimeOnly "mezz.jei:jei-${config.mc_version}-neoforge:${config.jei_version}"
     }
 
     def libraries = new File(file("libraries"), "${config.mc_version}")
@@ -156,7 +156,7 @@ dependencies {
     } else libDir.mkdir();
 }
 
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
+def resourceTargets = ['META-INF/neoforge.mods.toml', 'pack.mcmeta']
 def replaceProperties = [
         minecraft_version: config.mc_version, minecraft_version_range: config.mc_range,
         forge_version    : "${config.mc_version}-${config.forge_version}", forge_version_range: config.forge_range, javafml_range: config.javafml_range,
@@ -167,7 +167,6 @@ def replaceProperties = [
 ]
 processResources {
     inputs.properties replaceProperties
-    replaceProperties.put 'project', project
 
     filesMatching(resourceTargets) {
         expand replaceProperties
@@ -183,8 +182,7 @@ jar {
                 "Implementation-Title"    : project.name,
                 "Implementation-Version"  : archiveVersion,
                 "Implementation-Vendor"   : config.mod_authors,
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                "MixinConfigs"            : "mixins.${config.mod_id}.json"
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }
@@ -199,8 +197,7 @@ task deobfJar(type: Jar) {
                     "Implementation-Title"    : project.name,
                     "Implementation-Version"  : archiveVersion,
                     "Implementation-Vendor"   : config.mod_authors,
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
-                    "MixinConfigs"            : "mixins.${config.mod_id}.json"
+                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
     }
 }

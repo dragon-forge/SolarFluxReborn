@@ -9,6 +9,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLLoadCompleteEvent;
@@ -52,7 +53,7 @@ public class SolarFlux
 					.withTabsBefore(HLConstants.HL_TAB.id())
 	);
 	
-	public static SFCompatList SF_COMPAT ;
+	public static SFCompatList SF_COMPAT;
 	
 	public SolarFlux(IEventBus modBus)
 	{
@@ -103,7 +104,7 @@ public class SolarFlux
 		}
 	}
 	
-	@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD)
+	@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 	public static class ModEvents
 	{
 		@SubscribeEvent

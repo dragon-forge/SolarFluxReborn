@@ -6,8 +6,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.*;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -25,6 +24,7 @@ import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
 import org.zeith.hammerlib.api.forge.BlockAPI;
 import org.zeith.hammerlib.api.forge.ContainerAPI;
 import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
+import org.zeith.solarflux.items.data.PanelDataComponent;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
@@ -59,19 +59,20 @@ public class SolarPanelBlock
 	@Override
 	public void setPlacedBy(Level level, BlockPos pos, BlockState state, LivingEntity placer, ItemStack stack)
 	{
-		if(stack.hasTag())
+		var com = stack.get(PanelDataComponent.TYPE);
+		if(com.isEmpty()) return;
+		
+		SolarPanelTile spt = null;
+		BlockEntity tile = level.getBlockEntity(pos);
+		if(tile instanceof SolarPanelTile)
+			spt = (SolarPanelTile) tile;
+		else
 		{
-			SolarPanelTile spt = null;
-			BlockEntity tile = level.getBlockEntity(pos);
-			if(tile instanceof SolarPanelTile)
-				spt = (SolarPanelTile) tile;
-			else
-			{
-				spt = (SolarPanelTile) newBlockEntity(pos, state);
-				level.setBlockEntity(spt);
-			}
-			spt.loadFromItem(stack);
+			spt = (SolarPanelTile) newBlockEntity(pos, state);
+			level.setBlockEntity(spt);
 		}
+		
+		spt.loadFromItem(stack);
 	}
 	
 	@Override
@@ -155,57 +156,54 @@ public class SolarPanelBlock
 	}
 	
 	@Override
-	public InteractionResult use(BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand handIn, BlockHitResult hit)
+	protected ItemInteractionResult useItemOn(ItemStack held, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand p_316595_, BlockHitResult hit)
 	{
-		if(player instanceof ServerPlayer && worldIn.getBlockEntity(pos) instanceof SolarPanelTile tbs)
+		if(player instanceof ServerPlayer && worldIn.getBlockEntity(pos) instanceof SolarPanelTile tbs && !held.isEmpty() && held.getItem() instanceof UpgradeItem iu)
 		{
-			ItemStack held = player.getItemInHand(handIn);
-			if(!held.isEmpty() && held.getItem() instanceof UpgradeItem iu)
+			int amt = tbs.getUpgrades(iu);
+			if(amt < iu.getMaxUpgradesInstalled(tbs) && iu.canInstall(tbs, held, tbs.upgradeInventory))
 			{
-				int amt = tbs.getUpgrades(iu);
-				if(amt < iu.getMaxUpgradesInstalled(tbs) && iu.canInstall(tbs, held, tbs.upgradeInventory))
+				int installed = 0;
+				for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
 				{
-					int installed = 0;
-					for(int i = 0; i < tbs.upgradeInventory.getSlots(); ++i)
+					ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
+					if(ItemStack.isSameItemSameComponents(stack, held))
 					{
-						ItemStack stack = tbs.upgradeInventory.getStackInSlot(i);
-						if(ItemStack.isSameItemSameTags(stack, held))
-						{
-							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), Math.min(iu.getMaxStackSize(stack) - stack.getCount(), held.getCount()));
-							stack.grow(allow);
-							held.shrink(allow);
-							installed += allow;
-							break;
-						} else if(stack.isEmpty())
-						{
-							int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), held.getCount());
-							ItemStack copy = held.copy();
-							held.shrink(allow);
-							copy.setCount(allow);
-							tbs.upgradeInventory.setStackInSlot(i, copy);
-							installed += allow;
-							break;
-						}
-					}
-					if(installed > 0)
+						int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), Math.min(iu.getMaxStackSize(stack) - stack.getCount(), held.getCount()));
+						stack.grow(allow);
+						held.shrink(allow);
+						installed += allow;
+						break;
+					} else if(stack.isEmpty())
 					{
-						iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
-						worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, .1F, 1F);
-						return InteractionResult.SUCCESS;
+						int allow = Math.min(iu.getMaxUpgradesInstalled(tbs) - tbs.getUpgrades(iu), held.getCount());
+						ItemStack copy = held.copy();
+						held.shrink(allow);
+						copy.setCount(allow);
+						tbs.upgradeInventory.setStackInSlot(i, copy);
+						installed += allow;
+						break;
 					}
 				}
+				
+				if(installed > 0)
+				{
+					iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
+					worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, .1F, 1F);
+					return ItemInteractionResult.SUCCESS;
+				}
 			}
-			ContainerAPI.openContainerTile(player, tbs);
 		}
+		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+	}
+	
+	@Override
+	protected InteractionResult useWithoutItem(BlockState state, Level worldIn, BlockPos pos, Player player, BlockHitResult hit)
+	{
+		if(player instanceof ServerPlayer && worldIn.getBlockEntity(pos) instanceof SolarPanelTile tbs)
+			ContainerAPI.openContainerTile(player, tbs);
 		return InteractionResult.SUCCESS;
 	}
-
-//	@Override
-//	@OnlyIn(Dist.CLIENT)
-//	public boolean isSideInvisible(BlockState state, BlockState adjacentBlockState, Direction side)
-//	{
-//		return adjacentBlockState.getBlock() == state.getBlock() && side != Direction.UP;
-//	}
 	
 	@Override
 	public boolean hasAnalogOutputSignal(BlockState p_60457_)

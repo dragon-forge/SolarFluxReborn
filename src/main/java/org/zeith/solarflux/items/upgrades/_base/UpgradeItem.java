@@ -6,8 +6,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.compat.base.Ability;
 import org.zeith.solarflux.SolarFlux;
@@ -53,7 +51,7 @@ public abstract class UpgradeItem
 	}
 	
 	@Override
-	public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag context)
+	public void appendHoverText(ItemStack stack, TooltipContext level, List<Component> tooltip, TooltipFlag context)
 	{
 		try
 		{

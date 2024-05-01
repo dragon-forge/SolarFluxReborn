@@ -34,9 +34,6 @@ public abstract class AbstractFurnaceBlockEntityMixin
 	int litTime;
 	
 	@Shadow
-	public abstract ItemStack getItem(int p_58328_);
-	
-	@Shadow
 	int litDuration;
 	
 	protected AbstractFurnaceBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)

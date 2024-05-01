@@ -20,34 +20,34 @@ license="${mod_license}"
 [[accessTransformers]]
     file="META-INF/accesstransformer.cfg"
 
-[[dependencies.${mod_id}]]
+[[dependencies."${mod_id}"]]
     modId="neoforge"
     type = 'required'
     versionRange="${forge_version_range}"
     ordering="NONE" # NONE/BEFORE/AFTER
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies."${mod_id}"]]
     modId="minecraft"
     type = 'required'
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies."${mod_id}"]]
     modId="hammerlib"
     type = 'required'
     versionRange="[${hl_version},)"
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies."${mod_id}"]]
     modId="ae2"
     type = 'optional'
     ordering="NONE"
     side="BOTH"
 
-[[dependencies.${mod_id}]]
+[[dependencies."${mod_id}"]]
     modId="twilightforest"
     type = 'optional'
     ordering="NONE"

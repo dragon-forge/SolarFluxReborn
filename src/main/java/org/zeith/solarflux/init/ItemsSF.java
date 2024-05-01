@@ -3,11 +3,9 @@ package org.zeith.solarflux.init;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
-import org.zeith.hammerlib.proxy.HLConstants;
+import org.zeith.hammerlib.util.CommonMessages;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.items.JSItem;
 import org.zeith.solarflux.items.upgrades.*;
@@ -78,9 +76,9 @@ public interface ItemsSF
 		return SolarFlux.ITEM_GROUP.add(new Item(new Item.Properties())
 		{
 			@Override
-			public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag)
+			public void appendHoverText(ItemStack stack, TooltipContext level, List<Component> tooltip, TooltipFlag flag)
 			{
-				tooltip.add(HLConstants.CRAFTING_MATERIAL);
+				tooltip.add(CommonMessages.CRAFTING_MATERIAL);
 			}
 		});
 	}

@@ -69,7 +69,7 @@ public class RecipesSF
 				.id(MIRROR)
 				.result(ItemsSF.MIRROR, 3)
 				.shape("ggg", " i ")
-				.map('g', Tags.Items.GLASS)
+				.map('g', Tags.Items.GLASS_BLOCKS)
 				.map('i', Tags.Items.INGOTS_IRON)
 				.registerIf(SolarPanelsSF::isRecipeActive);
 		
@@ -103,7 +103,7 @@ public class RecipesSF
 					.id(PHOTOVOLTAIC_CELL_1)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_1)
 					.shape("ggg", "lll", "mmm")
-					.map('g', Tags.Items.GLASS)
+					.map('g', Tags.Items.GLASS_BLOCKS)
 					.map('l', Tags.Items.GEMS_LAPIS)
 					.map('m', ItemsSF.MIRROR)
 					.registerIf(SolarPanelsSF::isRecipeActive);
@@ -122,9 +122,9 @@ public class RecipesSF
 					.id(PHOTOVOLTAIC_CELL_3)
 					.result(ItemsSF.PHOTOVOLTAIC_CELL_3)
 					.shape("ggg", "lll", "oco")
-					.map('g', Tags.Items.GLASS)
+					.map('g', Tags.Items.GLASS_BLOCKS)
 					.map('l', Tags.Items.DUSTS_GLOWSTONE)
-					.map('o', Tags.Items.OBSIDIAN)
+					.map('o', Tags.Items.OBSIDIANS)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_2)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
@@ -135,7 +135,7 @@ public class RecipesSF
 					.map('b', ItemsSF.BLAZING_COATING)
 					.map('g', Tags.Items.DUSTS_GLOWSTONE)
 					.map('d', Tags.Items.GEMS_DIAMOND)
-					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
+					.map('q', Blocks.QUARTZ_BLOCK)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_3)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
@@ -146,7 +146,7 @@ public class RecipesSF
 					.map('b', ItemsSF.EMERALD_GLASS)
 					.map('g', TagsHL.Items.STORAGE_BLOCKS_GLOWSTONE)
 					.map('d', Tags.Items.STORAGE_BLOCKS_DIAMOND)
-					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
+					.map('q', Blocks.QUARTZ_BLOCK)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_4)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
@@ -157,7 +157,7 @@ public class RecipesSF
 					.map('b', ItemsSF.ENDER_GLASS)
 					.map('g', TagsHL.Items.STORAGE_BLOCKS_GLOWSTONE)
 					.map('d', Tags.Items.STORAGE_BLOCKS_EMERALD)
-					.map('q', Tags.Items.STORAGE_BLOCKS_QUARTZ)
+					.map('q', Blocks.QUARTZ_BLOCK)
 					.map('c', ItemsSF.PHOTOVOLTAIC_CELL_5)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
@@ -165,7 +165,7 @@ public class RecipesSF
 					.id(BLANK_UPGRADE)
 					.result(ItemsSF.BLANK_UPGRADE)
 					.shape(" c ", "cmc", " c ")
-					.map('c', Tags.Items.COBBLESTONE)
+					.map('c', Tags.Items.COBBLESTONES)
 					.map('m', ItemsSF.MIRROR)
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		}
