@@ -3,6 +3,7 @@ package org.zeith.solarflux.container;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
+import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelTile;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 
@@ -15,6 +16,15 @@ public class SlotUpgrade
 	{
 		super(inventoryIn.upgradeInventory, index, xPosition, yPosition);
 		this.tile = inventoryIn;
+	}
+	
+	@Override
+	public int getMaxStackSize(ItemStack stack)
+	{
+		if(!(stack.getItem() instanceof UpgradeItem ui)) return 0;
+		var current = getItem();
+		if((!current.isEmpty() && !current.is(ui)) || !tile.upgradeInventory.isItemValid(getSlotIndex(), stack)) return 0;
+		return ui.getMaxUpgradesInstalled(tile) - tile.getUpgrades(ui) + current.getCount();
 	}
 	
 	@Override
@@ -46,6 +56,7 @@ public class SlotUpgrade
 				
 				int insert = Math.min(Math.min(amount, item.getCount()), this.getMaxStackSize(item) - itemstack.getCount());
 				insert = Math.min(insert, up.getMaxUpgradesInstalled(tile) - prev);
+				insert = Math.max(0, insert);
 				
 				if(itemstack.isEmpty())
 				{
@@ -76,6 +87,8 @@ public class SlotUpgrade
 	@Override
 	public boolean mayPlace(ItemStack stack)
 	{
-		return tile.upgradeInventory.isItemValid(getSlotIndex(), stack);
+		return tile.upgradeInventory.isItemValid(getSlotIndex(), stack)
+			   && stack.getItem() instanceof UpgradeItem ui
+			   && tile.getUpgrades(ui) < ui.getMaxUpgradesInstalled(tile);
 	}
 }
