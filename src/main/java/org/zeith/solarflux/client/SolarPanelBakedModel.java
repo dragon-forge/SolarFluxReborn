@@ -12,10 +12,12 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.IDynamicBakedModel;
 import net.minecraftforge.client.model.data.ModelData;
+import net.minecraftforge.client.model.data.ModelProperty;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -31,6 +33,9 @@ import java.util.function.Function;
 public class SolarPanelBakedModel
 		implements IDynamicBakedModel
 {
+	public static final ModelProperty<BlockAndTintGetter> WORLD_PROP = new ModelProperty<>();
+	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
+	
 	public static final FaceBakery COOKER = new FaceBakery();
 	public final SolarPanelBlock block;
 	public final ResourceLocation registryName;
@@ -50,8 +55,8 @@ public class SolarPanelBakedModel
 		for(Direction side : sides)
 			if(side != null)
 			{
-				Level world = extraData.get(SolarPanelTile.WORLD_PROP);
-				BlockPos pos = extraData.get(SolarPanelTile.POS_PROP);
+				BlockAndTintGetter world = extraData.get(WORLD_PROP);
+				BlockPos pos = extraData.get(POS_PROP);
 				
 				TextureAtlasSprite top = t_top(), base = t_base();
 				
@@ -172,6 +177,15 @@ public class SolarPanelBakedModel
 							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
 			}
 		return quads;
+	}
+	
+	@Override
+	public @NotNull ModelData getModelData(@NotNull BlockAndTintGetter level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData modelData)
+	{
+		return modelData.derive()
+				.with(POS_PROP, pos)
+				.with(WORLD_PROP, level)
+				.build();
 	}
 	
 	@Override

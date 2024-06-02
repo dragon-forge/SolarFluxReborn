@@ -420,18 +420,6 @@ public class SolarPanelTile
 		return capacity;
 	}
 	
-	public static final ModelProperty<Level> WORLD_PROP = new ModelProperty<>();
-	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
-	
-	@Override
-	public ModelData getModelData()
-	{
-		return ModelData.builder()
-				.with(WORLD_PROP, level)
-				.with(POS_PROP, worldPosition)
-				.build();
-	}
-	
 	@Override
 	public CompoundTag writeNBT(CompoundTag nbt)
 	{
