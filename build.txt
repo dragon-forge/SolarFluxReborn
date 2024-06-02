@@ -4,9 +4,12 @@ archive_name=SolarFluxReborn
 mod_name=Solar Flux Reborn
 mod_version=19.3.11
 
+# Mod dependencies
+hl_version=19.3.81
+
 # Maven Info
 maven_group=org.zeith.solarflux
-hl_version=19.3.81
+maven_url=file:///SERVER//Maven
 
 # MC Info
 mc_version=1.19.2
@@ -18,6 +21,17 @@ java=17
 
 # Project ID on CurseForge
 cf_project=246974
+modrinth_project=4QG5lev4
 
 # alpha, beta, release
 release_type=release
+
+# List of mods separated by ;
+# If a specific mod for one platform is needed, @m: or @c: prefixes are used.
+# Example for adding Hammer Lib for both Modrinth & CurseForge:
+# @m:PlkSuVtM;@c:hammer-lib;
+# Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
+required_mods=hammer-lib;
+optional_mods=@c:Applied-Energistics-2;@m:ae2;@c:The-Twilight-Forest;@c:Avaritia-1-10;@c:Draconic-Evolution
+incompatible_mods=
+embedded_mods=
