@@ -13,10 +13,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
@@ -37,6 +39,9 @@ public class SolarPanelBakedModel
 	public final ResourceLocation registryName;
 	final ResourceLocation modelName = new ModelResourceLocation(InfoSF.MOD_ID, "solar_panel", "");
 	
+	public static final ModelProperty<BlockAndTintGetter> WORLD_PROP = new ModelProperty<>();
+	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
+	
 	public SolarPanelBakedModel(SolarPanelBlock spb)
 	{
 		this.block = spb;
@@ -46,14 +51,14 @@ public class SolarPanelBakedModel
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction sideIn, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType)
 	{
+		BlockAndTintGetter world = extraData.get(WORLD_PROP);
+		BlockPos pos = extraData.get(POS_PROP);
+		
 		List<BakedQuad> quads = new ArrayList<>();
 		Direction[] sides = sideIn == null ? Direction.values() : new Direction[] { sideIn };
 		for(Direction side : sides)
 			if(side != null)
 			{
-				Level world = extraData.get(SolarPanelTile.WORLD_PROP);
-				BlockPos pos = extraData.get(SolarPanelTile.POS_PROP);
-				
 				TextureAtlasSprite top = t_top(), base = t_base();
 				
 				float h = block.panel.getPanelData().height * 16F;
@@ -182,6 +187,15 @@ public class SolarPanelBakedModel
 					));
 			}
 		return quads;
+	}
+	
+	@Override
+	public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData)
+	{
+		return modelData.derive()
+				.with(POS_PROP, pos)
+				.with(WORLD_PROP, level)
+				.build();
 	}
 	
 	@Override
