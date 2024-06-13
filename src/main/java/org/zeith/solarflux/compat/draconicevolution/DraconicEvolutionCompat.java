@@ -112,7 +112,8 @@ public class DraconicEvolutionCompat
 						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
 						ingr(new ItemStack(awakenedCore)),
 						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
-						ingr(new ItemStack(awakenedCore))
+						ingr(new ItemStack(awakenedCore)),
+						ingr(SolarPanelsSF.getGeneratingSolars(draconic))
 				)), e);
 		} catch(LinkageError | ReflectiveOperationException error)
 		{
