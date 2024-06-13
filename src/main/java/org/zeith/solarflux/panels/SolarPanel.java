@@ -17,7 +17,9 @@ import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
 import org.zeith.hammerlib.util.configured.data.IntValueRange;
 import org.zeith.hammerlib.util.configured.types.ConfigCategory;
 import org.zeith.hammerlib.util.java.functions.Function3;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.InfoSF;
+import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -720,7 +722,7 @@ public class SolarPanel
 			{
 				ResourceLocation prn = panel.getRegistryName();
 				ShapedRecipeBuilder builder = evt.shaped()
-						.id(new ResourceLocation(prn.getNamespace(), "builtin/generated_" + prn.getPath() + "_x_" + amount + "_ln" + lineNumber))
+						.id(Resources.location(prn.getNamespace(), "builtin/generated_" + prn.getPath() + "_x_" + amount + "_ln" + lineNumber))
 						.result(new ItemStack(panel, amount));
 				handlers.forEach(c -> c.accept(builder));
 				builder.register();
@@ -731,7 +733,7 @@ public class SolarPanel
 	
 	public ResourceLocation getRegistryName()
 	{
-		return new ResourceLocation(InfoSF.MOD_ID, "sp_" + name);
+		return SolarFlux.id("sp_" + name);
 	}
 	
 	/**

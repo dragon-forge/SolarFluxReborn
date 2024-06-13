@@ -13,34 +13,34 @@ import org.zeith.solarflux.recipe.RecipeClearSolarPanel;
 
 public class RecipesSF
 {
-	public static final ResourceLocation MIRROR = new ResourceLocation(InfoSF.MOD_ID, "mirror");
-	public static final ResourceLocation BLAZING_COATING = new ResourceLocation(InfoSF.MOD_ID, "blazing_coating");
-	public static final ResourceLocation EMERALD_GLASS = new ResourceLocation(InfoSF.MOD_ID, "emerald_glass");
-	public static final ResourceLocation ENDER_GLASS = new ResourceLocation(InfoSF.MOD_ID, "ender_glass");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_1 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_1");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_2 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_2");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_3 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_3");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_4 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_4");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_5 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_5");
-	public static final ResourceLocation PHOTOVOLTAIC_CELL_6 = new ResourceLocation(InfoSF.MOD_ID, "photovoltaic_cell_6");
-	public static final ResourceLocation BLANK_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "blank_upgrade");
+	public static final ResourceLocation MIRROR = SolarFlux.id("mirror");
+	public static final ResourceLocation BLAZING_COATING = SolarFlux.id("blazing_coating");
+	public static final ResourceLocation EMERALD_GLASS = SolarFlux.id("emerald_glass");
+	public static final ResourceLocation ENDER_GLASS = SolarFlux.id("ender_glass");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_1 = SolarFlux.id("photovoltaic_cell_1");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_2 = SolarFlux.id("photovoltaic_cell_2");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_3 = SolarFlux.id("photovoltaic_cell_3");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_4 = SolarFlux.id("photovoltaic_cell_4");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_5 = SolarFlux.id("photovoltaic_cell_5");
+	public static final ResourceLocation PHOTOVOLTAIC_CELL_6 = SolarFlux.id("photovoltaic_cell_6");
+	public static final ResourceLocation BLANK_UPGRADE = SolarFlux.id("blank_upgrade");
 	
-	public static final ResourceLocation SOLAR_PANEL_1 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_1");
-	public static final ResourceLocation SOLAR_PANEL_2 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_2");
-	public static final ResourceLocation SOLAR_PANEL_3 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_3");
-	public static final ResourceLocation SOLAR_PANEL_4 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_4");
-	public static final ResourceLocation SOLAR_PANEL_5 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_5");
-	public static final ResourceLocation SOLAR_PANEL_6 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_6");
-	public static final ResourceLocation SOLAR_PANEL_7 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_7");
-	public static final ResourceLocation SOLAR_PANEL_8 = new ResourceLocation(InfoSF.MOD_ID, "solar_panel_8");
+	public static final ResourceLocation SOLAR_PANEL_1 = SolarFlux.id("solar_panel_1");
+	public static final ResourceLocation SOLAR_PANEL_2 = SolarFlux.id("solar_panel_2");
+	public static final ResourceLocation SOLAR_PANEL_3 = SolarFlux.id("solar_panel_3");
+	public static final ResourceLocation SOLAR_PANEL_4 = SolarFlux.id("solar_panel_4");
+	public static final ResourceLocation SOLAR_PANEL_5 = SolarFlux.id("solar_panel_5");
+	public static final ResourceLocation SOLAR_PANEL_6 = SolarFlux.id("solar_panel_6");
+	public static final ResourceLocation SOLAR_PANEL_7 = SolarFlux.id("solar_panel_7");
+	public static final ResourceLocation SOLAR_PANEL_8 = SolarFlux.id("solar_panel_8");
 	
-	public static final ResourceLocation EFFICIENCY_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "efficiency_upgrade");
-	public static final ResourceLocation TRANSFER_RATE_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "transfer_rate_upgrade");
-	public static final ResourceLocation TRAVERSAL_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "traversal_upgrade");
-	public static final ResourceLocation DISPERSIVE_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "dispersive_upgrade");
-	public static final ResourceLocation BLOCK_CHARGING_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "block_charging_upgrade");
-	public static final ResourceLocation FURNACE_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "furnace_upgrade");
-	public static final ResourceLocation CAPACITY_UPGRADE = new ResourceLocation(InfoSF.MOD_ID, "capacity_upgrade");
+	public static final ResourceLocation EFFICIENCY_UPGRADE = SolarFlux.id("efficiency_upgrade");
+	public static final ResourceLocation TRANSFER_RATE_UPGRADE = SolarFlux.id("transfer_rate_upgrade");
+	public static final ResourceLocation TRAVERSAL_UPGRADE = SolarFlux.id("traversal_upgrade");
+	public static final ResourceLocation DISPERSIVE_UPGRADE = SolarFlux.id("dispersive_upgrade");
+	public static final ResourceLocation BLOCK_CHARGING_UPGRADE = SolarFlux.id("block_charging_upgrade");
+	public static final ResourceLocation FURNACE_UPGRADE = SolarFlux.id("furnace_upgrade");
+	public static final ResourceLocation CAPACITY_UPGRADE = SolarFlux.id("capacity_upgrade");
 	
 	public static void indexRecipes()
 	{

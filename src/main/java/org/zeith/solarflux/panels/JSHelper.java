@@ -6,6 +6,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.items.JSItem;
 
 import java.util.*;
@@ -37,21 +38,21 @@ public class JSHelper
 	
 	public static ItemLike item(String id)
 	{
-		return () -> BuiltInRegistries.ITEM.get(new ResourceLocation(id));
+		return () -> BuiltInRegistries.ITEM.get(Resources.location(id));
 	}
 	
 	public static ItemLike item(String mod, String id)
 	{
-		return () -> BuiltInRegistries.ITEM.get(new ResourceLocation(mod, id));
+		return () -> BuiltInRegistries.ITEM.get(Resources.location(mod, id));
 	}
 	
 	public static Supplier<TagKey<Item>> tag(String id)
 	{
-		return () -> ItemTags.create(new ResourceLocation(id));
+		return () -> ItemTags.create(Resources.location(id));
 	}
 	
 	public static Supplier<TagKey<Item>> tag(String mod, String id)
 	{
-		return () -> ItemTags.create(new ResourceLocation(mod, id));
+		return () -> ItemTags.create(Resources.location(mod, id));
 	}
 }

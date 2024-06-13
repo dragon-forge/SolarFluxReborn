@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 import org.zeith.hammerlib.client.screen.ScreenWTFMojang;
 import org.zeith.hammerlib.client.utils.FXUtils;
 import org.zeith.hammerlib.client.utils.RenderUtils;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.block.SolarPanelTile;
 import org.zeith.solarflux.container.SolarPanelContainer;
 import org.zeith.solarflux.util.ComplexProgressManager;
@@ -21,8 +22,8 @@ import java.util.List;
 public class SolarPanelScreen
 		extends ScreenWTFMojang<SolarPanelContainer>
 {
-	private static final ResourceLocation ELEMENTS = new ResourceLocation("solarflux", "textures/gui/elements.png");
-	private static final ResourceLocation TEXTURE = new ResourceLocation("solarflux", "textures/gui/solar.png");
+	private static final ResourceLocation ELEMENTS = Resources.location("solarflux", "textures/gui/elements.png");
+	private static final ResourceLocation TEXTURE = Resources.location("solarflux", "textures/gui/solar.png");
 	private static final int GAUGE_WIDTH = 18;
 	private static final int GAUGE_HEIGHT = 50;
 	private static final int GAUGE_INNER_WIDTH = GAUGE_WIDTH - 2;

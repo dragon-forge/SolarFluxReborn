@@ -3,7 +3,6 @@ package org.zeith.solarflux.items;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
-import org.zeith.solarflux.InfoSF;
 import org.zeith.solarflux.SolarFlux;
 
 import java.util.HashMap;
@@ -91,7 +90,7 @@ public class JSItem
 		public JSItem create()
 		{
 			if(item != null) return item;
-			item = SolarFlux.ITEM_GROUP.add(new JSItem(new ResourceLocation(InfoSF.MOD_ID, name), new Item.Properties(), langs));
+			item = SolarFlux.ITEM_GROUP.add(new JSItem(SolarFlux.id(name), new Item.Properties(), langs));
 			return item;
 		}
 		

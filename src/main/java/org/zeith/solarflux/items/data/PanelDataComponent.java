@@ -10,6 +10,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
+import org.zeith.hammerlib.api.registrars.Registrar;
 
 import java.util.List;
 
@@ -45,11 +46,10 @@ public record PanelDataComponent(long energy, List<ItemStack> upgrades, List<Ite
 	);
 	
 	@RegistryName("solar_panel")
-	public static final DataComponentType<PanelDataComponent> TYPE = DataComponentType.<PanelDataComponent>builder()
+	public static final Registrar<DataComponentType<PanelDataComponent>> TYPE = Registrar.dataComponentType(DataComponentType.<PanelDataComponent>builder()
 			.persistent(CODEC)
 			.networkSynchronized(STREAM_CODEC)
-			.cacheEncoding()
-			.build();
+			.cacheEncoding());
 	
 	public boolean isEmpty()
 	{

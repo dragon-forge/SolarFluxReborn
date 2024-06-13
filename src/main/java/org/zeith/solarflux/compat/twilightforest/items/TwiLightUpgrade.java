@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.dimension.DimensionType;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
 import org.zeith.hammerlib.compat.base.Ability;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.items.upgrades._base.ISunIntensityMod;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
@@ -18,7 +19,7 @@ public class TwiLightUpgrade
 		extends UpgradeItem
 		implements ISunIntensityMod
 {
-	public static final ResourceKey<DimensionType> TWILIGHT_DIM_TYPE = ResourceKey.create(Registries.DIMENSION_TYPE, new ResourceLocation("twilightforest", "twilight_forest_type"));
+	public static final ResourceKey<DimensionType> TWILIGHT_DIM_TYPE = ResourceKey.create(Registries.DIMENSION_TYPE, Resources.location("twilightforest", "twilight_forest_type"));
 	
 	public TwiLightUpgrade()
 	{

@@ -23,7 +23,7 @@ public class SolarPanelBlockItem
 	public SolarPanelBlockItem(SolarPanelBlock blockIn, Properties builder)
 	{
 		super(blockIn, builder
-				.component(PanelDataComponent.TYPE, PanelDataComponent.EMPTY)
+				.component(PanelDataComponent.TYPE.get(), PanelDataComponent.EMPTY)
 		);
 		this.panelBlock = blockIn;
 	}
@@ -36,7 +36,7 @@ public class SolarPanelBlockItem
 		tooltip.add(Component.literal(I18n.get("info.solarflux.energy.transfer", panelBlock.panel.getPanelData().transfer)).withStyle(ChatFormatting.GRAY));
 		tooltip.add(Component.literal(I18n.get("info.solarflux.energy.capacity", panelBlock.panel.getPanelData().capacity)).withStyle(ChatFormatting.GRAY));
 		
-		PanelDataComponent com = stack.get(PanelDataComponent.TYPE);
+		PanelDataComponent com = stack.get(PanelDataComponent.TYPE.get());
 		if(com == null || com.isEmpty()) return;
 		
 		tooltip.add(Component.literal(I18n.get("info.solarflux.contentretained")).withStyle(s -> s.withItalic(true).withColor(0x009BB4)));

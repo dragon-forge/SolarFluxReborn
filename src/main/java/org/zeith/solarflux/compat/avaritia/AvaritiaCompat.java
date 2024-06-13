@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import org.zeith.hammerlib.compat.base.BaseCompat;
 import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -65,7 +66,7 @@ public class AvaritiaCompat
 		try
 		{
 			Map<String, Item> itemMap = new HashMap<>();
-			Function<String, Item> aItemF = k -> BuiltInRegistries.ITEM.get(new ResourceLocation("avaritia", k));
+			Function<String, Item> aItemF = k -> BuiltInRegistries.ITEM.get(Resources.location("avaritia", k));
 			Function<String, Item> item = key -> itemMap.computeIfAbsent(key, aItemF);
 			
 			extremeShaped(e)

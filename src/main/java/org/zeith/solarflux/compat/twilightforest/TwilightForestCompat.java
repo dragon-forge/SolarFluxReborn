@@ -6,7 +6,9 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import org.zeith.hammerlib.compat.base.BaseCompat;
 import org.zeith.hammerlib.compat.base.CompatContext;
+import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.ItemsSF;
@@ -63,14 +65,14 @@ public class TwilightForestCompat
 	@Override
 	public void registerRecipes(RegisterRecipesEvent e)
 	{
-		var fieryBlock = ItemTags.create(new ResourceLocation("forge", "storage_blocks/fiery"));
-		var carminiteItem = ItemTags.create(new ResourceLocation("forge", "gems/carminite"));
-		var ironwoodBlock = ItemTags.create(new ResourceLocation("forge", "storage_blocks/ironwood"));
-		var ironwoodIngot = ItemTags.create(new ResourceLocation("forge", "ingots/ironwood"));
-		var fieryIngot = ItemTags.create(new ResourceLocation("forge", "ingots/fiery"));
-		var knightmetal = ItemTags.create(new ResourceLocation("forge", "ingots/knightmetal"));
-		var steeleaf = ItemTags.create(new ResourceLocation("forge", "ingots/steeleaf"));
-		var torchberries = BuiltInRegistries.ITEM.get(new ResourceLocation("twilightforest", "torchberries"));
+		var fieryBlock = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "storage_blocks/fiery"));
+		var carminiteItem = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "gems/carminite"));
+		var ironwoodBlock = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "storage_blocks/ironwood"));
+		var ironwoodIngot = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "ingots/ironwood"));
+		var fieryIngot = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "ingots/fiery"));
+		var knightmetal = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "ingots/knightmetal"));
+		var steeleaf = ItemTags.create(Resources.location(RecipeHelper.NEOFORGE_MOD_ID_FOR_TAGS, "ingots/steeleaf"));
+		var torchberries = BuiltInRegistries.ITEM.get(Resources.location("twilightforest", "torchberries"));
 		
 		e.shaped()
 				.id(twiLightUpgradeRecipe)

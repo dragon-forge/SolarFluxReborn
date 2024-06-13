@@ -19,6 +19,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 import org.zeith.hammerlib.client.model.*;
 import org.zeith.hammerlib.util.java.Cast;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.block.SolarPanelBlock;
 
 import java.util.ArrayList;
@@ -34,19 +35,19 @@ public class SolarPanelItemModel
 	
 	public SolarPanelItemModel(JsonObject obj, JsonDeserializationContext context)
 	{
-		this.block = Cast.optionally(BuiltInRegistries.BLOCK.get(new ResourceLocation(GsonHelper.getAsString(obj, "panel"))), SolarPanelBlock.class)
+		this.block = Cast.optionally(BuiltInRegistries.BLOCK.get(Resources.location(GsonHelper.getAsString(obj, "panel"))), SolarPanelBlock.class)
 				.orElseThrow(() -> new JsonSyntaxException("Unable to find solar panel block by id '" + GsonHelper.getAsString(obj, "panel") + "'"));
 		
 		var registryName = BuiltInRegistries.BLOCK.getKey(block);
 		
-		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_base"));
-		topTx = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_top"));
+		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_base"));
+		topTx = new Material(InventoryMenu.BLOCK_ATLAS, Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_top"));
 	}
 	
 	@Override
-	public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides, ResourceLocation modelLocation)
+	public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides)
 	{
-		return new Baked(block, spriteGetter.apply(topTx), spriteGetter.apply(baseTx), modelLocation);
+		return new Baked(block, spriteGetter.apply(topTx), spriteGetter.apply(baseTx));
 	}
 	
 	private static class Baked
@@ -54,16 +55,14 @@ public class SolarPanelItemModel
 	{
 		public static final FaceBakery COOKER = new FaceBakery();
 		
-		public final ResourceLocation modelName;
 		public final SolarPanelBlock block;
 		public final TextureAtlasSprite top, base;
 		
-		public Baked(SolarPanelBlock block, TextureAtlasSprite top, TextureAtlasSprite base, ResourceLocation modelName)
+		public Baked(SolarPanelBlock block, TextureAtlasSprite top, TextureAtlasSprite base)
 		{
 			this.block = block;
 			this.top = top;
 			this.base = base;
-			this.modelName = modelName;
 		}
 		
 		@Override
@@ -84,7 +83,7 @@ public class SolarPanelItemModel
 									16,
 									16
 							}, 4)),
-							side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
@@ -99,7 +98,7 @@ public class SolarPanelItemModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
@@ -114,7 +113,7 @@ public class SolarPanelItemModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
@@ -124,7 +123,7 @@ public class SolarPanelItemModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
@@ -134,7 +133,7 @@ public class SolarPanelItemModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
@@ -144,7 +143,7 @@ public class SolarPanelItemModel
 									1,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
@@ -154,7 +153,7 @@ public class SolarPanelItemModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
@@ -164,7 +163,7 @@ public class SolarPanelItemModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 					
 					quads.add(COOKER.bakeQuad( //
 							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
@@ -174,7 +173,7 @@ public class SolarPanelItemModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
+							base, side, BlockModelRotation.X0_Y0, null, true));
 				}
 			return quads;
 		}

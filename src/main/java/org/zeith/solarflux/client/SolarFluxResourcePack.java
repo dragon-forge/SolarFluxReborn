@@ -10,6 +10,7 @@ import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
@@ -67,12 +68,12 @@ public class SolarFluxResourcePack
 		{
 			ResourceLocation reg = i.getRegistryName();
 			
-			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
+			ResourceLocation models_item = Resources.location(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
 			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":item/materials/" + reg.getPath() + "\"}}"));
 			
 			File items = new File(textures, "item");
-			ResourceLocation textures_items = new ResourceLocation(reg.getNamespace(), "textures/item/materials/" + reg.getPath() + ".png");
+			ResourceLocation textures_items = Resources.location(reg.getNamespace(), "textures/item/materials/" + reg.getPath() + ".png");
 			{
 				resourceMap.put(textures_items, ofFile(new File(items, reg.getPath() + ".png")));
 			}
@@ -83,9 +84,9 @@ public class SolarFluxResourcePack
 			SolarPanelBlock blk = si.getBlock();
 			ResourceLocation reg = BuiltInRegistries.BLOCK.getKey(blk);
 			
-			ResourceLocation blockstate = new ResourceLocation(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
-			ResourceLocation models_block = new ResourceLocation(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
-			ResourceLocation models_item = new ResourceLocation(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
+			ResourceLocation blockstate = Resources.location(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
+			ResourceLocation models_block = Resources.location(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
+			ResourceLocation models_item = Resources.location(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
 			resourceMap.put(blockstate, ofText("{\"variants\":{\"\":{\"model\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}}}"));
 			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}"));
@@ -100,10 +101,10 @@ public class SolarFluxResourcePack
 			{
 				File blocks = new File(textures, "block");
 				
-				ResourceLocation textures_blocks_base = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png");
-				ResourceLocation textures_blocks_top = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png");
-				ResourceLocation textures_blocks_base_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png.mcmeta");
-				ResourceLocation textures_blocks_top_mcmeta = new ResourceLocation(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png.mcmeta");
+				ResourceLocation textures_blocks_base = Resources.location(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png");
+				ResourceLocation textures_blocks_top = Resources.location(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png");
+				ResourceLocation textures_blocks_base_mcmeta = Resources.location(reg.getNamespace(), "textures/block/" + reg.getPath() + "_base.png.mcmeta");
+				ResourceLocation textures_blocks_top_mcmeta = Resources.location(reg.getNamespace(), "textures/block/" + reg.getPath() + "_top.png.mcmeta");
 				{
 					String n = reg.getPath().startsWith("sp_custom_") ? reg.getPath().substring(10) : reg.getPath().substring(3);
 					

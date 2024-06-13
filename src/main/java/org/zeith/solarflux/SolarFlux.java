@@ -28,6 +28,7 @@ import org.zeith.hammerlib.core.adapter.LanguageAdapter;
 import org.zeith.hammerlib.event.fml.FMLFingerprintCheckEvent;
 import org.zeith.hammerlib.proxy.HLConstants;
 import org.zeith.hammerlib.util.CommonMessages;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.client.SolarFluxResourcePack;
 import org.zeith.solarflux.client.SolarPanelBakedModel;
 import org.zeith.solarflux.compat._base.SFCompatList;
@@ -46,7 +47,7 @@ public class SolarFlux
 	public static final SFRCommonProxy PROXY = IProxy.create(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
 	
 	@CreativeTab.RegisterTab
-	public static final CreativeTab ITEM_GROUP = new CreativeTab(new ResourceLocation(InfoSF.MOD_ID, "root"),
+	public static final CreativeTab ITEM_GROUP = new CreativeTab(Resources.location(InfoSF.MOD_ID, "root"),
 			b -> b
 					.icon(ItemsSF.PHOTOVOLTAIC_CELL_3::getDefaultInstance)
 					.title(Component.translatable("itemGroup." + MOD_ID))
@@ -75,7 +76,7 @@ public class SolarFlux
 	
 	public static ResourceLocation id(String s)
 	{
-		return new ResourceLocation(MOD_ID, s);
+		return Resources.location(MOD_ID, s);
 	}
 	
 	@SubscribeEvent

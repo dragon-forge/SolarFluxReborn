@@ -21,8 +21,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.data.ModelProperty;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
@@ -45,7 +43,8 @@ import org.zeith.solarflux.items.data.PanelDataComponent;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
 import org.zeith.solarflux.net.PacketRequestSolarIntensity;
-import org.zeith.solarflux.panels.*;
+import org.zeith.solarflux.panels.SolarPanel;
+import org.zeith.solarflux.panels.SolarPanelInstance;
 import org.zeith.solarflux.util.BlockPosFace;
 
 import java.util.*;
@@ -531,7 +530,7 @@ public class SolarPanelTile
 		long reducedEnergy = energy - Math.round(energy * SolarPanelsSF.LOOSE_ENERGY / 100D);
 		if(reducedEnergy > 0 || !chargeInventory.isEmpty() || !upgradeInventory.isEmpty())
 		{
-			stack.set(PanelDataComponent.TYPE, new PanelDataComponent(
+			stack.set(PanelDataComponent.TYPE.get(), new PanelDataComponent(
 					reducedEnergy,
 					List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList()),
 					List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList())
@@ -560,14 +559,14 @@ public class SolarPanelTile
 	protected void applyImplicitComponents(DataComponentInput input)
 	{
 		super.applyImplicitComponents(input);
-		loadFromItem(input.getOrDefault(PanelDataComponent.TYPE, PanelDataComponent.EMPTY));
+		loadFromItem(input.getOrDefault(PanelDataComponent.TYPE.get(), PanelDataComponent.EMPTY));
 	}
 	
 	@Override
 	protected void collectImplicitComponents(DataComponentMap.Builder builder)
 	{
 		super.collectImplicitComponents(builder);
-		builder.set(PanelDataComponent.TYPE, saveToComponent());
+		builder.set(PanelDataComponent.TYPE.get(), saveToComponent());
 	}
 	
 	@Override

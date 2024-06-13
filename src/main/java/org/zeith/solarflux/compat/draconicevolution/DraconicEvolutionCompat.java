@@ -9,6 +9,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import org.zeith.hammerlib.compat.base.BaseCompat;
 import org.zeith.hammerlib.compat.base.CompatContext;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -78,7 +79,7 @@ public class DraconicEvolutionCompat
 	{
 		try
 		{
-			Function<String, Item> items = (id) -> BuiltInRegistries.ITEM.get(new ResourceLocation("draconicevolution", id));
+			Function<String, Item> items = (id) -> BuiltInRegistries.ITEM.get(Resources.location("draconicevolution", id));
 			
 			var chaoticCore = items.apply("chaotic_core");
 			var awakenedCore = items.apply("awakened_core");

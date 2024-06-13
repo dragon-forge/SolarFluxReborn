@@ -5,7 +5,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -14,7 +13,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.BlockAndTintGetter;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.IDynamicBakedModel;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -22,9 +20,8 @@ import net.neoforged.neoforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.zeith.solarflux.InfoSF;
+import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.block.SolarPanelTile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +34,6 @@ public class SolarPanelBakedModel
 	public static final FaceBakery COOKER = new FaceBakery();
 	public final SolarPanelBlock block;
 	public final ResourceLocation registryName;
-	final ResourceLocation modelName = new ModelResourceLocation(InfoSF.MOD_ID, "solar_panel", "");
 	
 	public static final ModelProperty<BlockAndTintGetter> WORLD_PROP = new ModelProperty<>();
 	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
@@ -71,7 +67,7 @@ public class SolarPanelBakedModel
 								16,
 								16
 						}, 4)), //
-						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName
+						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true
 				));
 				
 				// world/pos not set? no connected textures == no crash!
@@ -94,7 +90,7 @@ public class SolarPanelBakedModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(east = world.getBlockState(pos.east()).getBlock() != block)
@@ -111,7 +107,7 @@ public class SolarPanelBakedModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(north = world.getBlockState(pos.north()).getBlock() != block)
@@ -123,7 +119,7 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(south = world.getBlockState(pos.south()).getBlock() != block)
@@ -135,7 +131,7 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block)
@@ -147,7 +143,7 @@ public class SolarPanelBakedModel
 									1,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block)
@@ -159,7 +155,7 @@ public class SolarPanelBakedModel
 									16,
 									1
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block)
@@ -171,7 +167,7 @@ public class SolarPanelBakedModel
 									16,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 				
 				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block)
@@ -183,7 +179,7 @@ public class SolarPanelBakedModel
 									1,
 									16
 							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName
+							base, side, BlockModelRotation.X0_Y0, null, true
 					));
 			}
 		return quads;
@@ -243,14 +239,14 @@ public class SolarPanelBakedModel
 	public TextureAtlasSprite t_base()
 	{
 		if(baseTx == null)
-			baseTx = new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_base");
+			baseTx = Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_base");
 		return spriteGetter.apply(baseTx);
 	}
 	
 	public TextureAtlasSprite t_top()
 	{
 		if(topTx == null)
-			topTx = new ResourceLocation(registryName.getNamespace(), "block/" + registryName.getPath() + "_top");
+			topTx = Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_top");
 		return spriteGetter.apply(topTx);
 	}
 	
