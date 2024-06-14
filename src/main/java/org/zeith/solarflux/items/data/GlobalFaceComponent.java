@@ -9,6 +9,7 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.network.codec.StreamCodec;
 import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
+import org.zeith.hammerlib.api.registrars.Registrar;
 
 @SimplyRegister
 public record GlobalFaceComponent(GlobalPos pos, Direction dir)
@@ -27,9 +28,8 @@ public record GlobalFaceComponent(GlobalPos pos, Direction dir)
 	);
 	
 	@RegistryName("global_face")
-	public static final DataComponentType<GlobalFaceComponent> TYPE = DataComponentType.<GlobalFaceComponent>builder()
+	public static final Registrar<DataComponentType<GlobalFaceComponent>> TYPE = Registrar.dataComponentType(DataComponentType.<GlobalFaceComponent>builder()
 			.persistent(CODEC)
 			.networkSynchronized(STREAM_CODEC)
-			.cacheEncoding()
-			.build();
+			.cacheEncoding());
 }

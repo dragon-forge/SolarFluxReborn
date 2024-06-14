@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
+import org.zeith.hammerlib.api.items.coms.CustomGlintComponent;
+import org.zeith.hammerlib.core.init.ComponentTypesHL;
 import org.zeith.solarflux.api.IFurnaceBlockEntity;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.init.ItemsSF;
@@ -29,7 +31,11 @@ public class ItemBlockChargingUpgrade
 {
 	public ItemBlockChargingUpgrade()
 	{
-		super(new Properties().stacksTo(1).component(GlobalFaceComponent.TYPE, null));
+		super(new Properties()
+				.stacksTo(1)
+				.component(GlobalFaceComponent.TYPE.get(), null)
+				.component(ComponentTypesHL.CUSTOM_GLINT.get(), CustomGlintComponent.fixedColor(0xFF_11FF22))
+		);
 	}
 	
 	@Override
@@ -37,7 +43,7 @@ public class ItemBlockChargingUpgrade
 	{
 		super.appendHoverText(stack, worldIn, tooltip, flagIn);
 		
-		var face = stack.get(GlobalFaceComponent.TYPE);
+		var face = stack.get(GlobalFaceComponent.TYPE.get());
 		if(face == null) return;
 		
 		tooltip.add(Component.literal("Dimension: " + face.pos().dimension().location()));
@@ -57,7 +63,7 @@ public class ItemBlockChargingUpgrade
 		if(tile instanceof IFurnaceBlockEntity furnace && context.getClickedFace() == furnace.getSideForSolarPanel())
 		{
 			ItemStack held = context.getItemInHand();
-			held.set(GlobalFaceComponent.TYPE, new GlobalFaceComponent(GlobalPos.of(level.dimension(), pos), context.getClickedFace()));
+			held.set(GlobalFaceComponent.TYPE.get(), new GlobalFaceComponent(GlobalPos.of(level.dimension(), pos), context.getClickedFace()));
 			level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
 			return InteractionResult.SUCCESS;
 		}
@@ -66,7 +72,7 @@ public class ItemBlockChargingUpgrade
 		if(estorage != null && estorage.canReceive())
 		{
 			ItemStack held = context.getItemInHand();
-			held.set(GlobalFaceComponent.TYPE, new GlobalFaceComponent(GlobalPos.of(level.dimension(), pos), context.getClickedFace()));
+			held.set(GlobalFaceComponent.TYPE.get(), new GlobalFaceComponent(GlobalPos.of(level.dimension(), pos), context.getClickedFace()));
 			level.playSound(null, pos, SoundEvents.PLAYER_LEVELUP, SoundSource.PLAYERS, .25F, 1.8F);
 			return InteractionResult.SUCCESS;
 		}
@@ -77,13 +83,13 @@ public class ItemBlockChargingUpgrade
 	@Override
 	public boolean isFoil(ItemStack stack)
 	{
-		return stack.has(GlobalFaceComponent.TYPE);
+		return stack.has(GlobalFaceComponent.TYPE.get());
 	}
 	
 	@Override
 	public boolean canInstall(ISolarPanelTile tile, ItemStack stack, SimpleInventory upgradeInv)
 	{
-		var face = stack.get(GlobalFaceComponent.TYPE);
+		var face = stack.get(GlobalFaceComponent.TYPE.get());
 		
 		BlockPos pos;
 		return face != null
@@ -102,7 +108,7 @@ public class ItemBlockChargingUpgrade
 	@Override
 	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
 	{
-		var face = stack.get(GlobalFaceComponent.TYPE);
+		var face = stack.get(GlobalFaceComponent.TYPE.get());
 		if(face == null || tile.level().getDayTime() % 20L != 0L) return;
 		
 		BlockPos pos = face.pos().pos();

@@ -3,7 +3,7 @@ mod_version=21.0.0
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=21.0.0
+hl_version=21.0.1
 
 jei_mc_version=1.20.4
 jei_version=17.3.0.49
