@@ -14,8 +14,8 @@ import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.panels.JSHelper;
 
 import java.io.*;
 import java.util.*;
@@ -64,7 +64,7 @@ public class SolarFluxResourcePack
 		
 		File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 		
-		ItemsSF.JS_MATERIALS.forEach(i ->
+		JSHelper.JS_MATERIALS.forEach(i ->
 		{
 			ResourceLocation reg = i.getRegistryName();
 			

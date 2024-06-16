@@ -1,6 +1,9 @@
 {
-	"parent": "item/generated",
-	"textures": {
-		"layer0": "solarflux:item/blazing_coating"
+	"loader": "hammerlib:emissive",
+	"inline_parent": {
+		"parent": "item/generated",
+		"textures": {
+			"layer0": "solarflux:item/blazing_coating"
+		}
 	}
 }

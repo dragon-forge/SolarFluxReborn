@@ -1,12 +1,11 @@
 package org.zeith.solarflux.proxy;
 
-import net.neoforged.neoforge.common.NeoForge;
 import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.api.proxy.IClientProxy;
 import org.zeith.hammerlib.event.LanguageReloadEvent;
-import org.zeith.solarflux.init.ItemsSF;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.items.JSItem;
+import org.zeith.solarflux.panels.JSHelper;
 
 public class SFRClientProxy
 		extends SFRCommonProxy
@@ -19,7 +18,7 @@ public class SFRClientProxy
 	
 	public void reloadLangs(LanguageReloadEvent e)
 	{
-		for(JSItem mat : ItemsSF.JS_MATERIALS)
+		for(JSItem mat : JSHelper.JS_MATERIALS)
 		{
 			e.translate(mat.getDescriptionId(), mat.getLang().getName(e.getLang()));
 		}

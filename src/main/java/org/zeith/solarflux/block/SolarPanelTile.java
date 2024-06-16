@@ -59,11 +59,11 @@ public class SolarPanelTile
 	public static void capabilities(RegisterCapabilitiesEvent e)
 	{
 		e.registerBlockEntity(Capabilities.EnergyStorage.BLOCK, TilesSF.SOLAR_PANEL,
-				(SolarPanelTile object, @Nullable Direction context) -> object
+				(SolarPanelTile object, Direction context) -> object
 		);
 		
 		e.registerBlockEntity(Capabilities.ItemHandler.BLOCK, TilesSF.SOLAR_PANEL,
-				(SolarPanelTile object, @Nullable Direction context) -> object.chargeInventory
+				(SolarPanelTile object, Direction context) -> object.chargeInventory
 		);
 	}
 	

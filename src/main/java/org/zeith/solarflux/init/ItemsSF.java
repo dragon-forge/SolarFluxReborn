@@ -7,7 +7,6 @@ import org.zeith.hammerlib.annotations.RegistryName;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.CommonMessages;
 import org.zeith.solarflux.SolarFlux;
-import org.zeith.solarflux.items.JSItem;
 import org.zeith.solarflux.items.upgrades.*;
 import org.zeith.solarflux.panels.JSHelper;
 
@@ -17,8 +16,6 @@ import java.util.function.BiConsumer;
 @SimplyRegister
 public interface ItemsSF
 {
-	List<JSItem> JS_MATERIALS = JSHelper.JS_MATERIALS;
-	
 	@RegistryName("mirror")
 	Item MIRROR = newMaterial();
 	
