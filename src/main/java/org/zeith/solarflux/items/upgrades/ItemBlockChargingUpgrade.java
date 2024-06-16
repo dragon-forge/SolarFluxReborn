@@ -33,8 +33,8 @@ public class ItemBlockChargingUpgrade
 	{
 		super(new Properties()
 				.stacksTo(1)
-				.component(GlobalFaceComponent.TYPE.get(), null)
-				.component(ComponentTypesHL.CUSTOM_GLINT.get(), CustomGlintComponent.fixedColor(0xFF_11FF22))
+				.component(GlobalFaceComponent.TYPE, null)
+				.component(ComponentTypesHL.CUSTOM_GLINT, CustomGlintComponent.fixedColor(0xFF_11FF22))
 		);
 	}
 	

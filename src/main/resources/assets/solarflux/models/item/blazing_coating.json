@@ -2,6 +2,7 @@
 	"loader": "hammerlib:emissive",
 	"inline_parent": {
 		"parent": "item/generated",
+		"ambientocclusion": false,
 		"textures": {
 			"layer0": "solarflux:item/blazing_coating"
 		}
