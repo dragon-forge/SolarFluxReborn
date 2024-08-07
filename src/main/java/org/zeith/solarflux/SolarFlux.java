@@ -17,8 +17,8 @@ import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zeith.hammerlib.api.items.CreativeTab;
 import org.zeith.hammerlib.api.proxy.IProxy;
 import org.zeith.hammerlib.client.adapter.ResourcePackAdapter;
@@ -43,7 +43,7 @@ import org.zeith.solarflux.proxy.SFRCommonProxy;
 public class SolarFlux
 {
 	public static final String MOD_ID = "solarflux";
-	public static final Logger LOG = LogManager.getLogger();
+	public static final Logger LOG = LoggerFactory.getLogger(SolarFlux.class);
 	public static final SFRCommonProxy PROXY = IProxy.create(() -> SFRClientProxy::new, () -> SFRCommonProxy::new);
 	
 	@CreativeTab.RegisterTab
@@ -100,7 +100,7 @@ public class SolarFlux
 	{
 		if(e.getEntity() instanceof ServerPlayer sp)
 		{
-			LOG.info("Sending solar panels to " + sp.getGameProfile().getName() + ".");
+			LOG.info("Sending solar panels to {}.", sp.getGameProfile().getName());
 			PacketSyncPanelData.sendAllPanels(sp);
 		}
 	}

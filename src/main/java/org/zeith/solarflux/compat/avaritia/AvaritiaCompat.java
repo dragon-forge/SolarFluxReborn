@@ -95,7 +95,7 @@ public class AvaritiaCompat
 					.registerIf(SolarPanelsSF::isRecipeActive);
 		} catch(LinkageError error)
 		{
-			SolarFlux.LOG.fatal("Failed to register Avaritia recipes!", error);
+			SolarFlux.LOG.error("Failed to register Avaritia recipes!", error);
 		}
 	}
 	

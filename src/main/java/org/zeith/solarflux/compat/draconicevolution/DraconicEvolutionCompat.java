@@ -118,7 +118,7 @@ public class DraconicEvolutionCompat
 				)), e);
 		} catch(LinkageError | ReflectiveOperationException error)
 		{
-			SolarFlux.LOG.fatal("Failed to register DraconicEvolution recipes!", error);
+			SolarFlux.LOG.error("Failed to register DraconicEvolution recipes!", error);
 		}
 	}
 }

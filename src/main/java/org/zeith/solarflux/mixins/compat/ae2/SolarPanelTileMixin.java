@@ -6,8 +6,7 @@ import appeng.api.networking.energy.IAEPowerStorage;
 import appeng.api.util.INetworkToolAware;
 import appeng.me.helpers.BlockEntityNodeListener;
 import appeng.me.helpers.IGridConnectedBlockEntity;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.context.UseOnContext;
@@ -41,11 +40,6 @@ public abstract class SolarPanelTileMixin
 		extends TileSyncableTickable
 		implements IAEPowerStorage, IGridConnectedBlockEntity, IAE2SolarPanelTile
 {
-	public SolarPanelTileMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
-	{
-		super(type, pos, state);
-	}
-	
 	@Shadow
 	public long energy;
 	
@@ -62,7 +56,13 @@ public abstract class SolarPanelTileMixin
 	@Shadow
 	public abstract SimpleAttributeProperty capacity();
 	
-	private IManagedGridNode mainNode;
+	@Unique
+	private IManagedGridNode ae$mainNode;
+	
+	public SolarPanelTileMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
+	{
+		super(type, pos, state);
+	}
 	
 	@Inject(
 			method = "onConstructed",
@@ -76,10 +76,10 @@ public abstract class SolarPanelTileMixin
 	
 	private void createAe2MainNode()
 	{
-		if(mainNode != null)
-			mainNode.destroy();
+		if(ae$mainNode != null)
+			ae$mainNode.destroy();
 		
-		mainNode = GridHelper.createManagedNode(Cast.cast(this), BlockEntityNodeListener.INSTANCE)
+		ae$mainNode = GridHelper.createManagedNode(Cast.cast(this), BlockEntityNodeListener.INSTANCE)
 				.setVisualRepresentation(getBlockState().getBlock())
 				.setInWorldNode(true)
 				.setExposedOnSides(Arrays.stream(Direction.values()).filter(f -> f != Direction.UP).collect(Collectors.toSet()))
@@ -106,51 +106,49 @@ public abstract class SolarPanelTileMixin
 	
 	@Inject(
 			method = "writeNBT",
-			at = @At("HEAD"),
-			remap = false
+			at = @At("TAIL")
 	)
-	public void writeNBT_AE(CompoundTag nbt, CallbackInfoReturnable<CompoundTag> cir)
+	public void writeNBT_AE(CallbackInfoReturnable<CompoundTag> cir)
 	{
 		CompoundTag ae2 = new CompoundTag();
-		mainNode.saveToNBT(ae2);
-		nbt.put("AEGrid", ae2);
+		ae$mainNode.saveToNBT(ae2);
+		cir.getReturnValue().put("AEGrid", ae2);
 	}
 	
 	@Inject(
 			method = "readNBT",
-			at = @At("TAIL"),
-			remap = false
+			at = @At("TAIL")
 	)
-	public void readNBT_AE(CompoundTag nbt, CallbackInfo ci)
+	public void readNBT_AE(CompoundTag nbt, HolderLookup.Provider provider, CallbackInfo ci)
 	{
 		if(getUpgrades(ContentsSFAE2.ENERGY_UPGRADE) > 0)
 		{
 			createAe2MainNode();
-			mainNode.loadFromNBT(nbt.getCompound("AEGrid"));
+			ae$mainNode.loadFromNBT(nbt.getCompound("AEGrid"));
 		}
 	}
 	
 	public double ae$extractAEPower(double toExtract, Actionable action, PowerMultiplier mult)
 	{
 		if(getUpgrades(ContentsSFAE2.ENERGY_UPGRADE) <= 0) return 0;
-		int fe = (int) Math.min(Math.floor(PowerUnits.AE.convertTo(PowerUnits.FE, toExtract)), Integer.MAX_VALUE - 1);
+		int fe = (int) Math.min(Math.floor(PowerUnit.AE.convertTo(PowerUnit.FE, toExtract)), Integer.MAX_VALUE - 1);
 		fe = extractEnergy(fe, action.isSimulate());
-		return mult.multiply(PowerUnits.FE.convertTo(PowerUnits.AE, fe));
+		return mult.multiply(PowerUnit.FE.convertTo(PowerUnit.AE, fe));
 	}
 	
 	public IManagedGridNode aegrid$getMainNode()
 	{
-		return mainNode;
+		return ae$mainNode;
 	}
 	
 	public double ae$getAECurrentPower()
 	{
-		return PowerUnits.FE.convertTo(PowerUnits.AE, energy);
+		return PowerUnit.FE.convertTo(PowerUnit.AE, energy);
 	}
 	
 	public double ae$getAEMaxPower()
 	{
-		return PowerUnits.FE.convertTo(PowerUnits.AE, capacity().getValue());
+		return PowerUnit.FE.convertTo(PowerUnit.AE, capacity().getValue());
 	}
 	
 	public AccessRestriction ae$getPowerFlow()
@@ -202,16 +200,16 @@ public abstract class SolarPanelTileMixin
 	
 	public void sfr$setConnectedToAENetwork(boolean connected)
 	{
-		var isAe2NodeConnected = mainNode.getNode() != null;
+		var isAe2NodeConnected = ae$mainNode.getNode() != null;
 		if(isAe2NodeConnected != connected)
 		{
 			if(connected)
 			{
 				createAe2MainNode();
-				mainNode.create(level, worldPosition);
+				ae$mainNode.create(level, worldPosition);
 			} else
 			{
-				mainNode.destroy();
+				ae$mainNode.destroy();
 			}
 		}
 	}

@@ -1,7 +1,6 @@
 package org.zeith.solarflux.block;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -612,6 +611,18 @@ public class SolarPanelTile
 		bar.suffix = "%";
 		
 		consumer.addBar(bar);
+	}
+	
+	@Override
+	public CompoundTag writeNBT(CompoundTag nbt, HolderLookup.Provider provider)
+	{
+		return super.writeNBT(nbt, provider);
+	}
+	
+	@Override
+	public void readNBT(CompoundTag nbt, HolderLookup.Provider provider)
+	{
+		super.readNBT(nbt, provider);
 	}
 	
 	public void setDelegate(SolarPanel delegate)
