@@ -112,6 +112,7 @@ public class SolarFlux
 		public static void commonSetup(FMLCommonSetupEvent e)
 		{
 			PROXY.commonSetup();
+			SolarFluxResourcePack.canInit = true;
 		}
 		
 		@SubscribeEvent

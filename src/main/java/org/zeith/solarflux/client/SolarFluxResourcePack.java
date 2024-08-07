@@ -24,6 +24,8 @@ import java.util.function.BooleanSupplier;
 public class SolarFluxResourcePack
 		implements PackResources
 {
+	public static boolean canInit = false;
+	
 	public final Map<ResourceLocation, IResourceStreamSupplier> resourceMap = new HashMap<>();
 	
 	private static IResourceStreamSupplier ofText(String text)
@@ -57,7 +59,7 @@ public class SolarFluxResourcePack
 	
 	public void init()
 	{
-		if(hasInit) return;
+		if(hasInit || !canInit) return;
 		hasInit = true;
 		
 		resourceMap.clear();
