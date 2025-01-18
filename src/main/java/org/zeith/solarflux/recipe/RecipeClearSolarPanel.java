@@ -28,7 +28,7 @@ public class RecipeClearSolarPanel
 	}
 	
 	public static class RecipeClearSolarPanelBuilder
-			extends RecipeBuilder<RecipeClearSolarPanelBuilder, Recipe<?>>
+			extends RecipeBuilder<RecipeClearSolarPanelBuilder>
 	{
 		private final NonNullList<Ingredient> ingredients = NonNullList.create();
 		
@@ -44,12 +44,17 @@ public class RecipeClearSolarPanel
 		}
 		
 		@Override
-		public void register()
+		protected void validate()
 		{
-			validate();
+			super.validate();
 			if(ingredients.isEmpty())
 				throw new IllegalStateException(getClass().getSimpleName() + " does not have any defined ingredients!");
-			event.register(getIdentifier(), new RecipeClearSolarPanel(getIdentifier(), group, result, ingredients));
+		}
+		
+		@Override
+		protected Recipe<?> createRecipe()
+		{
+			return new RecipeClearSolarPanel(getIdentifier(), group, result, ingredients);
 		}
 	}
 }

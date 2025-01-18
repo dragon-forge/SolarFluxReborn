@@ -9,6 +9,8 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.ModList;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
 import org.zeith.hammerlib.core.RecipeHelper;
+import org.zeith.hammerlib.core.js.JsFactory;
+import org.zeith.hammerlib.core.js.parsers.OpenJDKParser;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 
@@ -78,8 +80,10 @@ public class SolarScriptEngine
 
 	public static ScriptEngine newEngine()
 	{
-		// Use openjdk nashorn that forge adds as a library (nashorn-core-15.3.jar)
-		ScriptEngine se = NASHORN_FACTORY.getScriptEngine(SolarScriptEngine::checkClass);
+		ScriptEngine se = NASHORN_FACTORY.getScriptEngine(new String[] {
+				"-doe",
+				"--language=es6"
+		}, getAppClassLoader(), SolarScriptEngine::checkClass);
 		try
 		{
 			se.put("panel", se.eval("function(){return Java.type('" + SolarPanel.class.getName() + "').customBuilder();}"));
@@ -116,5 +120,16 @@ public class SolarScriptEngine
 	static boolean checkClass(String s)
 	{
 		return ALLOWED_CLASSES.get().contains(s);
+	}
+	
+	private static ClassLoader getAppClassLoader()
+	{
+		// Revisit: script engine implementation needs the capability to
+		// find the class loader of the context in which the script engine
+		// is running so that classes will be found and loaded properly
+		return Objects.requireNonNullElseGet(
+				Thread.currentThread().getContextClassLoader(),
+				NashornScriptEngineFactory.class::getClassLoader
+		);
 	}
 }

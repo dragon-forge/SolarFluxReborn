@@ -292,6 +292,7 @@ modrinth {
     versionType = config.release_type
     uploadFile = jar
     gameVersions = [config.mc_version]
+    setChangelog(providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText)
     dependencies {
         def mods = config.required_mods.split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
@@ -351,8 +352,8 @@ curseforge {
     apiKey = System.env.CURSEFORGE_TOKEN != null ? System.env.CURSEFORGE_TOKEN : "NONE"
     project {
         id = config.cf_project
-        changelogType = 'html'
-        changelog = ""
+        changelogType = 'markdown'
+        changelog = file("CHANGELOG.md")
         releaseType = config.release_type
         addGameVersion config.mc_version
         addGameVersion "Forge"

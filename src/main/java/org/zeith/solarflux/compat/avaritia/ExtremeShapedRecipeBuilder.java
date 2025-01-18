@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ExtremeShapedRecipeBuilder
-		extends RecipeBuilder<ExtremeShapedRecipeBuilder, Recipe<?>>
+		extends RecipeBuilder<ExtremeShapedRecipeBuilder>
 {
 	private final Map<Character, Ingredient> dictionary = new HashMap<>();
 	private RecipeShape shape;
@@ -41,14 +41,18 @@ public class ExtremeShapedRecipeBuilder
 	}
 	
 	@Override
-	public void register()
+	protected void validate()
 	{
-		validate();
+		super.validate();
 		if(shape == null)
 			throw new IllegalStateException(getClass().getSimpleName() + " does not have a defined shape!");
 		if(dictionary.isEmpty())
 			throw new IllegalStateException(getClass().getSimpleName() + " does not have any defined ingredients!");
-		var id = getIdentifier();
-		event.register(id, new ExtremeShapedRecipe(id, group, shape.width, shape.height, shape.createIngredientMap(dictionary), result));
+	}
+	
+	@Override
+	protected Recipe<?> createRecipe()
+	{
+		return new ExtremeShapedRecipe(getIdentifier(), group, shape.width, shape.height, shape.createIngredientMap(dictionary), result);
 	}
 }
