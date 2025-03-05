@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=21.4.5
+mod_version=21.4.2
 build_candidate=false
 
 # Persistent mod info
@@ -25,6 +25,9 @@ modrinth_project=4QG5lev4
 
 # alpha, beta, release
 release_type=release
+
+# Git changelog stuff
+last_git_commit=d4e9d1598b9f2a9
 
 # List of mods separated by ;
 # If a specific mod for one platform is needed, @m: or @c: prefixes are used.
