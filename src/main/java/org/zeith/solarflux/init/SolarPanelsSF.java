@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 public class SolarPanelsSF
 {
 	public static final Map<String, SolarPanel> PANELS = new HashMap<>();
+	public static final Map<ResourceLocation, SolarPanel> PANELS_BY_ID = new HashMap<>();
 	
 	public static double LOOSE_ENERGY;
 	public static float RAIN_MULTIPLIER = 0.6F, THUNDER_MULTIPLIER = 0.4F;

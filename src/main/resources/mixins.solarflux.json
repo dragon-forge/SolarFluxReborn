@@ -1,8 +1,7 @@
 {
   "required": true,
-  "minVersion": "0.8.5",
+  "minVersion": "0.8.7",
   "package": "org.zeith.solarflux.mixins",
-  "refmap": "mixins.solarflux.refmap.json",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_21",
   "mixins": [

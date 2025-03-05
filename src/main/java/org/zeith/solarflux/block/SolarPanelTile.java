@@ -457,6 +457,7 @@ public class SolarPanelTile
 	public void resetVoxelShape()
 	{
 		shape = null;
+		requestModelDataUpdate();
 	}
 	
 	public VoxelShape getShape(SolarPanelBlock block)
@@ -464,7 +465,7 @@ public class SolarPanelTile
 		if(shape == null || voxelTimer <= 0)
 		{
 			shape = block.recalcShape(level, worldPosition);
-			voxelTimer = 20;
+			voxelTimer = 2000;
 		}
 		return shape;
 	}

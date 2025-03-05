@@ -67,13 +67,28 @@ public class SolarFluxResourcePack
 		
 		File textures = new File(SolarPanelsSF.CONFIG_DIR, "textures");
 		
+		final String itemModel = """
+				{
+				  "parent": "item/generated",
+				  "textures": {
+				    "layer0": "%s:item/materials/%s"
+				  }
+				}""";
+		
+		final String itemModelData = """
+				{
+				  "model": {
+				    "type": "minecraft:model",
+				    "model": "%s:item/%s"
+				  }
+				}""";
+		
 		JSHelper.JS_MATERIALS.forEach(i ->
 		{
 			ResourceLocation reg = i.getRegistryName();
 			
-			ResourceLocation models_item = Resources.location(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
-			
-			resourceMap.put(models_item, ofText("{\"parent\":\"item/generated\",\"textures\":{\"layer0\":\"" + reg.getNamespace() + ":item/materials/" + reg.getPath() + "\"}}"));
+			resourceMap.put(Resources.location(reg.getNamespace(), "models/item/" + reg.getPath() + ".json"), ofText(itemModel.formatted(reg.getNamespace(), reg.getPath())));
+			resourceMap.put(Resources.location(reg.getNamespace(), "items/" + reg.getPath() + ".json"), ofText(itemModelData.formatted(reg.getNamespace(), reg.getPath())));
 			
 			File items = new File(textures, "item");
 			ResourceLocation textures_items = Resources.location(reg.getNamespace(), "textures/item/materials/" + reg.getPath() + ".png");
@@ -82,6 +97,14 @@ public class SolarFluxResourcePack
 			}
 		});
 		
+		final String blockModelData = """
+				{
+				  "model": {
+				    "type": "minecraft:model",
+				    "model": "%s:block/%s"
+				  }
+				}""";
+		
 		SolarPanelsSF.listPanels().forEach(si ->
 		{
 			SolarPanelBlock blk = si.getBlock();
@@ -89,10 +112,18 @@ public class SolarFluxResourcePack
 			
 			ResourceLocation blockstate = Resources.location(reg.getNamespace(), "blockstates/" + reg.getPath() + ".json");
 			ResourceLocation models_block = Resources.location(reg.getNamespace(), "models/block/" + reg.getPath() + ".json");
-			ResourceLocation models_item = Resources.location(reg.getNamespace(), "models/item/" + reg.getPath() + ".json");
 			
-			resourceMap.put(blockstate, ofText("{\"variants\":{\"\":{\"model\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}}}"));
-			resourceMap.put(models_item, ofText("{\"parent\":\"" + reg.getNamespace() + ":block/" + reg.getPath() + "\"}"));
+			resourceMap.put(blockstate, ofText("""
+					{
+					  "variants": {
+					    "": {
+					      "model": "%s:block/%s"
+					    }
+					  }
+					}""".formatted(reg.getNamespace(), reg.getPath()))
+			);
+			
+			resourceMap.put(Resources.location(reg.getNamespace(), "items/" + reg.getPath() + ".json"), ofText(blockModelData.formatted(reg.getNamespace(), reg.getPath())));
 			
 			// Block Model
 			var blockModel = new JSONObject();
@@ -141,8 +172,9 @@ public class SolarFluxResourcePack
 	@Override
 	public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location)
 	{
+		if(type != PackType.CLIENT_RESOURCES) return null;
+		
 		var res = resourceMap.get(location);
-		SolarFlux.LOG.info("GET SFR RES " + location + " => " + res);
 		if(res == null) return null;
 		
 		if(!res.exists()) return null;

@@ -52,6 +52,8 @@ runs {
     }
 
     client {
+        systemProperty 'hammerlib.flowgui.nocache', 'true'
+
         def args = new ArrayList()
 
         if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {

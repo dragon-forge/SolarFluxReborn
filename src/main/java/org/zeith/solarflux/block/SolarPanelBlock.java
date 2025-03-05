@@ -2,9 +2,10 @@ package org.zeith.solarflux.block;
 
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.*;
-import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.*;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.*;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -19,8 +20,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
+import org.zeith.hammerlib.api.fml.IRegisterListener;
 import org.zeith.hammerlib.api.forge.*;
 import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
+import org.zeith.solarflux.client.SolarPanelModelData;
+import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
@@ -29,7 +33,7 @@ import java.util.stream.Stream;
 
 public class SolarPanelBlock
 		extends BaseEntityBlock
-		implements ICustomBlockItem
+		implements ICustomBlockItem, IRegisterListener
 {
 	public final SolarPanel panel;
 	
@@ -40,7 +44,14 @@ public class SolarPanelBlock
 		super(properties);
 		bindTool();
 		this.panel = panel;
-		this.CODEC = simpleCodec(props -> new SolarPanelBlock(panel, props));;
+		this.CODEC = simpleCodec(props -> new SolarPanelBlock(panel, props)); ;
+	}
+	
+	@Override
+	public void onPostRegistered(ResourceLocation id)
+	{
+		SolarPanelsSF.PANELS_BY_ID.put(id, panel);
+		IRegisterListener.super.onPostRegistered(id);
 	}
 	
 	protected void bindTool()
@@ -92,45 +103,62 @@ public class SolarPanelBlock
 	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston)
 	{
 		super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
-		if(level.getBlockEntity(pos) instanceof SolarPanelTile spt)
-			spt.resetVoxelShape();
+		for(int x = -1; x < 2; x++)
+			for(int z = -1; z < 2; z++)
+				if(level.getBlockEntity(pos.offset(x, 0, z)) instanceof SolarPanelTile spt)
+					spt.resetVoxelShape();
+	}
+	
+	@Override
+	protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess scheduledTickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random)
+	{
+		for(int x = -1; x < 2; x++)
+			for(int z = -1; z < 2; z++)
+				if(level.getBlockEntity(pos.offset(x, 0, z)) instanceof SolarPanelTile spt)
+					spt.resetVoxelShape();
+		return super.updateShape(state, level, scheduledTickAccess, pos, direction, neighborPos, neighborState, random);
 	}
 	
 	public VoxelShape recalcShape(BlockGetter world, BlockPos pos)
 	{
 		var pd = panel.getPanelData();
-		var ph = pd.height;
+		var height = pd.height;
 		
-		VoxelShape baseShape = Shapes.create(0, 0, 0, 1, ph, 1);
+		VoxelShape baseShape = Shapes.create(0, 0, 0, 1, height, 1);
 		Stream.Builder<VoxelShape> shapes = Stream.builder();
 		
-		boolean west = false, east = false, north = false, south = false;
+		if(!(world.getBlockEntity(pos) instanceof SolarPanelTile spt))
+			return baseShape;
 		
-		float h = ph, h2 = h + 0.25F / 16F;
+		SolarPanelModelData data = SolarPanelModelData.findOrItem(spt.getModelData());
 		
-		if(west = world.getBlockState(pos.west()).getBlock() != this)
-			shapes.add(Shapes.create(0, h, 1 / 16F, 1 / 16F, h2, 15 / 16F));
+		boolean west = !data.west(), east = !data.east(), north = !data.north(), south = !data.south();
 		
-		if(east = world.getBlockState(pos.east()).getBlock() != this)
-			shapes.add(Shapes.create(15 / 16F, h, 1 / 16F, 1, h2, 15 / 16F));
+		float h2 = height + 0.25F / 16F;
 		
-		if(north = world.getBlockState(pos.north()).getBlock() != this)
-			shapes.add(Shapes.create(1 / 16F, h, 0, 15 / 16F, h2, 1 / 16F));
+		if(west)
+			shapes.add(Shapes.create(0, height, 1 / 16F, 1 / 16F, h2, 15 / 16F));
 		
-		if(south = world.getBlockState(pos.south()).getBlock() != this)
-			shapes.add(Shapes.create(1 / 16F, h, 15 / 16F, 15 / 16F, h2, 1));
+		if(east)
+			shapes.add(Shapes.create(15 / 16F, height, 1 / 16F, 1, h2, 15 / 16F));
 		
-		if(west || north || world.getBlockState(pos.west().north()).getBlock() != this)
-			shapes.add(Shapes.create(0, h, 0, 1 / 16F, h2, 1 / 16F));
+		if(north)
+			shapes.add(Shapes.create(1 / 16F, height, 0, 15 / 16F, h2, 1 / 16F));
 		
-		if(east || north || world.getBlockState(pos.east().north()).getBlock() != this)
-			shapes.add(Shapes.create(15 / 16F, h, 0, 1, h2, 1 / 16F));
+		if(south)
+			shapes.add(Shapes.create(1 / 16F, height, 15 / 16F, 15 / 16F, h2, 1));
 		
-		if(south || east || world.getBlockState(pos.south().east()).getBlock() != this)
-			shapes.add(Shapes.create(15 / 16F, h, 15 / 16F, 1, h2, 1));
+		if(west || north || !data.westNorth())
+			shapes.add(Shapes.create(0, height, 0, 1 / 16F, h2, 1 / 16F));
 		
-		if(west || south || world.getBlockState(pos.west().south()).getBlock() != this)
-			shapes.add(Shapes.create(0, h, 15 / 16F, 1 / 16F, h2, 1));
+		if(east || north || !data.eastNorth())
+			shapes.add(Shapes.create(15 / 16F, height, 0, 1, h2, 1 / 16F));
+		
+		if(south || east || !data.eastSouth())
+			shapes.add(Shapes.create(15 / 16F, height, 15 / 16F, 1, h2, 1));
+		
+		if(west || south || !data.westSouth())
+			shapes.add(Shapes.create(0, height, 15 / 16F, 1 / 16F, h2, 1));
 		
 		return Shapes.or(baseShape, shapes.build().toArray(VoxelShape[]::new));
 	}
