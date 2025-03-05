@@ -1,22 +1,17 @@
 package org.zeith.solarflux.mixins;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.*;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.WorldlyContainer;
-import net.minecraft.world.inventory.RecipeCraftingHolder;
-import net.minecraft.world.inventory.StackedContentsCompatible;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.*;
 import org.zeith.hammerlib.util.java.Cast;
-import org.zeith.solarflux.api.IFurnaceBlockEntity;
-import org.zeith.solarflux.api.ISolarPanelTile;
-
-import javax.annotation.Nullable;
+import org.zeith.solarflux.api.*;
 
 @Implements({
 		@Interface(iface = IFurnaceBlockEntity.class, prefix = "ifbe$")
@@ -31,42 +26,46 @@ public abstract class AbstractFurnaceBlockEntityMixin
 	private RecipeType<? extends AbstractCookingRecipe> recipeType;
 	
 	@Shadow
-	int litTime;
+	int litTimeRemaining;
 	
 	@Shadow
-	int litDuration;
+	int litTotalTime;
+	
+	@Shadow protected NonNullList<ItemStack> items;
 	
 	protected AbstractFurnaceBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
 	{
 		super(type, pos, state);
 	}
 	
-	public void ifbe$activateWithSolarPanel(ISolarPanelTile solar)
+	public void ifbe$activateWithSolarPanel(ServerLevel level, ISolarPanelTile solar)
 	{
 		BlockPos pos = getBlockPos();
-		Level lvl = getLevel();
 		
-		RecipeHolder<? extends AbstractCookingRecipe> irecipe = lvl
-				.getRecipeManager()
-				.getRecipeFor(recipeType, Cast.cast(this), lvl)
+		AbstractFurnaceBlockEntity furnace = Cast.cast(this);
+		
+		RecipeHolder<? extends AbstractCookingRecipe> irecipe = level
+				.recipeAccess()
+				.getRecipeFor(recipeType, Cast.cast(this), level)
 				.orElse(null);
 		
-		if(litTime <= 1 && irecipe != null && SolarFlux$canSmelt(irecipe.value()) && solar.energy() >= 1000)
+		SingleRecipeInput input = new SingleRecipeInput(items.get(0));
+		
+		if(litTimeRemaining <= 1 && irecipe != null && AbstractFurnaceBlockEntity.canBurn(level.registryAccess(), irecipe, input, items, furnace.getMaxStackSize()) && solar.energy() >= 1000)
 		{
-			litTime = 201;
-			litDuration = 201;
+			litTimeRemaining = litTotalTime = 201;
 			solar.energy(solar.energy() - 1000L);
 			
-			BlockState state = lvl.getBlockState(pos);
+			BlockState state = level.getBlockState(pos);
 			if(state.hasProperty(AbstractFurnaceBlock.LIT) && !state.getValue(AbstractFurnaceBlock.LIT))
 			{
 				state = state.setValue(AbstractFurnaceBlock.LIT, true);
 				
-				lvl.setBlock(pos, state, 3);
+				level.setBlock(pos, state, 3);
 				
-				lvl.blockEntityChanged(pos);
+				level.blockEntityChanged(pos);
 				if(!state.isAir())
-					lvl.updateNeighbourForOutputSignal(pos, state.getBlock());
+					level.updateNeighbourForOutputSignal(pos, state.getBlock());
 			}
 		}
 	}
@@ -74,27 +73,5 @@ public abstract class AbstractFurnaceBlockEntityMixin
 	public Direction ifbe$getSideForSolarPanel()
 	{
 		return Direction.UP;
-	}
-	
-	@Unique
-	private boolean SolarFlux$canSmelt(@Nullable Recipe<?> recipe)
-	{
-		if(getItem(0).isEmpty() || recipe == null)
-			return false;
-		
-		ItemStack result = recipe.getResultItem(getLevel().registryAccess());
-		if(result.isEmpty()) return false;
-		
-		ItemStack curResIt = getItem(2);
-		if(curResIt.isEmpty())
-			return true;
-		
-		if(!ItemStack.isSameItem(curResIt, result))
-			return false;
-		
-		if(curResIt.getCount() + result.getCount() <= getMaxStackSize() && curResIt.getCount() + result.getCount() <= curResIt.getMaxStackSize())
-			return true;
-		
-		return curResIt.getCount() + result.getCount() <= result.getMaxStackSize();
 	}
 }

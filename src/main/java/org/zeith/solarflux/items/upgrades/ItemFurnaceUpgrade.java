@@ -2,6 +2,7 @@ package org.zeith.solarflux.items.upgrades;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.zeith.solarflux.api.IFurnaceBlockEntity;
@@ -23,7 +24,7 @@ public class ItemFurnaceUpgrade
 	@Override
 	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
 	{
-		Level lvl = tile.level();
+		if(!(tile.level() instanceof ServerLevel lvl)) return;
 		
 		Set<BlockPos> updated = new HashSet<>();
 		
@@ -39,11 +40,11 @@ public class ItemFurnaceUpgrade
 				updateFurnaceAt(tile, lvl, face.pos, face.face);
 	}
 	
-	public boolean updateFurnaceAt(ISolarPanelTile solar, Level lvl, BlockPos pos, Direction dir)
+	public boolean updateFurnaceAt(ISolarPanelTile solar, ServerLevel lvl, BlockPos pos, Direction dir)
 	{
 		if(lvl.getBlockEntity(pos) instanceof IFurnaceBlockEntity fbe && fbe.getSideForSolarPanel() == dir)
 		{
-			fbe.activateWithSolarPanel(solar);
+			fbe.activateWithSolarPanel(lvl, solar);
 			return true;
 		}
 		return false;

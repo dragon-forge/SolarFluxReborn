@@ -20,6 +20,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.inv.SimpleInventory;
@@ -34,6 +35,7 @@ import org.zeith.hammerlib.util.java.tuples.Tuples;
 import org.zeith.hammerlib.util.mcf.NormalizedTicker;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.attribute.SimpleAttributeProperty;
+import org.zeith.solarflux.client.SolarPanelModelData;
 import org.zeith.solarflux.compat._abilities.SFAbilities;
 import org.zeith.solarflux.container.SolarPanelContainer;
 import org.zeith.solarflux.init.SolarPanelsSF;
@@ -161,8 +163,8 @@ public class SolarPanelTile
 	public Stream<Tuple2<UpgradeItem, ItemStack>> getUpgrades()
 	{
 		return upgradeInventory.stream()
-				.map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
-				.filter(Objects::nonNull);
+							   .map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
+							   .filter(Objects::nonNull);
 	}
 	
 	@Override
@@ -334,6 +336,16 @@ public class SolarPanelTile
 	float effCache;
 	
 	@Override
+	public ModelData getModelData()
+	{
+		return super
+				.getModelData()
+				.derive()
+				.with(SolarPanelModelData.PROPERTY, SolarPanelModelData.gather(level, worldPosition, getBlockState().getBlock()))
+				.build();
+	}
+	
+	@Override
 	public int getGeneration()
 	{
 		float eff = effCache;
@@ -385,8 +397,8 @@ public class SolarPanelTile
 		{
 			cache$seeSkyTimer = 20;
 			cache$seeSky = level != null &&
-						   level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
-						   level.canSeeSky(worldPosition.above());
+					level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
+					level.canSeeSky(worldPosition.above());
 		}
 		return cache$seeSky;
 	}
@@ -530,10 +542,11 @@ public class SolarPanelTile
 		if(reducedEnergy > 0 || !chargeInventory.isEmpty() || !upgradeInventory.isEmpty())
 		{
 			stack.set(PanelDataComponent.TYPE.get(), new PanelDataComponent(
-					reducedEnergy,
-					List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList()),
-					List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList())
-					));
+							reducedEnergy,
+							List.copyOf(upgradeInventory.items.stream().map(ItemStack::copy).toList()),
+							List.copyOf(chargeInventory.items.stream().map(ItemStack::copy).toList())
+					)
+			);
 		}
 		return stack;
 	}

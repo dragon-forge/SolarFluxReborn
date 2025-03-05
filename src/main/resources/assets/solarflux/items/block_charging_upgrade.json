@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "solarflux:item/block_charging_upgrade"
+  }
+}

@@ -113,6 +113,6 @@ public class SolarFluxCompat
 	
 	public final String getCompatModID()
 	{
-		return getClass().getAnnotation(BaseCompat.LoadCompat.class).modid();
+		return getClass().getAnnotation(ModCompat.class).modid();
 	}
 }

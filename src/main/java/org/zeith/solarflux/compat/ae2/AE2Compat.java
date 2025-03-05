@@ -2,19 +2,17 @@ package org.zeith.solarflux.compat.ae2;
 
 import appeng.core.definitions.AEBlocks;
 import net.minecraft.resources.ResourceLocation;
-import org.zeith.hammerlib.compat.base.BaseCompat;
-import org.zeith.hammerlib.compat.base.CompatContext;
+import org.zeith.hammerlib.compat.base.*;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
-import org.zeith.solarflux.init.ItemsSF;
-import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.init.*;
 
 import java.util.function.Consumer;
 
-@BaseCompat.LoadCompat(
+@ModCompat(
 		modid = "ae2",
-		compatType = SolarFluxCompat.class
+		type = SolarFluxCompat.class
 )
 public class AE2Compat
 		extends SolarFluxCompat

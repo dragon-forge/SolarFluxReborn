@@ -1,19 +1,16 @@
 package org.zeith.solarflux.init;
 
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.*;
-import org.zeith.hammerlib.annotations.RegistryName;
-import org.zeith.hammerlib.annotations.SimplyRegister;
-import org.zeith.hammerlib.util.CommonMessages;
+import net.minecraft.world.item.Item;
+import org.zeith.hammerlib.annotations.*;
 import org.zeith.solarflux.SolarFlux;
+import org.zeith.solarflux.items.ItemMaterial;
 import org.zeith.solarflux.items.upgrades.*;
 import org.zeith.solarflux.panels.JSHelper;
 
-import java.util.List;
 import java.util.function.BiConsumer;
 
-@SimplyRegister
+@SimplyRegister(creativeTabs = @Ref(value = SolarFlux.class, field = "ITEM_GROUP"))
 public interface ItemsSF
 {
 	@RegistryName("mirror")
@@ -70,14 +67,7 @@ public interface ItemsSF
 	
 	static Item newMaterial()
 	{
-		return SolarFlux.ITEM_GROUP.add(new Item(new Item.Properties())
-		{
-			@Override
-			public void appendHoverText(ItemStack stack, TooltipContext level, List<Component> tooltip, TooltipFlag flag)
-			{
-				tooltip.add(CommonMessages.CRAFTING_MATERIAL);
-			}
-		});
+		return new ItemMaterial();
 	}
 	
 	@SimplyRegister

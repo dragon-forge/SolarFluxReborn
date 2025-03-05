@@ -1,12 +1,6 @@
 # Mod Info
-mod_version=21.0.5
+mod_version=21.4.5
 build_candidate=false
-
-# Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=21.0.13
-
-jei_mc_version=1.20.4
-jei_version=17.3.0.49
 
 # Persistent mod info
 mod_id=solarflux
@@ -23,15 +17,7 @@ maven_group=org.zeith.solarflux
 maven_url=file:///R:/
 
 # MC Info
-mc_version=1.21
-mc_range=[1.21,1.22)
-forge_version=21.0.163
-forge_range=[21.0.163,)
-javafml_range=[2.0,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
-
-# Misc Info
-java=17
 
 # Project ID on CurseForge
 cf_project=246974

@@ -135,7 +135,7 @@ public class SolarFlux
 		{
 			SolarPanelsSF.listPanels()
 					.forEach(spb ->
-							e.getModels().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb.getBlock()))
+							e.getBakingResult().blockStateModels().put(new ModelResourceLocation(spb.getRegistryName(), ""), new SolarPanelBakedModel(spb.getBlock()))
 					);
 		}
 	}

@@ -3,58 +3,69 @@ package org.zeith.solarflux.client;
 import com.google.gson.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.*;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.*;
 import net.minecraft.client.resources.model.*;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.GsonHelper;
-import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.util.*;
+import net.minecraft.util.context.ContextMap;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
-import net.neoforged.neoforge.client.model.geometry.IGeometryBakingContext;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.joml.Vector3f;
+import org.jetbrains.annotations.*;
 import org.zeith.hammerlib.client.model.*;
 import org.zeith.hammerlib.util.java.Cast;
 import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.block.SolarPanelBlock;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.Function;
+import java.util.*;
+
+import static org.zeith.solarflux.client.SolarPanelBakedModel.createSolarPanelQuads;
 
 @LoadUnbakedGeometry(path = "solar_panel")
 public class SolarPanelItemModel
-		implements IUnbakedGeometry<SolarPanelItemModel>
+		implements IUnbakedGeometry
 {
 	final SolarPanelBlock block;
-	Material baseTx, topTx;
+	private final TextureSlots.Data textureSlots;
 	
 	public SolarPanelItemModel(JsonObject obj, JsonDeserializationContext context)
 	{
 		this.block = Cast.optionally(BuiltInRegistries.BLOCK.get(Resources.location(GsonHelper.getAsString(obj, "panel"))), SolarPanelBlock.class)
-				.orElseThrow(() -> new JsonSyntaxException("Unable to find solar panel block by id '" + GsonHelper.getAsString(obj, "panel") + "'"));
+						 .orElseThrow(() -> new JsonSyntaxException("Unable to find solar panel block by id '" + GsonHelper.getAsString(obj, "panel") + "'"));
 		
-		var registryName = BuiltInRegistries.BLOCK.getKey(block);
+		var id = BuiltInRegistries.BLOCK.getKey(block);
 		
-		baseTx = new Material(InventoryMenu.BLOCK_ATLAS, Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_base"));
-		topTx = new Material(InventoryMenu.BLOCK_ATLAS, Resources.location(registryName.getNamespace(), "block/" + registryName.getPath() + "_top"));
+		var slots = new TextureSlots.Data.Builder();
+		
+		var atlas = TextureAtlas.LOCATION_BLOCKS;
+		
+		slots.addTexture("base", new Material(atlas, Resources.location(id.getNamespace(), "block/" + id.getPath() + "_base")));
+		slots.addTexture("top", new Material(atlas, Resources.location(id.getNamespace(), "block/" + id.getPath() + "_top")));
+		
+		textureSlots = slots.build();
 	}
 	
 	@Override
-	public BakedModel bake(IGeometryBakingContext context, ModelBaker bakery, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, ItemOverrides overrides)
+	public TextureSlots.Data getTextureSlots()
 	{
-		return new Baked(block, spriteGetter.apply(topTx), spriteGetter.apply(baseTx));
+		return textureSlots;
+	}
+	
+	@Override
+	public BakedModel bake(TextureSlots textures, ModelBaker baker, ModelState modelState, boolean useAmbientOcclusion, boolean usesBlockLight, ItemTransforms itemTransforms, ContextMap additionalProperties)
+	{
+		var spriteGetter = baker.sprites();
+		return new Baked(block, spriteGetter.get(textures.getMaterial("top")), spriteGetter.get(textures.getMaterial("base")));
+	}
+	
+	@Override
+	public void resolveDependencies(Resolver resolver)
+	{
 	}
 	
 	private static class Baked
 			implements IBakedModel
 	{
-		public static final FaceBakery COOKER = new FaceBakery();
-		
 		public final SolarPanelBlock block;
 		public final TextureAtlasSprite top, base;
 		
@@ -68,113 +79,13 @@ public class SolarPanelItemModel
 		@Override
 		public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction sideIn, @NotNull RandomSource rand, @NotNull ModelData data, @Nullable RenderType renderType)
 		{
+			SolarPanelModelData spmd = SolarPanelModelData.findOrItem(data);
 			List<BakedQuad> quads = new ArrayList<>();
-			Direction[] sides = sideIn == null ? Direction.values() : new Direction[] { sideIn };
+			Direction[] sides = sideIn == null ? Direction.values() : new Direction[] {sideIn};
+			float h = block.panel.getPanelData().height * 16F;
 			for(Direction side : sides)
 				if(side != null)
-				{
-					float h = block.panel.getPanelData().height * 16F;
-					
-					quads.add(COOKER.bakeQuad(
-							new Vector3f(0, 0, 0), new Vector3f(16, h, 16),
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									side.getAxis() == Direction.Axis.Y ? 0 : (16F - h),
-									16,
-									16
-							}, 4)),
-							side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									0,
-									0,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									15,
-									0,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									1,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									15,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									15,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true));
-				}
+					createSolarPanelQuads(quads, side, h, top, base, spmd);
 			return quads;
 		}
 		
@@ -194,12 +105,6 @@ public class SolarPanelItemModel
 		public boolean usesBlockLight()
 		{
 			return true;
-		}
-		
-		@Override
-		public boolean isCustomRenderer()
-		{
-			return false;
 		}
 		
 		final RandomSource rng = RandomSource.create();

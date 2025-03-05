@@ -1,7 +1,6 @@
 package org.zeith.solarflux.init;
 
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.fml.ModList;
@@ -9,13 +8,11 @@ import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforgespi.language.IModInfo;
 import org.zeith.hammerlib.annotations.SimplyRegister;
 import org.zeith.hammerlib.util.configured.ConfiguredLib;
-import org.zeith.hammerlib.util.configured.data.DecimalValueRange;
-import org.zeith.hammerlib.util.configured.data.IntValueRange;
+import org.zeith.hammerlib.util.configured.data.*;
 import org.zeith.hammerlib.util.configured.types.ConfigCategory;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
-import org.zeith.solarflux.panels.SolarPanel;
-import org.zeith.solarflux.panels.SolarScriptEngine;
+import org.zeith.solarflux.panels.*;
 
 import javax.script.ScriptException;
 import java.io.*;
@@ -366,7 +363,10 @@ public class SolarPanelsSF
 	
 	public static Ingredient getGeneratingSolars(long generation)
 	{
-		return Ingredient.fromValues(listPanels().filter(sp -> sp.getDelegateData().generation == generation).map(SolarPanel::getBlock).map(ItemStack::new).map(Ingredient.ItemValue::new));
+		return Ingredient.of(listPanels()
+				.filter(sp -> sp.getDelegateData().generation == generation)
+				.map(SolarPanel::getBlock)
+		);
 	}
 	
 	public static Ingredient getGeneratingSolars(SolarPanel as)

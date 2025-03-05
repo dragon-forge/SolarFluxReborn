@@ -5,6 +5,7 @@ import com.brandon3055.draconicevolution.api.crafting.FusionRecipe;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.ItemLike;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.java.Cast;
 
@@ -72,7 +73,7 @@ public class FusionRecipeAPI
 	 * @throws ReflectiveOperationException
 	 * 		if there is an error creating the Fusion Ingredient
 	 */
-	public static FusionRecipe.FusionIngredient ingr(ItemStack stack) throws ReflectiveOperationException
+	public static FusionRecipe.FusionIngredient ingr(ItemLike stack) throws ReflectiveOperationException
 	{
 		return ingr(stack, true);
 	}
@@ -90,9 +91,8 @@ public class FusionRecipeAPI
 	 * @throws ReflectiveOperationException
 	 * 		if there is an error creating the Fusion Ingredient
 	 */
-	public static FusionRecipe.FusionIngredient ingr(ItemStack stack, boolean consume) throws ReflectiveOperationException
+	public static FusionRecipe.FusionIngredient ingr(ItemLike stack, boolean consume) throws ReflectiveOperationException
 	{
-		@SuppressWarnings("JavaReflectionMemberAccess") // We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
 		var ctor = FusionRecipe.FusionIngredient.class.getDeclaredConstructor(Ingredient.class, boolean.class);
 		ctor.setAccessible(true);
 		return ctor.newInstance(Ingredient.of(stack), consume);

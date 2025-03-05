@@ -38,12 +38,12 @@ public class JSHelper
 	
 	public static ItemLike item(String id)
 	{
-		return () -> BuiltInRegistries.ITEM.get(Resources.location(id));
+		return () -> BuiltInRegistries.ITEM.getValue(Resources.location(id));
 	}
 	
 	public static ItemLike item(String mod, String id)
 	{
-		return () -> BuiltInRegistries.ITEM.get(Resources.location(mod, id));
+		return () -> BuiltInRegistries.ITEM.getValue(Resources.location(mod, id));
 	}
 	
 	public static Supplier<TagKey<Item>> tag(String id)

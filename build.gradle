@@ -6,13 +6,15 @@ buildscript {
 
 plugins {
     id 'java-library'
+    id 'maven-publish'
     id "com.modrinth.minotaur" version "2.+"
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
+    id 'idea'
+
+    id 'net.neoforged.gradle.userdev' version '7.0.173'
+    id "se.bjurr.gitchangelog.git-changelog-gradle-plugin" version "2.5.2"
 }
 
-apply plugin: 'idea'
-apply plugin: 'maven-publish'
-apply plugin: "com.matthewprenger.cursegradle"
+apply plugin: 'com.matthewprenger.cursegradle'
 
 ext.configFile = file("build.txt")
 configFile.withReader {
@@ -24,22 +26,13 @@ configFile.withReader {
     }
 }
 
-tasks.named('wrapper', Wrapper).configure {
-    // Define wrapper values here so as to not have to always do so when updating gradlew.properties.
-    // Switching this to Wrapper.DistributionType.ALL will download the full gradle sources that comes with
-    // documentation attached on cursor hover of gradle classes and methods. However, this comes with increased
-    // file size for Gradle. If you do switch this to ALL, run the Gradle wrapper task twice afterwards.
-    // (Verify by checking gradle/wrapper/gradle-wrapper.properties to see if distributionUrl now points to `-all`)
-    distributionType = Wrapper.DistributionType.BIN
-}
-
 version = config.mod_version
 group = config.maven_group
 base {
-    archivesName = "${config.archive_name}-${config.mc_version}"
+    archivesName = "${config.archive_name}-${mc_version}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(Integer.parseInt(mc_java))
 println('Java: ' + System.getProperty('java.version') + ' JVM: ' + System.getProperty('java.vm.version') + '(' + System.getProperty('java.vendor') + ') Arch: ' + System.getProperty('os.arch'))
 
 minecraft {
@@ -49,24 +42,33 @@ minecraft {
 }
 
 runs {
+
     configureEach {
         systemProperty 'forge.logging.console.level', 'debug'
         systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
 
-        programArguments(Arrays.asList("--mixin mixins.${config.mod_id}.json --username ${config.mc_user.split(',')[0]} --uuid ${config.mc_user.split(',')[1]}".split(' ')))
-
         modSource project.sourceSets.main
+        setWorkingDirectory(new File("runs/$mc_version/$name"))
     }
 
     client {
-        workingDirectory project.file('run/client')
-        systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
+        def args = new ArrayList()
+
+        if (hasConfig("mc_user") && !config.mc_user.isEmpty()) {
+            def userId = config.mc_user.split(',', 2)
+            args.add "--username"
+            args.add userId[0]
+
+            args.add "--uuid"
+            if (userId.length > 1) args.add userId[1]
+            else args.add "00000000000000000000000000000001" // this is a default
+        }
+
+        arguments(args)
     }
 
     server {
-        workingDirectory project.file('run/server')
-        systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
-        programArgument '--nogui'
+        argument '--nogui'
     }
 }
 
@@ -76,79 +78,91 @@ repositories {
     maven {
         name = "Zeitheron Maven"
         url = "https://maven.zeith.org/"
+        content {
+            includeGroupByRegex "org\\.zeith.*"
+        }
     }
     maven {
         name = "Jared's maven"
         url = "https://maven.blamejared.com/" // location of the maven that hosts JEI files since January 2023
+        content {
+            includeGroupByRegex "mezz\\.jei.*"
+        }
     }
-    flatDir { dirs "libraries/${config.mc_version}/all" }
-    flatDir { dirs "libraries/${config.mc_version}/classpathOnly" }
-    flatDir { dirs "libraries/${config.mc_version}/runtimeOnly" }
+    flatDir { dirs "libraries/${mc_version}/all" }
+    flatDir { dirs "libraries/${mc_version}/classpathOnly" }
+    flatDir { dirs "libraries/${mc_version}/runtimeOnly" }
     flatDir { dirs "libraries/embedded" }
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:${config.forge_version}"
+    implementation "net.neoforged:neoforge:${neo_version}"
 
     ////// UTILITY STUFF //////
-    compileOnly 'org.projectlombok:lombok:1.18.30'
-    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly "org.projectlombok:lombok:${lombok}"
+    annotationProcessor "org.projectlombok:lombok:${lombok}"
     ///////////////////////////
 
-    implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}"
-
-    if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
-        compileOnly "mezz.jei:jei-${config.jei_mc_version}-common-api:${config.jei_version}"
-        compileOnly "mezz.jei:jei-${config.jei_mc_version}-neoforge-api:${config.jei_version}"
-        //runtimeOnly "mezz.jei:jei-${config.mc_version}-neoforge:${config.jei_version}"
+    if (project.hasProperty("hammerlib")) {
+        implementation "org.zeith.hammerlib:HammerLib-$mc_version:$hammerlib"
     }
 
-    def libraries = new File(file("libraries"), "${config.mc_version}")
+    if (project.hasProperty("hammeranims")) {
+        implementation "org.zeith.hammeranims:HammerAnimations-$mc_version:$hammeranims"
+    }
+
+    if (project.hasConfig("jei") ) {
+        compileOnly "mezz.jei:jei-$mc_version-common-api:$jei"
+        compileOnly "mezz.jei:jei-$mc_version-neoforge-api:$jei"
+        runtimeOnly "mezz.jei:jei-$mc_version-neoforge:$jei"
+    }
+
+    def libraries = new File(file("libraries"), "${mc_version}")
     if (!libraries.isDirectory()) libraries.mkdirs()
 
-    def libDir = new File(libraries, "all");
+    def libDir = new File(libraries, "all")
     if (libDir.isDirectory()) {
         libDir.eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                implementation (project.dependencies.create("_all:$modartifact:$modversion") {
+                implementation(project.dependencies.create("_all:$modartifact:$modversion") {
                     transitive = false
                 })
             }
         }
     } else libDir.mkdir();
 
-    libDir = new File(libraries, "classpathOnly");
+    libDir = new File(libraries, "classpathOnly")
     if (libDir.isDirectory()) {
         libDir.eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                compileOnly (project.dependencies.create("_classpath:$modartifact:$modversion") {
+                compileOnly(project.dependencies.create("_classpath:$modartifact:$modversion") {
                     transitive = false
                 })
             }
         }
     } else libDir.mkdir();
 
-    libDir = new File(libraries, "runtimeOnly");
+    libDir = new File(libraries, "runtimeOnly")
     if (libDir.isDirectory()) {
         libDir.eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")
             def modartifact = file.name.substring(0, splitPos)
             def modversion = file.name.substring(splitPos + 1, file.name.length() - 4)
             dependencies {
-                runtimeOnly (project.dependencies.create("_runtime:$modartifact:$modversion") {
+                runtimeOnly(project.dependencies.create("_runtime:$modartifact:$modversion") {
                     transitive = false
                 })
             }
         }
     } else libDir.mkdir();
 
-    libDir = new File(file("libraries"), "embedded");
+    libDir = new File(file("libraries"), "embedded")
     if (libDir.isDirectory()) {
         libDir.eachFile { file ->
             def splitPos = file.name.lastIndexOf("-")
@@ -167,11 +181,11 @@ dependencies {
 
 def resourceTargets = ['META-INF/neoforge.mods.toml', 'pack.mcmeta']
 def replaceProperties = [
-        minecraft_version: config.mc_version, minecraft_version_range: config.mc_range,
-        forge_version    : "${config.mc_version}-${config.forge_version}", forge_version_range: config.forge_range, javafml_range: config.javafml_range,
+        minecraft_version: mc_version, minecraft_version_range: mc_range,
+        neo_version    : "${mc_version}-${neo_version}", neo_range: neo_range, loader_version_range: loader_version_range,
         mod_id           : config.mod_id, mod_name: config.mod_name, mod_license: config.mod_license, mod_version: config.mod_version,
         mod_authors      : config.mod_authors, mod_description: config.mod_description,
-        hl_version       : config.hl_version, modrinth_project: config.modrinth_project,
+        hl_version       : hammerlib, modrinth_project: config.modrinth_project,
         issue_tracker_url: config.issue_tracker_url, mod_credits: config.mod_credits
 ]
 processResources {
@@ -227,7 +241,8 @@ modrinth {
     versionNumber = config.mod_version
     versionType = config.release_type
     uploadFile = jar
-    gameVersions = [config.mc_version]
+    gameVersions = [mc_version]
+    setChangelog(providers.fileContents(layout.projectDirectory.file("CHANGELOG.md")).asText)
     dependencies {
         def mods = config.required_mods.split(";")
         if (mods.length > 0 && (mods.length > 1 || !mods[0].isEmpty()))
@@ -287,13 +302,13 @@ curseforge {
     apiKey = System.env.CURSEFORGE_TOKEN != null ? System.env.CURSEFORGE_TOKEN : "NONE"
     project {
         id = config.cf_project
-        changelogType = 'html'
-        changelog = ""
+        changelogType = 'markdown'
+        changelog = file("CHANGELOG.md")
         releaseType = config.release_type
-        addGameVersion config.mc_version
+        addGameVersion mc_version
         addGameVersion "NeoForge"
         mainArtifact(jar) {
-            displayName = "[${config.mc_version}] ${config.mod_name} - ${config.mod_version}"
+            displayName = "[${mc_version}] ${config.mod_name} - ${config.mod_version}"
         }
 
         def reqDeps = new ArrayList()
@@ -372,9 +387,8 @@ curseforge {
     }
 }
 
-import net.neoforged.gradle.common.tasks.PotentiallySignJar
-
-task signJar(type: PotentiallySignJar, dependsOn: jar) {
+tasks.register('signJar', net.neoforged.gradle.common.tasks.PotentiallySignJar) {
+    dependsOn('jar')
     onlyIf {
         System.env.MC_KS_PASS != null
     }
@@ -383,29 +397,31 @@ task signJar(type: PotentiallySignJar, dependsOn: jar) {
     storePass = System.env.MC_KS_PASS
     keyPass = System.env.MC_KS_PASS
     input = jar.archiveFile
-}
-
-task placeSignedJar {
+    def origJar = jar.archiveFile.get().asFile
+    outputFileName = origJar.getName() + ".signed"
     doLast {
-        def resF = signJar.output.get().asFile
-        def af = jar.archiveFile.get().asFile
+        def resF = output.get().asFile
+        def af = origJar
         af.delete()
         resF.renameTo(af)
     }
 }
 
-signJar.finalizedBy('placeSignedJar')
+assemble.finalizedBy('signJar')
 
-def reobfFile = jar.archiveFile.get().asFile
-def reobfArtifact = artifacts.add('default', reobfFile) {
-    type 'jar'
-    builtBy 'signJar'
+task generateChangelog(type: se.bjurr.gitchangelog.plugin.gradle.GitChangelogTask) {
+    group = "git changelog"
+    if (config.last_git_commit != null && !config.last_git_commit.isEmpty()) fromRevision = config.last_git_commit
+    templateContent = """
+Changelog:
+
+{{#tags}}
+  {{#commits}}
+- {{messageTitle}} ([{{hash}}](https://github.com/{{ownerName}}/{{repoName}}/commit/{{hash}})) by {{authorName}}
+  {{/commits}}
+{{/tags}}
+"""
 }
-
-jar.finalizedBy('signJar')
-publish.dependsOn('signJar')
-
-build.dependsOn signJar
 
 tasks.register('buildAndUploadMod') {
     group = "upload"
@@ -417,15 +433,20 @@ tasks.register('buildAndUploadMod') {
 }
 
 afterEvaluate {
-    tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
-    tasks["modrinth"].dependsOn.add(publish)
+    tasks["curseforge${config.cf_project}"].dependsOn.add(generateChangelog)
+    tasks["modrinth"].dependsOn.add(generateChangelog)
+
+    if (!config.maven_url.isEmpty()) {
+        tasks["curseforge${config.cf_project}"].dependsOn.add(publish)
+        tasks["modrinth"].dependsOn.add(publish)
+    }
 }
 
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
             from components.java
-            it.artifactId = config.archive_name + "-" + config.mc_version
+            it.artifactId = config.archive_name + "-" + mc_version
             it.artifact srcJar
         }
     }
@@ -442,32 +463,47 @@ tasks.withType(JavaCompile).configureEach {
 
 import java.nio.file.Files
 
-def incrementBuild = {
-    if (!hasConfig("build_candidate") || !Boolean.parseBoolean(config.build_candidate)) {
-        def buildTxt = configFile.toPath()
-        List<String> lines = Files.readAllLines buildTxt
-        lines.replaceAll { String ln ->
-            if (ln.startsWith("mod_version")) {
-                def version = ln.split("=")[1]
-                def dot = version.lastIndexOf('.') + 1
-                def newVersion = version.substring(0, dot)
-                def lastOne = Integer.parseInt(version.substring(dot)) + 1
-                return "mod_version=" + newVersion + lastOne
-            }
-            return ln
-        }
-        Files.write buildTxt, lines, java.nio.file.StandardOpenOption.CREATE
-    } else println "Build candidate enabled, we are not increasing build number after this."
-}
-
 tasks.register("incrementBuildVersionProperty") {
     group "upload"
-    doLast incrementBuild
+    doLast {
+        if (!project.ext.config.isSet("build_candidate") || !Boolean.parseBoolean(project.ext.config.build_candidate)) {
+            def buildTxt = configFile.toPath()
+            List<String> lines = Files.readAllLines buildTxt
+            lines.replaceAll { String ln ->
+                if (ln.startsWith("mod_version")) {
+                    def version = ln.split("=")[1]
+                    def dot = version.lastIndexOf('.') + 1
+                    def newVersion = version.substring(0, dot)
+                    def lastOne = Integer.parseInt(version.substring(dot)) + 1
+                    return "mod_version=" + newVersion + lastOne
+                }
+                if (ln.startsWith("last_git_commit")) {
+                    def lastCommit = ln.split("=", 2)[1]
+                    def truncated = se.bjurr.gitchangelog.api.GitChangelogApi.gitChangelogApiBuilder()
+                            .withFromRevision(lastCommit)
+                            .withFromRepo(projectDir)
+                            .withTemplateContent("""
+{{#tags}}
+{{#commits}}
+[START]{{hash}}[END]
+{{/commits}}
+{{/tags}}
+""").render()
+
+                    def found = truncated.indexOf("[START]")
+                    def endIdx = truncated.indexOf("[END]", found)
+                    if (found == -1 || endIdx == -1) return ln
+                    return "last_git_commit=" + truncated.substring(found + 7, endIdx)
+                }
+                return ln
+            }
+            Files.write buildTxt, lines, java.nio.file.StandardOpenOption.CREATE
+        } else println "Build candidate enabled, we are not increasing build number after this."
+    }
 }
 
 // This piece of garbage will ensure that the build number is updated after build is executed.
-tasks.build.doLast incrementBuild
-tasks.buildAndUploadMod.doLast incrementBuild
+tasks.buildAndUploadMod.finalizedBy('incrementBuildVersionProperty')
 
 idea {
     module {

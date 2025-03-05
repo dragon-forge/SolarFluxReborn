@@ -1,10 +1,10 @@
 package org.zeith.solarflux.compat.avaritia;
 
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import org.zeith.hammerlib.compat.base.BaseCompat;
-import org.zeith.hammerlib.compat.base.CompatContext;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.*;
+import net.minecraft.resources.*;
+import net.minecraft.world.item.*;
+import org.zeith.hammerlib.compat.base.*;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.SolarFlux;
@@ -12,13 +12,12 @@ import org.zeith.solarflux.compat._base.SolarFluxCompat;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.panels.SolarPanel;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.*;
 
-@BaseCompat.LoadCompat(
+@ModCompat(
 		modid = "avaritia",
-		compatType = SolarFluxCompat.class
+		type = SolarFluxCompat.class
 )
 public class AvaritiaCompat
 		extends SolarFluxCompat
@@ -38,18 +37,18 @@ public class AvaritiaCompat
 	{
 		neutronium = registrar.apply(
 				factory.get()
-						.name("avaritia.neutronium")
-						.generation(8_192 * 1024)
-						.transfer(32_768 * 1000)
-						.capacity(131_072_000_000L)
+					   .name("avaritia.neutronium")
+					   .generation(8_192 * 1024)
+					   .transfer(32_768 * 1000)
+					   .capacity(131_072_000_000L)
 		);
 		
 		infinity = registrar.apply(
 				factory.get()
-						.name("avaritia.infinity")
-						.generation(16_384 * 1024)
-						.transfer(65_536 * 1000)
-						.capacity(262_144_000_000L)
+					   .name("avaritia.infinity")
+					   .generation(16_384 * 1024)
+					   .transfer(65_536 * 1000)
+					   .capacity(262_144_000_000L)
 		);
 	}
 	
@@ -65,8 +64,9 @@ public class AvaritiaCompat
 	{
 		try
 		{
+			String modid = getCompatModID();
 			Map<String, Item> itemMap = new HashMap<>();
-			Function<String, Item> aItemF = k -> BuiltInRegistries.ITEM.get(Resources.location("avaritia", k));
+			Function<String, Item> aItemF = k -> e.getItemLookup().get(ResourceKey.create(Registries.ITEM, Resources.location(modid, k))).map(Holder.Reference::value).orElse(Items.AIR);
 			Function<String, Item> item = key -> itemMap.computeIfAbsent(key, aItemF);
 			
 			extremeShaped(e)
@@ -93,7 +93,7 @@ public class AvaritiaCompat
 					.map('i', item.apply("infinity_catalyst"))
 					.map('s', item.apply("neutronium_block"))
 					.registerIf(SolarPanelsSF::isRecipeActive);
-		} catch(LinkageError error)
+		} catch(LinkageError | Exception error)
 		{
 			SolarFlux.LOG.error("Failed to register Avaritia recipes!", error);
 		}

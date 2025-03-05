@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "solarflux:item/furnace_upgrade"
+  }
+}

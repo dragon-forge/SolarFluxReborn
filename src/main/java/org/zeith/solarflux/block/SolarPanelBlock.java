@@ -1,30 +1,26 @@
 package org.zeith.solarflux.block;
 
 import com.mojang.serialization.MapCodec;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.*;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
+import net.minecraft.sounds.*;
 import net.minecraft.world.*;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.*;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.*;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
-import org.zeith.hammerlib.api.forge.BlockAPI;
-import org.zeith.hammerlib.api.forge.ContainerAPI;
+import org.zeith.hammerlib.api.forge.*;
 import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
-import org.zeith.solarflux.items.data.PanelDataComponent;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
@@ -49,7 +45,7 @@ public class SolarPanelBlock
 	
 	protected void bindTool()
 	{
-		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, Tiers.IRON, this);
+		BlockHarvestAdapter.bindTool(BlockHarvestAdapter.MineableType.PICKAXE, ToolMaterial.IRON, this);
 	}
 	
 	@Nullable
@@ -93,10 +89,10 @@ public class SolarPanelBlock
 	}
 	
 	@Override
-	public void neighborChanged(BlockState state, Level worldIn, BlockPos pos, Block blockIn, BlockPos fromPos, boolean isMoving)
+	protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston)
 	{
-		super.neighborChanged(state, worldIn, pos, blockIn, fromPos, isMoving);
-		if(worldIn.getBlockEntity(pos) instanceof SolarPanelTile spt)
+		super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+		if(level.getBlockEntity(pos) instanceof SolarPanelTile spt)
 			spt.resetVoxelShape();
 	}
 	
@@ -140,7 +136,7 @@ public class SolarPanelBlock
 	}
 	
 	@Override
-	protected ItemInteractionResult useItemOn(ItemStack held, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand p_316595_, BlockHitResult hit)
+	protected InteractionResult useItemOn(ItemStack held, BlockState state, Level worldIn, BlockPos pos, Player player, InteractionHand p_316595_, BlockHitResult hit)
 	{
 		if(player instanceof ServerPlayer && worldIn.getBlockEntity(pos) instanceof SolarPanelTile tbs && !held.isEmpty() && held.getItem() instanceof UpgradeItem iu)
 		{
@@ -174,11 +170,11 @@ public class SolarPanelBlock
 				{
 					iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
 					worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, .1F, 1F);
-					return ItemInteractionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 		}
-		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+		return InteractionResult.TRY_WITH_EMPTY_HAND;
 	}
 	
 	@Override
@@ -247,13 +243,13 @@ public class SolarPanelBlock
 //	}
 	
 	@Override
-	public boolean propagatesSkylightDown(BlockState p_49928_, BlockGetter p_49929_, BlockPos p_49930_)
+	protected boolean propagatesSkylightDown(BlockState state)
 	{
 		return false;
 	}
 	
 	@Override
-	public BlockItem createBlockItem()
+	public BlockItem createBlockItem(ResourceKey<Item> id)
 	{
 		return new SolarPanelBlockItem(this, new Item.Properties());
 	}

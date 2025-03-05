@@ -4,22 +4,20 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
-import org.zeith.hammerlib.compat.base.BaseCompat;
-import org.zeith.hammerlib.compat.base.CompatContext;
+import org.zeith.hammerlib.compat.base.*;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.compat._base.SolarFluxCompat;
-import org.zeith.solarflux.init.ItemsSF;
-import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.init.*;
 import org.zeith.solarflux.panels.SolarPanel;
 
 import java.util.function.*;
 
-@BaseCompat.LoadCompat(
+@ModCompat(
 		modid = "twilightforest",
-		compatType = SolarFluxCompat.class
+		type = SolarFluxCompat.class
 )
 public class TwilightForestCompat
 		extends SolarFluxCompat
@@ -42,11 +40,13 @@ public class TwilightForestCompat
 	@Override
 	public void registerSolarPanels(Supplier<SolarPanel.Builder> factory, Function<SolarPanel.Builder, SolarPanel> registrar)
 	{
-		fiery = registrar.apply(factory.get()
+		fiery = registrar.apply(factory
+				.get()
 				.name("tf.fiery")
 				.copyEnergy(SolarPanelsSF.CORE_PANELS[5])
 		);
-		carminite = registrar.apply(factory.get()
+		carminite = registrar.apply(factory
+				.get()
 				.name("tf.carminite")
 				.copyEnergy(SolarPanelsSF.CORE_PANELS[6])
 		);
@@ -75,54 +75,54 @@ public class TwilightForestCompat
 		var torchberries = BuiltInRegistries.ITEM.get(Resources.location("twilightforest", "torchberries"));
 		
 		e.shaped()
-				.id(twiLightUpgradeRecipe)
-				.result(ContentsSFTF.TWI_LIGHT_UPGRADE)
-				.shape("ici", "tbt", "iti")
-				.map('i', ironwoodIngot)
-				.map('c', Items.CLOCK)
-				.map('t', torchberries)
-				.map('b', ItemsSF.EFFICIENCY_UPGRADE)
-				.registerIf(SolarPanelsSF::isRecipeActive);
+		 .id(twiLightUpgradeRecipe)
+		 .result(ContentsSFTF.TWI_LIGHT_UPGRADE)
+		 .shape("ici", "tbt", "iti")
+		 .map('i', ironwoodIngot)
+		 .map('c', Items.CLOCK)
+		 .map('t', torchberries)
+		 .map('b', ItemsSF.EFFICIENCY_UPGRADE)
+		 .registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
-				.id(twiCell1Recipe)
-				.result(ContentsSFTF.TWILIGHT_CELL_1, 2)
-				.shape("bbb", "gdg", "qcq")
-				.map('b', ItemsSF.BLAZING_COATING)
-				.map('g', fieryIngot)
-				.map('d', steeleaf)
-				.map('q', ironwoodBlock)
-				.map('c', ItemsSF.PHOTOVOLTAIC_CELL_3)
-				.registerIf(SolarPanelsSF::isRecipeActive);
+		 .id(twiCell1Recipe)
+		 .result(ContentsSFTF.TWILIGHT_CELL_1, 2)
+		 .shape("bbb", "gdg", "qcq")
+		 .map('b', ItemsSF.BLAZING_COATING)
+		 .map('g', fieryIngot)
+		 .map('d', steeleaf)
+		 .map('q', ironwoodBlock)
+		 .map('c', ItemsSF.PHOTOVOLTAIC_CELL_3)
+		 .registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
-				.id(twiCell2Recipe)
-				.result(ContentsSFTF.TWILIGHT_CELL_2, 3)
-				.shape("bbb", "gdg", "cqc")
-				.map('b', ItemsSF.EMERALD_GLASS)
-				.map('g', fieryBlock)
-				.map('d', carminiteItem)
-				.map('q', knightmetal)
-				.map('c', ContentsSFTF.TWILIGHT_CELL_1)
-				.registerIf(SolarPanelsSF::isRecipeActive);
+		 .id(twiCell2Recipe)
+		 .result(ContentsSFTF.TWILIGHT_CELL_2, 3)
+		 .shape("bbb", "gdg", "cqc")
+		 .map('b', ItemsSF.EMERALD_GLASS)
+		 .map('g', fieryBlock)
+		 .map('d', carminiteItem)
+		 .map('q', knightmetal)
+		 .map('c', ContentsSFTF.TWILIGHT_CELL_1)
+		 .registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
-				.id(fieryRecipe)
-				.result(fiery, 2)
-				.shape("ppp", "scs", "sbs")
-				.map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[4]))
-				.map('p', ContentsSFTF.TWILIGHT_CELL_1)
-				.map('c', torchberries)
-				.map('b', fieryBlock)
-				.registerIf(SolarPanelsSF::isRecipeActive);
+		 .id(fieryRecipe)
+		 .result(fiery, 2)
+		 .shape("ppp", "scs", "sbs")
+		 .map('s', SolarPanelsSF.getGeneratingSolars(SolarPanelsSF.CORE_PANELS[4]))
+		 .map('p', ContentsSFTF.TWILIGHT_CELL_1)
+		 .map('c', torchberries)
+		 .map('b', fieryBlock)
+		 .registerIf(SolarPanelsSF::isRecipeActive);
 		
 		e.shaped()
-				.id(carminiteRecipe)
-				.result(carminite, 2)
-				.shape("ppp", "scs", "scs")
-				.map('s', fiery)
-				.map('p', ContentsSFTF.TWILIGHT_CELL_2)
-				.map('c', carminiteItem)
-				.registerIf(SolarPanelsSF::isRecipeActive);
+		 .id(carminiteRecipe)
+		 .result(carminite, 2)
+		 .shape("ppp", "scs", "scs")
+		 .map('s', fiery)
+		 .map('p', ContentsSFTF.TWILIGHT_CELL_2)
+		 .map('c', carminiteItem)
+		 .registerIf(SolarPanelsSF::isRecipeActive);
 	}
 }

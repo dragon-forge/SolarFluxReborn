@@ -1,14 +1,15 @@
 package org.zeith.solarflux.client;
 
-import com.google.gson.JsonObject;
 import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
-import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
+import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.server.packs.repository.PackSource;
 import net.minecraft.server.packs.resources.IoSupplier;
+import org.apache.logging.log4j.util.Cast;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
@@ -180,15 +181,14 @@ public class SolarFluxResourcePack
 	}
 	
 	@Override
-	public <T> T getMetadataSection(MetadataSectionSerializer<T> deserializer)
-			throws IOException
+	public @Nullable <T> T getMetadataSection(MetadataSectionType<T> type)
 	{
-		if(deserializer.getMetadataSectionName().equals("pack"))
+		if(PackMetadataSection.TYPE.equals(type))
 		{
-			JsonObject obj = new JsonObject();
-			obj.addProperty("pack_format", SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES));
-			obj.addProperty("description", "Generated resources for SolarFlux");
-			return deserializer.fromJson(obj);
+			return Cast.cast(new PackMetadataSection(
+					Component.literal("Generated resources for SolarFlux"),
+					SharedConstants.getCurrentVersion().getPackVersion(PackType.CLIENT_RESOURCES)
+			));
 		}
 		return null;
 	}
