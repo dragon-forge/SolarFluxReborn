@@ -31,9 +31,9 @@
 *   - you can have a line "define a_key !value!" to make the compiler replace all a_key with !value! at runtime.
 */
 
-define english "en_us"
+const english = "en_us";
 
-var ourMaterial = false;
+let ourMaterial;
 
 /** This function is called when mod is being constructed */
 function init()
@@ -62,7 +62,7 @@ function init()
 			.shape("ppp", "8c8", "8h8")
 			.bind('p', item("solarflux", "photovoltaic_cell_6"))
 			.bind('8', item("solarflux:sp_8"))
-			.bind('c', tag("forge", "storage_blocks/emerald"))
+			.bind('c', tag("c", "storage_blocks/emerald"))
 			.bind('h', ourMaterial) // Here we use the newly added material in the recipe!
 		.build(2);
 
@@ -80,7 +80,7 @@ function registerRecipes($)
     // $.add(IRecipe<?>)
     // Just don't forget to import the recipe class.
     // To pass an ingredient to a recipe wrap your item()/tag() call in a ingredient().
-    // Basically this will create Minecraft Ingredient: ingredient(tag("forge", "storage_blocks/emerald"))
+    // Basically this will create Minecraft Ingredient: ingredient(tag("c", "storage_blocks/emerald"))
 
     if(ourMaterial)
     {
@@ -88,15 +88,15 @@ function registerRecipes($)
             .result(ourMaterial, 2)
             .shape("###", "#$#", "###")
             .map('$', item("solarflux", "ender_glass"))
-            .map('#', tag("forge", "rods/blaze"))
+            .map('#', tag("c", "rods/blaze"))
             .register();
 
         $.shapeless() // Shapeless recipe example
             .result(ourMaterial, 1)
             .add(item("solarflux", "ender_glass"))
-            .add(tag("forge", "rods/blaze"))
-            .add(tag("forge", "rods/blaze"))
-            .add(tag("forge", "rods/blaze"))
+            .add(tag("c", "rods/blaze"))
+            .add(tag("c", "rods/blaze"))
+            .add(tag("c", "rods/blaze"))
             .register();
 
         $.stoneCutting() // Stone cutting recipe example

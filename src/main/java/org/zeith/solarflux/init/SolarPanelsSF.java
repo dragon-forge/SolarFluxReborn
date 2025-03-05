@@ -3,6 +3,7 @@ package org.zeith.solarflux.init;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
 import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforgespi.language.IModInfo;
@@ -62,7 +63,7 @@ public class SolarPanelsSF
 	public static final List<ResourceLocation> RECIPE_KEYS = new ArrayList<>();
 	private static final List<ResourceLocation> ENABLED_RECIPES = new ArrayList<>();
 	
-	public static void init()
+	public static void init(IEventBus modBus)
 	{
 		File solarflux = CONFIG_DIR = new File(FMLPaths.CONFIGDIR.get().toFile(), "solarflux");
 		
@@ -279,7 +280,7 @@ public class SolarPanelsSF
 		
 		try
 		{
-			SolarScriptEngine engine = new SolarScriptEngine(Files.readAllLines(custom_panels.toPath(), StandardCharsets.UTF_8).stream());
+			SolarScriptEngine engine = new SolarScriptEngine(modBus, Files.readAllLines(custom_panels.toPath(), StandardCharsets.UTF_8).stream());
 			engine.callFunction("init");
 		} catch(IOException | ScriptException | ReflectiveOperationException e)
 		{

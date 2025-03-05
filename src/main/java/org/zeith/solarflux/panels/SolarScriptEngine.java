@@ -1,14 +1,15 @@
 package org.zeith.solarflux.panels;
 
 import com.google.common.base.Suppliers;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModList;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.openjdk.nashorn.api.scripting.NashornScriptEngineFactory;
-import org.zeith.hammerlib.HammerLib;
 import org.zeith.hammerlib.core.RecipeHelper;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.solarflux.SolarFlux;
@@ -24,7 +25,7 @@ public class SolarScriptEngine
 	final ScriptEngine engine;
 	final Invocable engineInvocable;
 
-	public SolarScriptEngine(Stream<String> lines) throws ScriptException
+	public SolarScriptEngine(IEventBus modBus, Stream<String> lines) throws ScriptException
 	{
 		StringBuilder content = new StringBuilder();
 		Map<String, String> defines = new HashMap<>();
@@ -51,14 +52,17 @@ public class SolarScriptEngine
 		});
 		this.engineInvocable = (Invocable) (this.engine = newEngine());
 		this.engine.eval(content.toString());
-		HammerLib.EVENT_BUS.addListener(this::reloadRecipes);
+		modBus.addListener(this::reloadRecipes);
 	}
 
 	public void reloadRecipes(RegisterRecipesEvent e)
 	{
 		try
 		{
+			var lookup = e.getItemLookup();
+			JSHelper.CURRENT_ITEM_LOOKUP.set(id -> lookup.get(ResourceKey.create(Registries.ITEM, id)).map(Holder.Reference::value).orElse(Items.AIR));
 			callFunction("registerRecipes", e);
+			JSHelper.CURRENT_ITEM_LOOKUP.remove();
 		} catch(NoSuchMethodException ignored)
 		{
 		} catch(Throwable er)
@@ -77,7 +81,11 @@ public class SolarScriptEngine
 	public static ScriptEngine newEngine()
 	{
 		// Use openjdk nashorn that forge adds as a library (nashorn-core-15.3.jar)
-		ScriptEngine se = NASHORN_FACTORY.getScriptEngine(SolarScriptEngine::checkClass);
+		ScriptEngine se = NASHORN_FACTORY.getScriptEngine(new String[] {
+						"-doe",
+						"--language=es6"
+				}, getAppClassLoader(), SolarScriptEngine::checkClass
+		);
 		try
 		{
 			se.put("panel", se.eval("function(){return Java.type('" + SolarPanel.class.getName() + "').customBuilder();}"));
@@ -114,5 +122,16 @@ public class SolarScriptEngine
 	static boolean checkClass(String s)
 	{
 		return ALLOWED_CLASSES.get().contains(s);
+	}
+	
+	private static ClassLoader getAppClassLoader()
+	{
+		// Revisit: script engine implementation needs the capability to
+		// find the class loader of the context in which the script engine
+		// is running so that classes will be found and loaded properly
+		return Objects.requireNonNullElseGet(
+				Thread.currentThread().getContextClassLoader(),
+				NashornScriptEngineFactory.class::getClassLoader
+		);
 	}
 }

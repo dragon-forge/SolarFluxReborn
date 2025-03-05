@@ -63,7 +63,7 @@ public class SolarFlux
 		NeoForge.EVENT_BUS.register(this);
 		modBus.addListener(RecipesSF::addRecipes);
 		
-		SolarPanelsSF.init();
+		SolarPanelsSF.init(modBus);
 		SF_COMPAT.setupSolarPanels();
 		LanguageAdapter.registerMod(MOD_ID);
 		

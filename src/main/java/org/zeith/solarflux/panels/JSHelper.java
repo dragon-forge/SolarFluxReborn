@@ -1,5 +1,6 @@
 package org.zeith.solarflux.panels;
 
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -10,8 +11,7 @@ import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.solarflux.items.JSItem;
 
 import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Supplier;
+import java.util.function.*;
 
 public class JSHelper
 {
@@ -36,14 +36,17 @@ public class JSHelper
 		});
 	}
 	
+	public static final Function<ResourceLocation, Item> DEF_ITEM_LOOKUP = BuiltInRegistries.ITEM::getValue;
+	public static ThreadLocal<Function<ResourceLocation, Item>> CURRENT_ITEM_LOOKUP = ThreadLocal.withInitial(() -> DEF_ITEM_LOOKUP);
+	
 	public static ItemLike item(String id)
 	{
-		return () -> BuiltInRegistries.ITEM.getValue(Resources.location(id));
+		return () -> CURRENT_ITEM_LOOKUP.get().apply(Resources.location(id));
 	}
 	
 	public static ItemLike item(String mod, String id)
 	{
-		return () -> BuiltInRegistries.ITEM.getValue(Resources.location(mod, id));
+		return () -> CURRENT_ITEM_LOOKUP.get().apply(Resources.location(mod, id));
 	}
 	
 	public static Supplier<TagKey<Item>> tag(String id)
