@@ -27,6 +27,8 @@ import org.zeith.solarflux.block.SolarPanelBlock;
 import java.util.*;
 import java.util.function.Function;
 
+import static org.zeith.solarflux.client.SolarPanelBakedModel.createSolarPanelQuads;
+
 @LoadUnbakedGeometry(path = "solar_panel")
 public class SolarPanelItemModel
 		implements IUnbakedGeometry<SolarPanelItemModel>
@@ -60,8 +62,6 @@ public class SolarPanelItemModel
 	private static class Baked
 			implements IBakedModel
 	{
-		public static final FaceBakery COOKER = new FaceBakery();
-		
 		public final ResourceLocation modelName;
 		public final SolarPanelBlock block;
 		public final TextureAtlasSprite top, base;
@@ -77,113 +77,13 @@ public class SolarPanelItemModel
 		@Override
 		public @NotNull List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction sideIn, @NotNull RandomSource rand, @NotNull ModelData data, @Nullable RenderType renderType)
 		{
+			SolarPanelModelData spmd = SolarPanelModelData.findOrItem(data);
 			List<BakedQuad> quads = new ArrayList<>();
-			Direction[] sides = sideIn == null ? Direction.values() : new Direction[] { sideIn };
+			Direction[] sides = sideIn == null ? Direction.values() : new Direction[] {sideIn};
+			float h = block.panel.getPanelData().height * 16F;
 			for(Direction side : sides)
 				if(side != null)
-				{
-					float h = block.panel.getPanelData().height * 16F;
-					
-					quads.add(COOKER.bakeQuad(
-							new Vector3f(0, 0, 0), new Vector3f(16, h, 16),
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									side.getAxis() == Direction.Axis.Y ? 0 : (16F - h),
-									16,
-									16
-							}, 4)),
-							side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									0,
-									0,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									15,
-									0,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									1,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									15,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-					
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									15,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true, modelName));
-				}
+					createSolarPanelQuads(quads, side, h, top, base, spmd);
 			return quads;
 		}
 		
