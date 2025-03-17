@@ -54,7 +54,7 @@ minecraft {
     copyIdeResources = true
     runs {
         client {
-            workingDirectory project.file('run/client')
+            workingDirectory project.file("runs/$config.mc_version/client")
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
             def args = new ArrayList()
@@ -83,7 +83,7 @@ minecraft {
         }
 
         server {
-            workingDirectory project.file('run/server')
+            workingDirectory project.file("runs/$config.mc_version/server")
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
             def args = new ArrayList()
@@ -99,7 +99,7 @@ minecraft {
         }
 
         gameTestServer {
-            workingDirectory project.file('run/server')
+            workingDirectory project.file("runs/$config.mc_version/gameTestServer")
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
             def args = new ArrayList()
@@ -115,7 +115,7 @@ minecraft {
         }
 
         data {
-            workingDirectory project.file('run/client')
+            workingDirectory project.file("runs/$config.mc_version/clientData")
             property 'forge.logging.console.level', 'debug'
             property 'forge.enabledGameTestNamespaces', config.mod_id
             def args = new ArrayList()
