@@ -41,7 +41,7 @@ import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
-import org.zeith.solarflux.util.BlockPosFace;
+import org.zeith.solarflux.util.*;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -58,8 +58,8 @@ public class SolarPanelTile
 	private SolarPanel delegate;
 	private SolarPanelInstance instance;
 	
-	public final SimpleInventory upgradeInventory = new SimpleInventory(5);
-	public final SimpleInventory chargeInventory = new SimpleInventory(1);
+	public final SimpleInventory upgradeInventory = new SimpleSyncInventory(5, this::setChanged);
+	public final SimpleInventory chargeInventory = new SimpleSyncInventory(1, this::setChanged);
 	
 	public final List<BlockPosFace> traversal = new ArrayList<>();
 	
@@ -139,8 +139,8 @@ public class SolarPanelTile
 	public Stream<Tuple2<UpgradeItem, ItemStack>> getUpgrades()
 	{
 		return upgradeInventory.stream()
-				.map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
-				.filter(Objects::nonNull);
+							   .map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
+							   .filter(Objects::nonNull);
 	}
 	
 	@Override
@@ -488,7 +488,10 @@ public class SolarPanelTile
 		int transfer = this.transfer.getValueI();
 		int energyExtracted = Math.min(getEnergyStored(), Math.min(transfer, maxExtract));
 		if(!simulate)
+		{
 			energy -= energyExtracted;
+			setChanged();
+		}
 		return energyExtracted;
 	}
 	
@@ -506,7 +509,10 @@ public class SolarPanelTile
 		long cap = capacity.getValueL();
 		int energyReceived = Math.min((int) Math.min(cap - energy, Integer.MAX_VALUE), Math.min(transfer, maxReceive));
 		if(!simulate)
+		{
 			energy += energyReceived;
+			setChanged();
+		}
 		return energyReceived;
 	}
 	
