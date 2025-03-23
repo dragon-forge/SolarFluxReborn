@@ -44,7 +44,7 @@ import org.zeith.solarflux.items.upgrades._base.UpgradeSystem;
 import org.zeith.solarflux.net.PacketRequestSolarIntensity;
 import org.zeith.solarflux.panels.SolarPanel;
 import org.zeith.solarflux.panels.SolarPanelInstance;
-import org.zeith.solarflux.util.BlockPosFace;
+import org.zeith.solarflux.util.*;
 
 import java.util.*;
 import java.util.stream.Stream;
@@ -61,8 +61,8 @@ public class SolarPanelTile
 	private SolarPanel delegate;
 	private SolarPanelInstance instance;
 	
-	public final SimpleInventory upgradeInventory = new SimpleInventory(5);
-	public final SimpleInventory chargeInventory = new SimpleInventory(1);
+	public final SimpleInventory upgradeInventory = new SimpleInventory(5, this::setChanged);
+	public final SimpleInventory chargeInventory = new SimpleInventory(1, this::setChanged);
 	
 	public final List<BlockPosFace> traversal = new ArrayList<>();
 	
@@ -76,6 +76,10 @@ public class SolarPanelTile
 	{
 		super(TilesSF.SOLAR_PANEL, pos, state);
 		onConstructed();
+		
+		upgradeInventory.isStackValid = (index, stack) -> !stack.isEmpty()
+				&& stack.getItem() instanceof UpgradeItem ui
+				&& getUpgrades(ui) + stack.getCount() <= ui.getMaxUpgradesInstalled(this);
 	}
 	
 	/**
@@ -143,7 +147,8 @@ public class SolarPanelTile
 	@Override
 	public Stream<Tuple2<UpgradeItem, ItemStack>> getUpgrades()
 	{
-		return upgradeInventory.stream()
+		return upgradeInventory
+				.stream()
 				.map(i -> !i.isEmpty() && i.getItem() instanceof UpgradeItem u ? Tuples.immutable(u, i) : null)
 				.filter(Objects::nonNull);
 	}
@@ -170,7 +175,7 @@ public class SolarPanelTile
 		return instance;
 	}
 	
-	List<ResourceLocation> tickedUpgrades = new ArrayList<>();
+	Set<ResourceLocation> tickedUpgrades = new HashSet<>();
 	
 	public void tickUpgrades()
 	{
@@ -186,23 +191,32 @@ public class SolarPanelTile
 			stack = upgradeInventory.getStackInSlot(i);
 			if(!stack.isEmpty())
 			{
-				if(stack.getItem() instanceof UpgradeItem upgrade && upgrade.canStayInPanel(this, stack, upgradeInventory))
+				if(stack.getItem() instanceof UpgradeItem ui && ui.canStayInPanel(this, stack, upgradeInventory))
 				{
 					id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-					if(!tickedUpgrades.contains(id))
+					if(tickedUpgrades.add(id))
 					{
-						upgrade.update(this, stack, getUpgrades(upgrade));
-						tickedUpgrades.add(id);
+						int maxAllowed = ui.getMaxUpgradesInstalled(this);
+						int currentCount = getUpgrades(ui);
+						int appliedCount = Math.min(currentCount, maxAllowed);
+						
+						ui.update(this, stack, appliedCount);
+						
+						if(currentCount > maxAllowed && isOnServer())
+						{
+							int excess = currentCount - maxAllowed;
+							dropItem(stack.split(excess));
+							setChanged();
+						}
 					}
-				} else
+				} else if(isOnServer())
 				{
 					// Why non-upgrade item would end up in this inventory?
 					// idk, let's drop them!
-					ItemStack s = upgradeInventory.getStackInSlot(i);
-					s.copy();
+					ItemStack s = upgradeInventory.getStackInSlot(i).copyAndClear();
 					upgradeInventory.setStackInSlot(i, ItemStack.EMPTY);
-					if(isOnServer())
-						level.addFreshEntity(new ItemEntity(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack));
+					dropItem(s);
+					setChanged();
 				}
 			}
 		}
@@ -223,6 +237,11 @@ public class SolarPanelTile
 			}
 		
 		tickedUpgrades.clear();
+	}
+	
+	private void dropItem(ItemStack stack)
+	{
+		level.addFreshEntity(new ItemEntity(level, worldPosition.getX() + .5, worldPosition.getY() + .5, worldPosition.getZ() + .5, stack));
 	}
 	
 	// We really don't need to make a copy of all values every tick, so this constant is here to save the day.
@@ -374,8 +393,8 @@ public class SolarPanelTile
 		{
 			cache$seeSkyTimer = 20;
 			cache$seeSky = level != null &&
-						   level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
-						   level.canSeeSky(worldPosition.above());
+					level.getBrightness(LightLayer.SKY, worldPosition) > 0 &&
+					level.canSeeSky(worldPosition.above());
 		}
 		return cache$seeSky;
 	}
@@ -434,7 +453,8 @@ public class SolarPanelTile
 	@Override
 	public ModelData getModelData()
 	{
-		return ModelData.builder()
+		return ModelData
+				.builder()
 				.with(WORLD_PROP, level)
 				.with(POS_PROP, worldPosition)
 				.build();
@@ -508,7 +528,10 @@ public class SolarPanelTile
 		int transfer = this.transfer.getValueI();
 		int energyExtracted = Math.min(getEnergyStored(), Math.min(transfer, maxExtract));
 		if(!simulate)
+		{
 			energy -= energyExtracted;
+			setChanged();
+		}
 		return energyExtracted;
 	}
 	
@@ -526,7 +549,10 @@ public class SolarPanelTile
 		long cap = capacity.getValueL();
 		int energyReceived = Math.min((int) Math.min(cap - energy, Integer.MAX_VALUE), Math.min(transfer, maxReceive));
 		if(!simulate)
+		{
 			energy += energyReceived;
+			setChanged();
+		}
 		return energyReceived;
 	}
 	

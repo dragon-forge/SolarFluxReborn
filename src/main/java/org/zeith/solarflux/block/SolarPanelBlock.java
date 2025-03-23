@@ -196,6 +196,7 @@ public class SolarPanelBlock
 					}
 					if(installed > 0)
 					{
+						tbs.setChanged();
 						iu.onInstalled(tbs, amt, tbs.getUpgrades(iu));
 						worldIn.playSound(null, pos, SoundEvents.ANVIL_LAND, SoundSource.BLOCKS, .1F, 1F);
 						return InteractionResult.SUCCESS;
