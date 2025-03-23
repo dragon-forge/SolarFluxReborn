@@ -39,7 +39,7 @@ import java.util.stream.Collectors;
 })
 public abstract class SolarPanelTileMixin
 		extends TileSyncableTickable
-		implements IAEPowerStorage, IGridConnectedBlockEntity, IAE2SolarPanelTile
+		implements IAEPowerStorage, IGridConnectedBlockEntity, IAE2SolarPanelTile, IInWorldGridNodeHost, INetworkToolAware
 {
 	public SolarPanelTileMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
 	{
@@ -58,9 +58,6 @@ public abstract class SolarPanelTileMixin
 	
 	@Shadow
 	public abstract int extractEnergy(int maxExtract, boolean simulate);
-	
-	@Shadow
-	public abstract SimpleAttributeProperty capacity();
 	
 	private IManagedGridNode mainNode;
 	
@@ -82,6 +79,7 @@ public abstract class SolarPanelTileMixin
 		mainNode = GridHelper.createManagedNode(Cast.cast(this), BlockEntityNodeListener.INSTANCE)
 				.setVisualRepresentation(getBlockState().getBlock())
 				.setInWorldNode(true)
+				.setIdlePowerUsage(0)
 				.setExposedOnSides(Arrays.stream(Direction.values()).filter(f -> f != Direction.UP).collect(Collectors.toSet()))
 				.addService(IAEPowerStorage.class, this);
 	}
@@ -133,9 +131,9 @@ public abstract class SolarPanelTileMixin
 	public double ae$extractAEPower(double toExtract, Actionable action, PowerMultiplier mult)
 	{
 		if(getUpgrades(ContentsSFAE2.ENERGY_UPGRADE) <= 0) return 0;
-		int fe = (int) Math.min(Math.floor(PowerUnits.AE.convertTo(PowerUnits.RF, toExtract)), Integer.MAX_VALUE - 1);
+		int fe = (int) Math.min(Math.floor(PowerUnits.AE.convertTo(PowerUnits.FE, toExtract)), Integer.MAX_VALUE - 1);
 		fe = extractEnergy(fe, action.isSimulate());
-		return mult.multiply(PowerUnits.RF.convertTo(PowerUnits.AE, fe));
+		return mult.multiply(PowerUnits.FE.convertTo(PowerUnits.AE, fe));
 	}
 	
 	public IManagedGridNode aegrid$getMainNode()
@@ -145,12 +143,12 @@ public abstract class SolarPanelTileMixin
 	
 	public double ae$getAECurrentPower()
 	{
-		return PowerUnits.RF.convertTo(PowerUnits.AE, energy);
+		return PowerUnits.FE.convertTo(PowerUnits.AE, energy);
 	}
 	
 	public double ae$getAEMaxPower()
 	{
-		return PowerUnits.RF.convertTo(PowerUnits.AE, capacity().getValue());
+		return PowerUnits.FE.convertTo(PowerUnits.AE, capacity.getValue());
 	}
 	
 	public AccessRestriction ae$getPowerFlow()
