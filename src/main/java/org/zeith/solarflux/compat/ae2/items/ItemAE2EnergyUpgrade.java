@@ -1,7 +1,6 @@
 package org.zeith.solarflux.compat.ae2.items;
 
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
+import net.minecraft.world.item.*;
 import org.zeith.solarflux.api.ISolarPanelTile;
 import org.zeith.solarflux.compat.ae2.tile.IAE2SolarPanelTile;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
@@ -46,6 +45,15 @@ public class ItemAE2EnergyUpgrade
 //						ServerListener.syncTileEntity(be);
 //				}
 //			}
+		}
+	}
+	
+	@Override
+	public void update(ISolarPanelTile tile, ItemStack stack, int amount)
+	{
+		if(!tile.level().isClientSide() && tile instanceof IAE2SolarPanelTile aesp)
+		{
+			aesp.setConnectedToAENetwork(true);
 		}
 	}
 }

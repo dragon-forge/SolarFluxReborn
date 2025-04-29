@@ -207,9 +207,11 @@ public abstract class SolarPanelTileMixin
 			{
 				createAe2MainNode();
 				mainNode.create(level, worldPosition);
+				setChanged();
 			} else
 			{
 				mainNode.destroy();
+				setChanged();
 			}
 		}
 	}
