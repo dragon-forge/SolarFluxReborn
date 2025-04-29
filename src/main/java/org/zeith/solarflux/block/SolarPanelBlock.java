@@ -3,6 +3,7 @@ package org.zeith.solarflux.block;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -21,9 +22,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.*;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
+import org.zeith.hammerlib.api.fml.IRegisterListener;
 import org.zeith.hammerlib.api.forge.BlockAPI;
 import org.zeith.hammerlib.api.forge.ContainerAPI;
-import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
+import org.zeith.hammerlib.core.adapter.*;
+import org.zeith.solarflux.init.TilesSF;
 import org.zeith.solarflux.items.data.PanelDataComponent;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
@@ -33,7 +36,7 @@ import java.util.stream.Stream;
 
 public class SolarPanelBlock
 		extends BaseEntityBlock
-		implements ICustomBlockItem
+		implements ICustomBlockItem, IRegisterListener
 {
 	public final SolarPanel panel;
 	
@@ -45,6 +48,13 @@ public class SolarPanelBlock
 		bindTool();
 		this.panel = panel;
 		this.CODEC = simpleCodec(props -> new SolarPanelBlock(panel, props));;
+	}
+	
+	@Override
+	public void onPostRegistered(ResourceLocation id)
+	{
+		BlockEntityAdapter.addBlocksToEntityType(TilesSF.SOLAR_PANEL, this);
+		IRegisterListener.super.onPostRegistered(id);
 	}
 	
 	protected void bindTool()

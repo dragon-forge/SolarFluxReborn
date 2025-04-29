@@ -59,12 +59,12 @@ runs {
     }
 
     client {
-        workingDirectory project.file('run/client')
+        workingDirectory project.file("runs/$config.mc_version/client")
         systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
     }
 
     server {
-        workingDirectory project.file('run/server')
+        workingDirectory project.file("runs/$config.mc_version/server")
         systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
         programArgument '--nogui'
     }

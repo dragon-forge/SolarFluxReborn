@@ -35,162 +35,169 @@ public class SolarPanelBakedModel
 	public final SolarPanelBlock block;
 	public final ResourceLocation registryName;
 	
-	public static final ModelProperty<BlockAndTintGetter> WORLD_PROP = new ModelProperty<>();
-	public static final ModelProperty<BlockPos> POS_PROP = new ModelProperty<>();
-	
 	public SolarPanelBakedModel(SolarPanelBlock spb)
 	{
 		this.block = spb;
 		this.registryName = BuiltInRegistries.BLOCK.getKey(spb);
 	}
 	
+	public static BakedQuad quad(Vector3f from, Vector3f to, float[] uv, int uvRot, TextureAtlasSprite sprite, Direction facing)
+	{
+		return COOKER.bakeQuad(
+				from, to,
+				new BlockElementFace(null, 0, "#0", new BlockFaceUV(uv, uvRot)),
+				sprite, facing, BlockModelRotation.X0_Y0, null, true
+		);
+	}
+	
+	public static void createSolarPanelQuads(
+			List<BakedQuad> quads, Direction side,
+			float h, TextureAtlasSprite top, TextureAtlasSprite base,
+			SolarPanelModelData data
+	)
+	{
+		boolean west = !data.west(), east = !data.east(), north = !data.north(), south = !data.south();
+		
+		quads.add(quad(
+				new Vector3f(0, 0, 0), new Vector3f(16, h, 16),
+				new float[] {
+						0,
+						side.getAxis() == Direction.Axis.Y ? 0 : (16F - h),
+						16,
+						16
+				},
+				4, side == Direction.UP ? top : base, side
+		));
+		
+		if(west)
+			quads.add(quad(
+					new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15),
+					side != Direction.UP ? new float[] {
+							0,
+							0,
+							16,
+							1
+					} : new float[] {
+							0,
+							0,
+							1,
+							16
+					},
+					4, base, side
+			));
+		
+		if(east)
+			quads.add(quad(
+					new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15),
+					side != Direction.UP ? new float[] {
+							0,
+							0,
+							16,
+							1
+					} : new float[] {
+							15,
+							0,
+							16,
+							16
+					},
+					4, base, side
+			));
+		
+		if(north)
+			quads.add(quad(
+					new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1),
+					new float[] {
+							0,
+							0,
+							16,
+							1
+					},
+					4, base, side
+			));
+		
+		if(south)
+			quads.add(quad(
+					new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16),
+					new float[] {
+							0,
+							0,
+							16,
+							1
+					},
+					4, base, side
+			));
+		
+		if(west || north || !data.westNorth())
+			quads.add(quad(
+					new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1),
+					new float[] {
+							0,
+							0,
+							1,
+							1
+					},
+					4, base, side
+			));
+		
+		if(east || north || !data.eastNorth())
+			quads.add(quad(
+					new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1),
+					new float[] {
+							15,
+							0,
+							16,
+							1
+					},
+					4, base, side
+			));
+		
+		if(south || east || !data.eastSouth())
+			quads.add(quad(
+					new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16),
+					new float[] {
+							15,
+							15,
+							16,
+							16
+					},
+					4, base, side
+			));
+		
+		if(west || south || !data.westSouth())
+			quads.add(quad(
+					new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16),
+					new float[] {
+							0,
+							15,
+							1,
+							16
+					},
+					4, base, side
+			));
+	}
+	
 	@Override
 	public List<BakedQuad> getQuads(@Nullable BlockState state, @Nullable Direction sideIn, @NotNull RandomSource rand, @NotNull ModelData extraData, @Nullable RenderType renderType)
 	{
-		BlockAndTintGetter world = extraData.get(WORLD_PROP);
-		BlockPos pos = extraData.get(POS_PROP);
+		SolarPanelModelData data = SolarPanelModelData.findOrItem(extraData);
+		TextureAtlasSprite top = t_top(), base = t_base();
+		float h = block.panel.getPanelData().height * 16F;
 		
 		List<BakedQuad> quads = new ArrayList<>();
-		Direction[] sides = sideIn == null ? Direction.values() : new Direction[] { sideIn };
+		Direction[] sides = sideIn == null ? Direction.values() : new Direction[] {sideIn};
 		for(Direction side : sides)
 			if(side != null)
-			{
-				TextureAtlasSprite top = t_top(), base = t_base();
-				
-				float h = block.panel.getPanelData().height * 16F;
-				
-				quads.add(COOKER.bakeQuad( //
-						new Vector3f(0, 0, 0), new Vector3f(16, h, 16), //
-						new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-								0,
-								side.getAxis() == Direction.Axis.Y ? 0 : (16F - h),
-								16,
-								16
-						}, 4)), //
-						side == Direction.UP ? top : base, side, BlockModelRotation.X0_Y0, null, true
-				));
-				
-				// world/pos not set? no connected textures == no crash!
-				if(world == null || pos == null)
-					return quads;
-				
-				boolean west = false, east = false, north = false, south = false;
-				
-				if(west = world.getBlockState(pos.west()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 1), new Vector3f(1, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									0,
-									0,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(east = world.getBlockState(pos.east()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 1), new Vector3f(16, h + 0.25F, 15), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(side != Direction.UP ? new float[] {
-									0,
-									0,
-									16,
-									1
-							} : new float[] {
-									15,
-									0,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(north = world.getBlockState(pos.north()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 0), new Vector3f(15, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(south = world.getBlockState(pos.south()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(1, h, 15), new Vector3f(15, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(west || north || world.getBlockState(pos.west().north()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 0), new Vector3f(1, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									0,
-									1,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(east || north || world.getBlockState(pos.east().north()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 0), new Vector3f(16, h + 0.25F, 1), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									0,
-									16,
-									1
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(south || east || world.getBlockState(pos.south().east()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(15, h, 15), new Vector3f(16, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									15,
-									15,
-									16,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-				
-				if(west || south || world.getBlockState(pos.west().south()).getBlock() != block)
-					quads.add(COOKER.bakeQuad( //
-							new Vector3f(0, h, 15), new Vector3f(1, h + 0.25F, 16), //
-							new BlockElementFace(null, 0, "#0", new BlockFaceUV(new float[] {
-									0,
-									15,
-									1,
-									16
-							}, 4)), //
-							base, side, BlockModelRotation.X0_Y0, null, true
-					));
-			}
+				createSolarPanelQuads(quads, side, h, top, base, data);
+		
 		return quads;
 	}
 	
 	@Override
 	public ModelData getModelData(BlockAndTintGetter level, BlockPos pos, BlockState state, ModelData modelData)
 	{
-		return modelData.derive()
-				.with(POS_PROP, pos)
-				.with(WORLD_PROP, level)
+		return modelData
+				.derive()
+				.with(SolarPanelModelData.PROPERTY, SolarPanelModelData.gather(level, pos, state.getBlock()))
 				.build();
 	}
 	
