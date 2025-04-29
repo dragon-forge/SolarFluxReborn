@@ -22,9 +22,9 @@ import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.api.blocks.ICustomBlockItem;
 import org.zeith.hammerlib.api.fml.IRegisterListener;
 import org.zeith.hammerlib.api.forge.*;
-import org.zeith.hammerlib.core.adapter.BlockHarvestAdapter;
+import org.zeith.hammerlib.core.adapter.*;
 import org.zeith.solarflux.client.SolarPanelModelData;
-import org.zeith.solarflux.init.SolarPanelsSF;
+import org.zeith.solarflux.init.*;
 import org.zeith.solarflux.items.upgrades._base.UpgradeItem;
 import org.zeith.solarflux.panels.SolarPanel;
 
@@ -50,6 +50,7 @@ public class SolarPanelBlock
 	@Override
 	public void onPostRegistered(ResourceLocation id)
 	{
+		BlockEntityAdapter.addBlocksToEntityType(TilesSF.SOLAR_PANEL, this);
 		SolarPanelsSF.PANELS_BY_ID.put(id, panel);
 		IRegisterListener.super.onPostRegistered(id);
 	}
