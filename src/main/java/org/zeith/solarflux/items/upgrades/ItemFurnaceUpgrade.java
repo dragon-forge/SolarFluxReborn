@@ -35,17 +35,14 @@ public class ItemFurnaceUpgrade
 		}
 		
 		for(BlockPosFace face : tile.traversal())
-			if(!updated.contains(face.pos))
+			if(updated.add(face.pos))
 				updateFurnaceAt(tile, lvl, face.pos, face.face);
 	}
 	
 	public boolean updateFurnaceAt(ISolarPanelTile solar, Level lvl, BlockPos pos, Direction dir)
 	{
-		if(lvl.getBlockEntity(pos) instanceof IFurnaceBlockEntity fbe && fbe.getSideForSolarPanel() == dir)
-		{
-			fbe.activateWithSolarPanel(solar);
-			return true;
-		}
-		return false;
+		return lvl.getBlockEntity(pos) instanceof IFurnaceBlockEntity fbe
+				&& fbe.getSideForSolarPanel() == dir
+				&& fbe.activateWithSolarPanel(solar);
 	}
 }

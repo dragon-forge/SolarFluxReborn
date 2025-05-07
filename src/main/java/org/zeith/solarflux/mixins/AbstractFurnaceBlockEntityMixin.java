@@ -36,20 +36,24 @@ public abstract class AbstractFurnaceBlockEntityMixin
 	@Shadow
 	int litDuration;
 	
+	@Shadow
+	@Final
+	private RecipeManager.CachedCheck<SingleRecipeInput, ? extends AbstractCookingRecipe> quickCheck;
+	
 	protected AbstractFurnaceBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
 	{
 		super(type, pos, state);
 	}
 	
-	public void ifbe$activateWithSolarPanel(ISolarPanelTile solar)
+	public boolean ifbe$activateWithSolarPanel(ISolarPanelTile solar)
 	{
 		BlockPos pos = getBlockPos();
 		Level lvl = getLevel();
 		
-		RecipeHolder<? extends AbstractCookingRecipe> irecipe = lvl
-				.getRecipeManager()
-				.getRecipeFor(recipeType, Cast.cast(this), lvl)
-				.orElse(null);
+		SingleRecipeInput singlerecipeinput = new SingleRecipeInput(getItem(0));
+		RecipeHolder<? extends AbstractCookingRecipe> irecipe =
+				quickCheck.getRecipeFor(singlerecipeinput, lvl)
+						  .orElse(null);
 		
 		if(litTime <= 1 && irecipe != null && SolarFlux$canSmelt(irecipe.value()) && solar.energy() >= 1000)
 		{
@@ -68,7 +72,12 @@ public abstract class AbstractFurnaceBlockEntityMixin
 				if(!state.isAir())
 					lvl.updateNeighbourForOutputSignal(pos, state.getBlock());
 			}
+			
+			setChanged();
+			return true;
 		}
+		
+		return false;
 	}
 	
 	public Direction ifbe$getSideForSolarPanel()

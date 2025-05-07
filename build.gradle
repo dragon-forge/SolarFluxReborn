@@ -52,6 +52,7 @@ runs {
     configureEach {
         systemProperty 'forge.logging.console.level', 'debug'
         systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
+        systemProperty 'mixin.debug.export', 'true'
 
         programArguments(Arrays.asList("--mixin mixins.${config.mod_id}.json --username ${config.mc_user.split(',')[0]} --uuid ${config.mc_user.split(',')[1]}".split(' ')))
 
@@ -100,7 +101,7 @@ dependencies {
     if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
         compileOnly "mezz.jei:jei-${config.jei_mc_version}-common-api:${config.jei_version}"
         compileOnly "mezz.jei:jei-${config.jei_mc_version}-neoforge-api:${config.jei_version}"
-        //runtimeOnly "mezz.jei:jei-${config.mc_version}-neoforge:${config.jei_version}"
+        runtimeOnly "mezz.jei:jei-${config.jei_mc_version}-neoforge:${config.jei_version}"
     }
 
     def libraries = new File(file("libraries"), "${config.mc_version}")
@@ -431,7 +432,7 @@ publishing {
     }
     repositories {
         maven {
-            url config.maven_url
+            url System.env.MAVEN_URL
         }
     }
 }

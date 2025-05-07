@@ -9,7 +9,7 @@ public interface IFurnaceBlockEntity
 	 * <p>
 	 * If you wish to use this interface, return true only when your entity should consume energy.
 	 */
-	void activateWithSolarPanel(ISolarPanelTile solar);
+	boolean activateWithSolarPanel(ISolarPanelTile solar);
 	
 	Direction getSideForSolarPanel();
 }

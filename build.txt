@@ -1,12 +1,12 @@
 # Mod Info
-mod_version=21.0.6
+mod_version=21.0.7
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
-hl_version=21.0.13
+hl_version=21.0.14
 
-jei_mc_version=1.20.4
-jei_version=17.3.0.49
+jei_mc_version=1.21.1
+jei_version=19.21.0.247
 
 # Persistent mod info
 mod_id=solarflux
@@ -20,7 +20,6 @@ issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 
 # Maven Info
 maven_group=org.zeith.solarflux
-maven_url=file:///R:/
 
 # MC Info
 mc_version=1.21
@@ -46,6 +45,6 @@ release_type=release
 # @m:PlkSuVtM;@c:hammer-lib;
 # Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
 required_mods=hammer-lib;
-optional_mods=@m:ae2;@c:applied-energistics-2;draconic-evolution;@c:the-twilight-forest;@c:avaritia-1-10;
+optional_mods=@m:ae2;@c:applied-energistics-2;draconic-evolution;@c:the-twilight-forest;@c:avaritia-1-10;iron-furnaces;
 incompatible_mods=
 embedded_mods=
