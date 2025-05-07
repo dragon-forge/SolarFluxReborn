@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=21.4.3
+mod_version=21.4.7
 build_candidate=false
 
 # Persistent mod info
@@ -14,7 +14,6 @@ issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 
 # Maven Info
 maven_group=org.zeith.solarflux
-maven_url=file:///R:/
 
 # MC Info
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
@@ -26,15 +25,12 @@ modrinth_project=4QG5lev4
 # alpha, beta, release
 release_type=release
 
-# Git changelog stuff
-last_git_commit=6e3a0cc2cb795be
-
 # List of mods separated by ;
 # If a specific mod for one platform is needed, @m: or @c: prefixes are used.
 # Example for adding Hammer Lib for both Modrinth & CurseForge: 
 # @m:PlkSuVtM;@c:hammer-lib;
 # Which can be simplified to be just "hammer-lib" since the slug is the same on both platforms.
 required_mods=hammer-lib;
-optional_mods=@m:ae2;@c:applied-energistics-2;draconic-evolution;@c:the-twilight-forest;@c:avaritia-1-10;
+optional_mods=@m:ae2;@c:applied-energistics-2;draconic-evolution;@c:the-twilight-forest;@c:avaritia-1-10;iron-furnaces;
 incompatible_mods=
 embedded_mods=

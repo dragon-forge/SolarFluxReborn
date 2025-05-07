@@ -22,10 +22,6 @@ public abstract class AbstractFurnaceBlockEntityMixin
 		implements WorldlyContainer, RecipeCraftingHolder, StackedContentsCompatible
 {
 	@Shadow
-	@Final
-	private RecipeType<? extends AbstractCookingRecipe> recipeType;
-	
-	@Shadow
 	int litTimeRemaining;
 	
 	@Shadow
@@ -33,25 +29,27 @@ public abstract class AbstractFurnaceBlockEntityMixin
 	
 	@Shadow protected NonNullList<ItemStack> items;
 	
+	@Shadow
+	@Final
+	private RecipeManager.CachedCheck<SingleRecipeInput, ? extends AbstractCookingRecipe> quickCheck;
+	
 	protected AbstractFurnaceBlockEntityMixin(BlockEntityType<?> type, BlockPos pos, BlockState state)
 	{
 		super(type, pos, state);
 	}
 	
-	public void ifbe$activateWithSolarPanel(ServerLevel level, ISolarPanelTile solar)
+	public boolean ifbe$activateWithSolarPanel(ServerLevel level, ISolarPanelTile solar)
 	{
 		BlockPos pos = getBlockPos();
 		
-		AbstractFurnaceBlockEntity furnace = Cast.cast(this);
-		
-		RecipeHolder<? extends AbstractCookingRecipe> irecipe = level
-				.recipeAccess()
-				.getRecipeFor(recipeType, Cast.cast(this), level)
-				.orElse(null);
+		SingleRecipeInput singlerecipeinput = new SingleRecipeInput(getItem(0));
+		RecipeHolder<? extends AbstractCookingRecipe> irecipe =
+				quickCheck.getRecipeFor(singlerecipeinput, level)
+						  .orElse(null);
 		
 		SingleRecipeInput input = new SingleRecipeInput(items.get(0));
 		
-		if(litTimeRemaining <= 1 && irecipe != null && AbstractFurnaceBlockEntity.canBurn(level.registryAccess(), irecipe, input, items, furnace.getMaxStackSize()) && solar.energy() >= 1000)
+		if(litTimeRemaining <= 1 && irecipe != null && AbstractFurnaceBlockEntity.canBurn(level.registryAccess(), irecipe, input, items, getMaxStackSize()) && solar.energy() >= 1000)
 		{
 			litTimeRemaining = litTotalTime = 201;
 			solar.energy(solar.energy() - 1000L);
@@ -67,7 +65,12 @@ public abstract class AbstractFurnaceBlockEntityMixin
 				if(!state.isAir())
 					level.updateNeighbourForOutputSignal(pos, state.getBlock());
 			}
+			
+			setChanged();
+			return true;
 		}
+		
+		return false;
 	}
 	
 	public Direction ifbe$getSideForSolarPanel()

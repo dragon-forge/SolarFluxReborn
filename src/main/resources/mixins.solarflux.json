@@ -4,9 +4,11 @@
   "package": "org.zeith.solarflux.mixins",
   "target": "@env(DEFAULT)",
   "compatibilityLevel": "JAVA_21",
+  "plugin": "org.zeith.solarflux.mixins.ConfigPlugin",
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
-    "compat.ae2.SolarPanelTileMixin"
+    "compat.ae2.SolarPanelTileMixin",
+    "compat.ironfurnaces.BlockIronFurnaceTileBaseMixin"
   ],
   "client": [
   ],

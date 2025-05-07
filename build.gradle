@@ -42,10 +42,10 @@ minecraft {
 }
 
 runs {
-
     configureEach {
         systemProperty 'forge.logging.console.level', 'debug'
         systemProperty 'forge.enabledGameTestNamespaces', config.mod_id
+        systemProperty 'mixin.debug.export', 'true'
 
         modSource project.sourceSets.main
         setWorkingDirectory(new File("runs/$mc_version/$name"))
@@ -454,7 +454,7 @@ publishing {
     }
     repositories {
         maven {
-            url config.maven_url
+            url System.env.MAVEN_URL
         }
     }
 }

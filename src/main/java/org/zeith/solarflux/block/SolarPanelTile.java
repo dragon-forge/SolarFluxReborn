@@ -1,5 +1,6 @@
 package org.zeith.solarflux.block;
 
+import lombok.Setter;
 import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -74,6 +75,7 @@ public class SolarPanelTile
 	public long currentGeneration;
 	public float sunIntensity = 1.0E-30F;
 	
+	@Setter
 	private SolarPanel delegate;
 	private SolarPanelInstance instance;
 	
@@ -296,7 +298,7 @@ public class SolarPanelTile
 		energy += Math.min(capacity.getValueL() - energy, gen * suppressed);
 		currentGeneration = gen;
 		
-		energy = clamp(energy, 0L, capacity.getValueL());
+		energy = Math.clamp(energy, 0L, capacity.getValueL());
 		
 		for(Direction hor : DIRECTIONS_HORIZONTAL)
 		{
@@ -430,7 +432,8 @@ public class SolarPanelTile
 	@Override
 	public void energy(long newEnergy)
 	{
-		energy = clamp(newEnergy, 0L, capacity.getValueL());
+		energy = Math.clamp(newEnergy, 0L, capacity.getValueL());
+		setChanged();
 	}
 	
 	@Override
@@ -490,7 +493,10 @@ public class SolarPanelTile
 		int transfer = this.transfer.getValueI();
 		int energyExtracted = Math.min(getEnergyStored(), Math.min(transfer, maxExtract));
 		if(!simulate)
+		{
 			energy -= energyExtracted;
+			setChanged();
+		}
 		return energyExtracted;
 	}
 	
@@ -508,7 +514,10 @@ public class SolarPanelTile
 		long cap = capacity.getValueL();
 		int energyReceived = Math.min((int) Math.min(cap - energy, Integer.MAX_VALUE), Math.min(transfer, maxReceive));
 		if(!simulate)
+		{
 			energy += energyReceived;
+			setChanged();
+		}
 		return energyReceived;
 	}
 	
@@ -625,27 +634,5 @@ public class SolarPanelTile
 		bar.suffix = "%";
 		
 		consumer.addBar(bar);
-	}
-	
-	@Override
-	public CompoundTag writeNBT(CompoundTag nbt, HolderLookup.Provider provider)
-	{
-		return super.writeNBT(nbt, provider);
-	}
-	
-	@Override
-	public void readNBT(CompoundTag nbt, HolderLookup.Provider provider)
-	{
-		super.readNBT(nbt, provider);
-	}
-	
-	public void setDelegate(SolarPanel delegate)
-	{
-		this.delegate = delegate;
-	}
-	
-	public static long clamp(long val, long min, long max)
-	{
-		return Math.min(Math.max(val, min), max);
 	}
 }
