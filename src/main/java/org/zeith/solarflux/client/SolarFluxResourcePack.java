@@ -12,7 +12,6 @@ import net.minecraft.server.packs.resources.IoSupplier;
 import org.jetbrains.annotations.Nullable;
 import org.zeith.hammerlib.util.mcf.Resources;
 import org.zeith.hammerlib.util.shaded.json.JSONObject;
-import org.zeith.solarflux.SolarFlux;
 import org.zeith.solarflux.block.SolarPanelBlock;
 import org.zeith.solarflux.init.SolarPanelsSF;
 import org.zeith.solarflux.panels.JSHelper;
@@ -141,7 +140,6 @@ public class SolarFluxResourcePack
 	public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location)
 	{
 		var res = resourceMap.get(location);
-		SolarFlux.LOG.info("GET SFR RES " + location + " => " + res);
 		if(res == null) return null;
 		
 		if(!res.exists()) return null;
