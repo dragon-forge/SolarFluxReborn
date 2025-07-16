@@ -7,7 +7,7 @@ buildscript {
 plugins {
     id 'java-library'
     id "com.modrinth.minotaur" version "2.+"
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
+    id 'net.neoforged.gradle.userdev' version '7.0.190'
 }
 
 apply plugin: 'idea'
@@ -96,7 +96,7 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.30'
     ///////////////////////////
 
-    implementation "org.zeith.hammerlib:HammerLib-${config.mc_version}:${config.hl_version}"
+    implementation "org.zeith.hammerlib:HammerLib-1.21:${config.hl_version}"
 
     if (hasConfig("jei_version") && !config.jei_version.isEmpty()) {
         compileOnly "mezz.jei:jei-${config.jei_mc_version}-common-api:${config.jei_version}"

@@ -8,7 +8,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import org.zeith.hammerlib.event.recipe.RegisterRecipesEvent;
 import org.zeith.hammerlib.util.java.Cast;
 
-import java.util.Collection;
+import java.util.*;
 
 /**
  * Provides utility methods for interacting with Draconic Evolution's Fusion Recipe API.
@@ -35,8 +35,6 @@ public class FusionRecipeAPI
 	/**
 	 * Creates a new Fusion Recipe.
 	 *
-	 * @param id
-	 * 		the recipe identifier
 	 * @param result
 	 * 		the resulting ItemStack
 	 * @param catalyst
@@ -53,12 +51,11 @@ public class FusionRecipeAPI
 	 * @throws ReflectiveOperationException
 	 * 		if there is an error creating the recipe
 	 */
-	public static FusionRecipe create(ResourceLocation id, ItemStack result, Ingredient catalyst, long totalEnergy, TechLevel techLevel, Collection<FusionRecipe.FusionIngredient> ingredients) throws ReflectiveOperationException
+	public static FusionRecipe create(ItemStack result, Ingredient catalyst, long totalEnergy, TechLevel techLevel, List<FusionRecipe.FusionIngredient> ingredients) throws ReflectiveOperationException
 	{
-		@SuppressWarnings("JavaReflectionMemberAccess") // We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
-		var ctor = FusionRecipe.class.getDeclaredConstructor(ResourceLocation.class, ItemStack.class, Ingredient.class, long.class, TechLevel.class, Collection.class);
+		var ctor = FusionRecipe.class.getDeclaredConstructor(ItemStack.class, Ingredient.class, long.class, TechLevel.class, List.class);
 		ctor.setAccessible(true);
-		return ctor.newInstance(id, result, catalyst, totalEnergy, techLevel, ingredients);
+		return ctor.newInstance(result, catalyst, totalEnergy, techLevel, ingredients);
 	}
 	
 	/**
@@ -92,7 +89,7 @@ public class FusionRecipeAPI
 	 */
 	public static FusionRecipe.FusionIngredient ingr(ItemStack stack, boolean consume) throws ReflectiveOperationException
 	{
-		@SuppressWarnings("JavaReflectionMemberAccess") // We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
+		// We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
 		var ctor = FusionRecipe.FusionIngredient.class.getDeclaredConstructor(Ingredient.class, boolean.class);
 		ctor.setAccessible(true);
 		return ctor.newInstance(Ingredient.of(stack), consume);
@@ -129,7 +126,6 @@ public class FusionRecipeAPI
 	 */
 	public static FusionRecipe.FusionIngredient ingr(Ingredient ingredient, boolean consume) throws ReflectiveOperationException
 	{
-		@SuppressWarnings("JavaReflectionMemberAccess") // We compiled with DE 1.16.5, thus ItemStack and other things are not visible.
 		var ctor = FusionRecipe.FusionIngredient.class.getDeclaredConstructor(Ingredient.class, boolean.class);
 		ctor.setAccessible(true);
 		return ctor.newInstance(ingredient, consume);

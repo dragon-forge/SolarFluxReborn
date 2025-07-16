@@ -1,5 +1,5 @@
 # Mod Info
-mod_version=21.0.8
+mod_version=21.1.8
 build_candidate=false
 
 # Mod dependencies (jei is not a requirement, but HammerLib is)
@@ -22,10 +22,10 @@ issue_tracker_url=https://github.com/dragon-forge/SolarFluxReborn/issues
 maven_group=org.zeith.solarflux
 
 # MC Info
-mc_version=1.21
-mc_range=[1.21,1.22)
-forge_version=21.0.163
-forge_range=[21.0.163,)
+mc_version=1.21.1
+mc_range=[1.21.1,1.22)
+forge_version=21.1.192
+forge_range=[21.1.100,)
 javafml_range=[2.0,)
 mc_user=Zeitheron,63fa4c485b5640809727d5d59663e603
 

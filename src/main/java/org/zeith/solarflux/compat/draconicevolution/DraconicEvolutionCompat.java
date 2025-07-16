@@ -33,9 +33,9 @@ public class DraconicEvolutionCompat
 	
 	public SolarPanel wyvern, draconic, chaotic;
 	
-	public DraconicEvolutionCompat(CompatContext ctx, Class<?>... simplyRegisterClasses)
+	public DraconicEvolutionCompat(CompatContext ctx)
 	{
-		super(ctx, simplyRegisterClasses);
+		super(ctx);
 	}
 	
 	@Override
@@ -106,7 +106,7 @@ public class DraconicEvolutionCompat
 					.registerIf(SolarPanelsSF::isRecipeActive);
 			
 			if(SolarPanelsSF.isRecipeActive(chaoticRecipe))
-				FusionRecipeAPI.register(chaoticRecipe, FusionRecipeAPI.create(chaoticRecipe, new ItemStack(chaotic.getBlock(), 4), Ingredient.of(chaoticCore), 256L * MEGA, TechLevel.CHAOTIC, List.of(
+				FusionRecipeAPI.register(chaoticRecipe, FusionRecipeAPI.create(new ItemStack(chaotic.getBlock(), 4), Ingredient.of(chaoticCore), 256L * MEGA, TechLevel.CHAOTIC, List.of(
 						ingr(new ItemStack(awakenedCore)),
 						ingr(SolarPanelsSF.getGeneratingSolars(draconic)),
 						ingr(new ItemStack(awakenedCore)),
